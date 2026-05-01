@@ -3,797 +3,711 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gridle Word Puzzle</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Horror House Experience</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Lexend:wght@400;700&display=swap');
-
-        :root {
-            --color-correct: #6aaa64;
-            --color-present: #c9b458;
-            --color-absent: #787c7e;
-            --color-background: #ffffff;
-            --color-text: #1e293b;
-            --color-cell-bg: #4b4b4b;
-            --color-cell-text: #ffffff;
-            --color-border: #cbd5e1;
-            --color-drawer: #ffffff;
-        }
-
         body {
-            font-family: 'Lexend', sans-serif;
-            background-color: var(--color-background);
-            color: var(--color-text);
-            touch-action: manipulation;
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: #fff;
             user-select: none;
-            overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
         }
 
-        .gridle-title {
-            font-family: 'Fredoka One', cursive;
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
         }
 
-        .gridle-grid {
-            display: grid;
-            gap: 8px;
-            width: 100%;
-            max-width: 380px;
-            aspect-ratio: 1 / 1;
-            margin: 0 auto;
-        }
-
-        .grid-5 { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); }
-        .grid-7 { grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr); }
-
-        .cell {
-            aspect-ratio: 1 / 1;
+        #uiLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            pointer-events: none;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: grab;
-            transition: transform 0.2s, background-color 0.2s;
-            text-transform: uppercase;
-            position: relative;
+            padding-left: 10vw;
         }
 
-        .cell:active { cursor: grabbing; }
-        .cell.inactive { background-color: transparent; cursor: default; border: none; }
-        .cell.active { border: 2px solid var(--color-border); background-color: var(--color-cell-bg); color: var(--color-cell-text); }
-        .cell.correct { background-color: var(--color-correct); border-color: var(--color-correct); color: white; cursor: default; }
-        .cell.present { background-color: var(--color-present); border-color: var(--color-present); color: white; }
-        .cell.dragging { opacity: 0.3; transform: scale(0.9); }
-        .cell.drag-over { transform: scale(1.05); border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
-
-        @keyframes swap-anim {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-        .swapping { animation: swap-anim 0.3s ease-in-out; }
-
-        .modal-overlay { background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .drawer-content { transition: transform 0.3s ease-in-out; background-color: var(--color-drawer); }
-        .drawer-hidden { transform: translateX(-100%); }
-
-        .menu-item-btn {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.8rem;
-            width: 100%;
-            text-align: left;
-            border-radius: 0.5rem;
-            transition: background 0.2s;
-        }
-        .menu-item-btn:hover { background-color: rgba(0,0,0,0.05); }
-
-        .stats-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
-        .stats-table td { padding: 0.5rem; border-bottom: 1px solid var(--color-border); text-transform: uppercase; font-size: 0.75rem; font-weight: 700; }
-        .stats-table .val { text-align: right; font-size: 1rem; }
-
-        .dist-bar-bg { background-color: rgba(0,0,0,0.05); height: 1.5rem; border-radius: 2px; flex-grow: 1; position: relative; }
-        .dist-bar-fill { background-color: #6aaa64; height: 100%; border-radius: 2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5rem; color: white; font-size: 0.75rem; font-weight: 700; min-width: 1.5rem; }
-
-        /* Vocabulary Section Styling */
-        .dictionary-entry {
-            border-bottom: 1px solid var(--color-border);
-            padding: 1rem 0;
-            text-align: left;
+        /* Main Menu Styles */
+        .menu-item {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 10px 0;
+            cursor: pointer;
+            pointer-events: auto;
+            text-shadow: 2px 2px 0px #000;
+            transition: color 0.2s, transform 0.2s;
+            width: fit-content;
         }
 
-        /* Help Modal Specific Styles */
-        .help-cell {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 14px;
-            text-transform: uppercase;
+        .menu-item:hover {
+            color: #ff0000;
+            transform: scale(1.1) translateX(20px);
         }
-        .help-cell-empty { background-color: #f1f5f9; border: 1px solid #e2e8f0; color: #1e293b; }
-        .help-cell-correct { background-color: #6aaa64; color: white; }
-        .help-cell-present { background-color: #c9b458; color: white; }
+
+        #menuTitle {
+            font-size: 2rem;
+            margin-bottom: 50px;
+            color: #aaa;
+            pointer-events: none;
+        }
+
+        /* Game UI Styles */
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 3;
+        }
+
+        #instruction {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            display: none;
+            z-index: 3;
+            text-align: center;
+        }
+
+        #overlayScreens {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border: 2px solid #555;
+            display: none;
+            z-index: 10;
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.2rem;
+        }
+        
+        .close-btn:hover {
+            background: #ff0000;
+        }
     </style>
+    <!-- Importing Three.js for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4">
+<body>
 
-    <!-- Sidebar Menu -->
-    <div id="side-menu-overlay" class="fixed inset-0 z-[200] modal-overlay hidden">
-        <div id="side-menu-content" class="drawer-content drawer-hidden fixed inset-y-0 left-0 w-80 shadow-2xl flex flex-col p-6 overflow-y-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold uppercase tracking-widest">Menu</h2>
-                <button id="close-drawer-btn" class="p-2 hover:text-red-500 text-slate-400 transition">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
+    <!-- WebGL Canvas -->
+    <canvas id="gameCanvas"></canvas>
 
-            <div class="space-y-2 mb-8">
-                <button id="menu-daily-btn" class="menu-item-btn">
-                    <div class="w-10 h-10 bg-orange-100 text-orange-500 flex items-center justify-center rounded-lg">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    </div>
-                    <div>
-                        <div class="font-bold uppercase text-sm">Daily Gridle</div>
-                        <div class="text-xs opacity-60">The daily 5x5 challenge</div>
-                    </div>
-                </button>
-
-                <button id="menu-deluxe-btn" class="menu-item-btn">
-                    <div class="w-10 h-10 bg-yellow-100 text-yellow-600 flex items-center justify-center rounded-lg">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                    </div>
-                    <div>
-                        <div class="font-bold uppercase text-sm">Deluxe Gridle</div>
-                        <div class="text-xs opacity-60">Master the 7x7 grid</div>
-                    </div>
-                </button>
-
-                <button id="menu-archive-btn" class="menu-item-btn">
-                    <div class="w-10 h-10 bg-red-100 text-red-500 flex items-center justify-center rounded-lg">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    </div>
-                    <div>
-                        <div class="font-bold uppercase text-sm">Archive</div>
-                        <div class="text-xs opacity-60">Past daily puzzles</div>
-                    </div>
-                </button>
-            </div>
-
-            <div class="border-t border-gray-200 mt-auto pt-6 space-y-2">
-                <button id="menu-stats-btn" class="menu-item-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
-                    <span class="font-bold uppercase text-xs">Statistics</span>
-                </button>
-                <button id="menu-help-btn" class="menu-item-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                    <span class="font-bold uppercase text-xs">Help</span>
-                </button>
-            </div>
-        </div>
+    <!-- UI Elements -->
+    <div id="uiLayer">
+        <div id="menuTitle">You think you can<br>just leave our game?</div>
+        <div class="menu-item" id="btnStart" onmouseover="aimAt(0)" onclick="startGame()">Start</div>
+        <div class="menu-item" id="btnOptions" onmouseover="aimAt(1)" onclick="showScreen('Options')">Options</div>
+        <div class="menu-item" id="btnCredits" onmouseover="aimAt(2)" onclick="showScreen('Credits')">Credits</div>
+        <div class="menu-item" id="btnExit" onmouseover="aimAt(3)" onclick="showScreen('Exit')">Exit</div>
     </div>
 
-    <!-- Header (Old clean design) -->
-    <header class="w-full max-w-md flex justify-between items-center mb-6 border-b pb-4">
-        <div class="flex gap-2">
-            <button id="open-drawer-btn" class="p-2 bg-gray-50 rounded-lg transition hover:bg-gray-100">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <a href="https://discord.com/users/1056147064569987163" target="_blank" id="heart-btn" class="p-2 text-red-500 bg-gray-50 rounded-lg hover:bg-red-50 transition">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </a>
-        </div>
-        <div class="text-center">
-            <h1 class="gridle-title text-3xl tracking-wider uppercase font-bold text-slate-800">Gridle</h1>
-            <p id="level-indicator" class="text-xs font-bold text-gray-400 uppercase tracking-tighter"></p>
-            <p id="countdown-timer" class="text-[10px] font-bold text-blue-400 mt-1 uppercase tracking-widest"></p>
-        </div>
-        <div class="flex gap-2">
-            <button id="stats-header-btn" class="p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
-            </button>
-            <button id="help-header-btn" class="p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </button>
-        </div>
-    </header>
+    <!-- In-Game UI -->
+    <div id="crosshair"></div>
+    <div id="instruction">Click to Lock Mouse<br>WASD to Move, SPACE to Jump (Very Slow)</div>
 
-    <!-- Swaps Counter Section -->
-    <div id="swaps-section" class="mb-6 text-center">
-        <p class="text-gray-500 uppercase text-xs font-bold tracking-widest mb-1">Swaps Remaining</p>
-        <span id="swap-count" class="text-3xl font-bold text-slate-800">15</span>
-    </div>
-
-    <!-- Game Grid Container -->
-    <main id="game-container" class="w-full max-w-md">
-        <div id="gridle-grid" class="gridle-grid bg-slate-50 p-3 rounded-xl shadow-inner"></div>
-    </main>
-
-    <!-- Dictionary Result Section -->
-    <div id="dictionary-section" class="hidden w-full max-w-md mt-10 mb-10 overflow-y-auto px-4 text-center">
-        <h3 class="text-xl font-bold mb-4 pb-2 border-b-2 border-slate-800 uppercase italic">Vocabulary</h3>
-        <div id="dictionary-list" class="space-y-4"></div>
-    </div>
-
-    <!-- Stats Modal -->
-    <div id="modal-stats" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay">
-        <div class="bg-white rounded-2xl p-8 max-sm:p-4 max-w-sm w-full shadow-2xl relative">
-            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest">Statistics</h2>
-            <table class="stats-table">
-                <tr><td>Played</td><td class="val" id="stat-played">0</td></tr>
-                <tr><td>Total Stars</td><td class="val" id="stat-stars">0</td></tr>
-                <tr><td>Streak</td><td class="val" id="stat-streak">0</td></tr>
-                <tr><td>Best</td><td class="val" id="stat-best">0</td></tr>
-            </table>
-            <h3 class="text-center font-bold uppercase text-xs tracking-widest mb-4">Star Distribution</h3>
-            <div id="star-distribution" class="space-y-2"></div>
-        </div>
-    </div>
-
-    <!-- Archive Modal -->
-    <div id="modal-archive" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative max-h-[80vh] overflow-y-auto">
-            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-            <h2 class="text-2xl font-bold mb-6 uppercase tracking-widest text-center">Archive</h2>
-            <div id="archive-list" class="grid grid-cols-4 sm:grid-cols-5 gap-4"></div>
-        </div>
-    </div>
-
-    <!-- Help Modal (Paginated) -->
-    <div id="modal-help" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay overflow-y-auto">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative my-10 min-h-[400px] flex flex-col">
-            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition z-10">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            
-            <h2 class="text-2xl font-bold mb-6 text-center uppercase tracking-widest text-slate-800">How to Play</h2>
-            
-            <!-- Page Container -->
-            <div id="help-content-pages" class="flex-grow">
-                <!-- Page 1: Basics -->
-                <div id="help-page-1" class="help-page space-y-4 text-sm text-slate-600 leading-relaxed">
-                    <div class="space-y-2">
-                        <p>Solve the <span class="font-bold">GRIDLE</span> in 15 swaps or fewer.</p>
-                        <p>Every <span class="font-bold">GRIDLE</span> can be solved in a minimum of 10 swaps.</p>
-                        <p>You will earn a star for every swap you have remaining after the <span class="font-bold">GRIDLE</span> has been solved ⭐</p>
-                    </div>
-                    <hr class="border-gray-200">
-                    <p>Rearrange the letters into the correct words, horizontally and vertically. Drag letters anywhere on the board. The letters will change colour to show whether they are in the correct position. The number of swaps remaining is displayed below the board.</p>
-                </div>
-
-                <!-- Page 2: Colors -->
-                <div id="help-page-2" class="help-page hidden space-y-4 text-sm text-slate-600 leading-relaxed">
-                    <div class="space-y-4 pt-2">
-                        <div class="flex flex-col items-center">
-                            <p class="mb-2 italic text-xs">This letter is in the correct place:</p>
-                            <div class="flex gap-1 justify-center">
-                                <div class="help-cell help-cell-correct">P</div>
-                                <div class="help-cell help-cell-empty">E</div>
-                                <div class="help-cell help-cell-empty">R</div>
-                                <div class="help-cell help-cell-empty">K</div>
-                                <div class="help-cell help-cell-empty">Y</div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col items-center">
-                            <p class="mb-2 italic text-xs">This letter is in the word, but in a different position:</p>
-                            <div class="flex gap-1 justify-center">
-                                <div class="help-cell help-cell-empty">K</div>
-                                <div class="help-cell help-cell-present">N</div>
-                                <div class="help-cell help-cell-empty">O</div>
-                                <div class="help-cell help-cell-empty">L</div>
-                                <div class="help-cell help-cell-empty">L</div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col items-center">
-                            <p class="mb-2 italic text-xs">This letter is in the vertical word, but in a different position:</p>
-                            <div class="flex flex-col gap-1 items-center">
-                                <div class="help-cell help-cell-empty">B</div>
-                                <div class="help-cell help-cell-present">M</div>
-                                <div class="help-cell help-cell-empty">U</div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col items-center">
-                            <p class="mb-2 italic text-xs">This letter is on a corner, so either the vertical word contains this letter or the horizontal word:</p>
-                            <div class="flex flex-col items-center">
-                                <div class="help-cell help-cell-empty mb-1">B</div>
-                                <div class="flex gap-1">
-                                    <div class="help-cell help-cell-empty">B</div>
-                                    <div class="help-cell help-cell-present">O</div>
-                                    <div class="help-cell help-cell-empty">O</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 3: Special Cases -->
-                <div id="help-page-3" class="help-page hidden space-y-4 text-sm text-slate-600 leading-relaxed">
-                    <h3 class="text-lg font-bold text-center uppercase tracking-widest border-t border-b border-gray-200 py-2 mb-4">Special Cases</h3>
-                    
-                    <div class="space-y-6">
-                        <div class="text-center">
-                            <p class="font-bold text-xs uppercase mb-2">Same letter multiple times</p>
-                            <p class="text-[11px] mb-3">If a word only has one 'S', only one will be highlighted if neither are correct.</p>
-                            <div class="flex gap-1 justify-center mb-3">
-                                <div class="help-cell help-cell-correct">H</div>
-                                <div class="help-cell help-cell-present">S</div>
-                                <div class="help-cell help-cell-present">A</div>
-                                <div class="help-cell help-cell-empty">S</div>
-                                <div class="help-cell help-cell-correct">E</div>
-                            </div>
-                        </div>
-
-                        <div class="text-center">
-                            <p class="font-bold text-xs uppercase mb-2">The Funky Dingo Situation</p>
-                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto mb-2 scale-75 origin-center">
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">F</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">C</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">N</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">U</div>
-                                <div class="help-cell help-cell-correct">D</div><div class="help-cell help-cell-present">N</div><div class="help-cell help-cell-correct">L</div><div class="help-cell help-cell-correct">G</div><div class="help-cell help-cell-correct">O</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">I</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">K</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">Y</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">E</div>
-                            </div>
-                            <p class="text-[10px] italic">A highlighted letter means it's in the mystery word, not necessarily at that exact cross.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pagination Controls -->
-            <div class="mt-auto pt-6 flex justify-between items-center border-t border-gray-100">
-                <button id="help-prev-btn" class="px-4 py-2 text-slate-400 font-bold uppercase text-xs hover:text-slate-800 transition disabled:opacity-30" disabled>Back</button>
-                <div id="help-dots" class="flex gap-2">
-                    <div class="w-2 h-2 rounded-full bg-slate-800"></div>
-                    <div class="w-2 h-2 rounded-full bg-slate-200"></div>
-                    <div class="w-2 h-2 rounded-full bg-slate-200"></div>
-                </div>
-                <button id="help-next-btn" class="px-4 py-2 text-slate-800 font-bold uppercase text-xs hover:text-slate-600 transition">Next</button>
-            </div>
-            
-            <button id="help-finish-btn" class="hidden mt-4 w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition tracking-widest">Got it</button>
-        </div>
+    <!-- Overlay Screens (Options/Credits) -->
+    <div id="overlayScreens">
+        <h2 id="overlayTitle">Title</h2>
+        <p id="overlayContent">Content goes here.</p>
+        <button class="close-btn" onclick="closeScreen()">Back</button>
     </div>
 
     <script>
-        /**
-         * Gridle Master Game Engine - Core Logic with Classic Light Design
-         */
+        // --- GLOBAL VARIABLES & STATE ---
+        let gameState = 'MENU'; // 'MENU' or 'GAME'
+        let renderer, cameraMenu, cameraGame, sceneMenu, sceneGame;
+        let lumberjack, rightArm, laser;
+        let lastTime = performance.now();
+        
+        // Physics & Input
+        let keys = { w: false, a: false, s: false, d: false, space: false };
+        let velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+        let isGrounded = false;
+        const gravity = -3.0; // Low gravity for floating feel
+        
+        // User requested very slow movement
+        const moveSpeed = 15.0; 
+        const jumpVelocity = 2.0; 
+        
+        // Collision Boxes
+        const colliders = [];
 
-        const MAP_5 = [1,1,1,1,1, 1,0,1,0,1, 1,1,1,1,1, 1,0,1,0,1, 1,1,1,1,1];
-        const MAP_7 = [1,1,1,1,1,1,1, 1,0,1,0,1,0,1, 1,1,1,1,1,1,1, 1,0,1,0,1,0,1, 1,1,1,1,1,1,1, 1,0,1,0,1,0,1, 1,1,1,1,1,1,1];
+        // Mouse look variables
+        let pitch = new THREE.Object3D();
+        let yaw = new THREE.Object3D();
+        const PI_2 = Math.PI / 2;
 
-        const PUZZLES_5 = [
-            {
-                grid: ['R','A','P','I','D','E',null,'L',null,'O','B','R','E','A','D','E',null,'A',null,'G','L','E','D','G','E'],
-                defs: [
-                    { word: "rapid", phon: "/ˈræpɪd/", type: "adj", def: "Very swift or quick.", ex: "I made rapid progress." },
-                    { word: "bread", phon: "/brɛd/", type: "noun", def: "Food made from baked dough.", ex: "I love fresh bread." },
-                    { word: "ledge", phon: "/lɛdʒ/", type: "noun", def: "A shelf-like projection.", ex: "Place it on the ledge." },
-                    { word: "rebel", phon: "/ˈrɛbəl/", type: "noun", def: "A person who resists authority.", ex: "The rebel led the charge." },
-                    { word: "plead", phon: "/pliːd/", type: "verb", def: "To argue a case.", ex: "I plead for mercy." },
-                    { word: "dodge", phon: "/dɒdʒ/", type: "verb", def: "Avoid by moving quickly.", ex: "Dodge the ball!" }
-                ]
+        // Variablen für das komplexe Zielen der Waffe
+        let targetAim = new THREE.Vector3(-4, 5, 0); // Standardziel
+        const dummyArm = new THREE.Object3D();
+
+        init();
+        animate();
+
+        function init() {
+            // Setup Renderer
+            const canvas = document.getElementById('gameCanvas');
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+
+            // --- SETUP MENU SCENE ---
+            sceneMenu = new THREE.Scene();
+            sceneMenu.background = new THREE.Color(0x050505);
+            sceneMenu.fog = new THREE.FogExp2(0x050505, 0.05);
+
+            cameraMenu = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            cameraMenu.position.set(0, 4, 10);
+            cameraMenu.lookAt(0, 3, 0);
+
+            // Menu Lighting
+            const ambLightMenu = new THREE.AmbientLight(0x202020);
+            sceneMenu.add(ambLightMenu);
+            const dirLightMenu = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLightMenu.position.set(5, 10, 5);
+            dirLightMenu.castShadow = true;
+            sceneMenu.add(dirLightMenu);
+            const redGlow = new THREE.PointLight(0xff0000, 1, 10);
+            redGlow.position.set(-2, 3, 2);
+            sceneMenu.add(redGlow);
+
+            // Ground for Menu
+            const planeGeoMenu = new THREE.PlaneGeometry(100, 100);
+            const planeMatMenu = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+            const planeMenu = new THREE.Mesh(planeGeoMenu, planeMatMenu);
+            planeMenu.rotation.x = -Math.PI / 2;
+            planeMenu.receiveShadow = true;
+            sceneMenu.add(planeMenu);
+
+            buildMenuCharacter();
+
+            // --- SETUP GAME SCENE (HORROR HOUSE) ---
+            sceneGame = new THREE.Scene();
+            sceneGame.background = new THREE.Color(0x000000); // Pitch black
+            // Eerie fog
+            sceneGame.fog = new THREE.Fog(0x000000, 1, 25);
+
+            cameraGame = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+            
+            // Custom First Person Controls setup
+            yaw.position.set(0, 3, 0); // Player height
+            sceneGame.add(yaw);
+            yaw.add(pitch);
+            pitch.add(cameraGame);
+
+            // Game Lighting
+            const ambLightGame = new THREE.AmbientLight(0x020205); // Almost no ambient light
+            sceneGame.add(ambLightGame);
+
+            // Flashlight attached to camera
+            const flashlight = new THREE.SpotLight(0xfff0dd, 2, 40, Math.PI / 6, 0.5, 1);
+            flashlight.position.set(0, 0, 0);
+            flashlight.target.position.set(0, 0, -1);
+            flashlight.castShadow = true;
+            flashlight.shadow.mapSize.width = 1024;
+            flashlight.shadow.mapSize.height = 1024;
+            pitch.add(flashlight);
+            pitch.add(flashlight.target);
+
+            buildHorrorHouse();
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('mousemove', onDocumentMouseMove, false);
+            
+            // Pointer Lock Event Listeners
+            document.addEventListener('click', requestPointerLock);
+            document.addEventListener('pointerlockchange', onPointerLockChange);
+
+            // Keyboard Listeners
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        }
+
+        // --- PROCEDURAL TEXTURES ---
+        function createWoodTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#3d2817';
+            ctx.fillRect(0, 0, 256, 256);
+            for(let i=0; i<100; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#2c1c0f' : '#4d3521';
+                ctx.fillRect(Math.random()*256, 0, Math.random()*5+1, 256);
             }
-        ];
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(10, 10);
+            return tex;
+        }
 
-        const PUZZLES_7 = [
-            {
-                grid: [
-                    'S','T','A','R','T','E','R', 'U',null,'B',null,'E',null,'U', 'P','U','Z','Z','L','E','S', 'P',null,'E',null,'L',null,'T', 'O','R','D','E','R','E','D', 'R',null,'S',null,'D',null,'D', 'T','I','G','H','T','E','R'
-                ],
-                defs: [
-                    { word: "starter", phon: "/ˈstɑːrtər/", type: "noun", def: "The beginning of something.", ex: "A great starter." },
-                    { word: "puzzles", phon: "/ˈpʌzəlz/", type: "noun", def: "Complex problems.", ex: "I love word puzzles." },
-                    { word: "ordered", phon: "/ˈɔːrdərd/", type: "adj", def: "Arranged neatly.", ex: "An ordered list." },
-                    { word: "tighter", phon: "/ˈtaɪtər/", type: "adj", def: "More firm or secure.", ex: "Make it tighter." }
-                ]
+        function createWallTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, 0, 128, 128);
+            // Grimy pattern
+            for(let i=0; i<500; i++) {
+                ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.3})`;
+                ctx.beginPath();
+                ctx.arc(Math.random()*128, Math.random()*128, Math.random()*5, 0, Math.PI*2);
+                ctx.fill();
             }
-        ];
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 2);
+            return tex;
+        }
 
-        class GridleGame {
-            constructor() {
-                this.mode = 'daily';
-                this.currentMap = MAP_5;
-                this.solution = [];
-                this.currentBoard = [];
-                this.swapsRemaining = 15;
-                this.isGameOver = false;
-                this.draggedIdx = null;
-                this.helpPage = 1;
+        function createPlaidTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#aa0000';
+            ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#222222';
+            ctx.fillRect(0, 0, 32, 32);
+            ctx.fillRect(32, 32, 32, 32);
+            return new THREE.CanvasTexture(canvas);
+        }
 
-                this.stats = JSON.parse(localStorage.getItem('gridle_stats')) || {
-                    played: 0, stars: 0, streak: 0, best: 0,
-                    dist: { X:0, 0:0, 1:0, 2:0, 3:0, 4:0, 5:0 }
-                };
+        // --- MENU CHARACTER (LUMBERJACK) ---
+        function buildMenuCharacter() {
+            lumberjack = new THREE.Group();
+            
+            const matJeans = new THREE.MeshStandardMaterial({ color: 0x1f3b5c });
+            const matSkin = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+            const matPlaid = new THREE.MeshStandardMaterial({ map: createPlaidTexture() });
+            const matHat = new THREE.MeshStandardMaterial({ color: 0x880000 });
+            const matGun = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 });
 
-                this.init();
-            }
+            // Torso
+            const torsoGeo = new THREE.BoxGeometry(1.2, 1.5, 0.6);
+            const torso = new THREE.Mesh(torsoGeo, matPlaid);
+            torso.position.y = 2.5;
+            torso.castShadow = true;
+            lumberjack.add(torso);
 
-            init() {
-                this.setupListeners();
-                this.startGame('daily');
-                this.startCountdown();
-            }
+            // Head
+            const headGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            const head = new THREE.Mesh(headGeo, matSkin);
+            head.position.y = 3.8;
+            head.castShadow = true;
+            lumberjack.add(head);
 
-            setupListeners() {
-                document.getElementById('open-drawer-btn').onclick = () => this.toggleDrawer(true);
-                document.getElementById('close-drawer-btn').onclick = () => this.toggleDrawer(false);
-                document.getElementById('menu-daily-btn').onclick = () => { this.startGame('daily'); this.toggleDrawer(false); };
-                document.getElementById('menu-deluxe-btn').onclick = () => { this.startGame('deluxe'); this.toggleDrawer(false); };
-                document.getElementById('menu-archive-btn').onclick = () => { this.showArchive(); this.toggleDrawer(false); };
-                document.getElementById('menu-stats-btn').onclick = () => { this.showStats(); this.toggleDrawer(false); };
-                document.getElementById('menu-help-btn').onclick = () => { this.toggleModal('modal-help', true); this.toggleDrawer(false); };
+            // Hat
+            const hatGeo = new THREE.BoxGeometry(0.85, 0.2, 1.0);
+            const hat = new THREE.Mesh(hatGeo, matHat);
+            hat.position.y = 4.25;
+            hat.position.z = 0.1;
+            hat.castShadow = true;
+            lumberjack.add(hat);
+
+            // Legs
+            const legGeo = new THREE.BoxGeometry(0.5, 1.8, 0.5);
+            const leftLeg = new THREE.Mesh(legGeo, matJeans);
+            leftLeg.position.set(-0.3, 0.9, 0);
+            leftLeg.castShadow = true;
+            lumberjack.add(leftLeg);
+
+            const rightLeg = new THREE.Mesh(legGeo, matJeans);
+            rightLeg.position.set(0.3, 0.9, 0);
+            rightLeg.castShadow = true;
+            lumberjack.add(rightLeg);
+
+            // Left Arm
+            const armGeo = new THREE.BoxGeometry(0.4, 1.4, 0.4);
+            const leftArm = new THREE.Mesh(armGeo, matPlaid);
+            leftArm.position.set(-0.8, 2.5, 0);
+            leftArm.castShadow = true;
+            lumberjack.add(leftArm);
+
+            // Right Arm (Aims the gun)
+            rightArm = new THREE.Group();
+            rightArm.position.set(0.8, 3.0, 0); // Pivot at shoulder
+            
+            const rightArmMesh = new THREE.Mesh(armGeo, matPlaid);
+            rightArmMesh.position.set(0, -0.5, 0.5); // Extend forward
+            rightArmMesh.rotation.x = -Math.PI / 2;
+            rightArmMesh.castShadow = true;
+            rightArm.add(rightArmMesh);
+
+            // Gun
+            const gunGeo = new THREE.BoxGeometry(0.2, 0.3, 1.0);
+            const gun = new THREE.Mesh(gunGeo, matGun);
+            gun.position.set(0, -0.5, 1.2);
+            gun.castShadow = true;
+            rightArm.add(gun);
+
+            // Laser Pointer
+            const laserMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const laserGeo = new THREE.CylinderGeometry(0.02, 0.02, 50, 8);
+            laserGeo.translate(0, 25, 0); // Move origin to base
+            laser = new THREE.Mesh(laserGeo, laserMat);
+            laser.rotation.x = Math.PI / 2;
+            laser.position.set(0, -0.5, 1.5); // End of gun
+            rightArm.add(laser);
+
+            lumberjack.add(rightArm);
+            lumberjack.position.set(3, 0, 0); // Stand to the right
+            lumberjack.rotation.y = -0.5; // Angle slightly towards center
+            sceneMenu.add(lumberjack);
+        }
+
+        // --- HORROR HOUSE GENERATOR ---
+        function buildHorrorHouse() {
+            // Materials
+            const woodMat = new THREE.MeshStandardMaterial({ 
+                map: createWoodTexture(), 
+                roughness: 0.9 
+            });
+            const wallMat = new THREE.MeshStandardMaterial({ 
+                map: createWallTexture(), 
+                roughness: 1.0 
+            });
+            const ceilingMat = new THREE.MeshStandardMaterial({ 
+                color: 0x111111, 
+                roughness: 1.0 
+            });
+
+            // Complex layout data (x, z, width, depth)
+            const floorPlan = [
+                {x: 0, z: 0, w: 40, d: 40} // Main large floor
+            ];
+
+            const walls = [
+                // Outer Walls
+                {x: 0, z: -20, w: 40, d: 1}, // North
+                {x: 0, z: 20, w: 40, d: 1},  // South
+                {x: -20, z: 0, w: 1, d: 40}, // West
+                {x: 20, z: 0, w: 1, d: 40},  // East
                 
-                document.getElementById('help-header-btn').onclick = () => this.toggleModal('modal-help', true);
-                document.getElementById('stats-header-btn').onclick = () => this.showStats();
-                
-                document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => {
-                    this.toggleModal('modal-help', false);
-                    this.toggleModal('modal-stats', false);
-                    this.toggleModal('modal-archive', false);
-                });
+                // Inner Walls (Creating rooms and hallways)
+                {x: -5, z: -10, w: 10, d: 1}, 
+                {x: -10, z: -5, w: 1, d: 10},
+                {x: 10, z: 0, w: 1, d: 20},
+                {x: 0, z: 10, w: 20, d: 1}
+            ];
 
-                // Help Pagination Listeners
-                document.getElementById('help-prev-btn').onclick = () => this.changeHelpPage(-1);
-                document.getElementById('help-next-btn').onclick = () => this.changeHelpPage(1);
-                document.getElementById('help-finish-btn').onclick = () => this.toggleModal('modal-help', false);
+            // Build Floor
+            floorPlan.forEach(f => {
+                const geo = new THREE.BoxGeometry(f.w, 1, f.d);
+                const mesh = new THREE.Mesh(geo, woodMat);
+                mesh.position.set(f.x, -0.5, f.z);
+                mesh.receiveShadow = true;
+                sceneGame.add(mesh);
+            });
 
-                // Close modals on clicking overlay background
-                const overlays = ['modal-stats', 'modal-archive', 'modal-help', 'side-menu-overlay'];
-                overlays.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        el.onclick = (e) => {
-                            if (e.target === el) {
-                                if (id === 'side-menu-overlay') this.toggleDrawer(false);
-                                else this.toggleModal(id, false);
-                            }
-                        };
+            // Build Ceiling
+            const ceilGeo = new THREE.BoxGeometry(40, 1, 40);
+            const ceilMesh = new THREE.Mesh(ceilGeo, ceilingMat);
+            ceilMesh.position.set(0, 10.5, 0);
+            ceilMesh.receiveShadow = true;
+            sceneGame.add(ceilMesh);
+
+            // Build Walls & Add to Colliders
+            const wallHeight = 10;
+            walls.forEach(w => {
+                const geo = new THREE.BoxGeometry(w.w, wallHeight, w.d);
+                const mesh = new THREE.Mesh(geo, wallMat);
+                mesh.position.set(w.x, wallHeight / 2, w.z);
+                mesh.receiveShadow = true;
+                mesh.castShadow = true;
+                sceneGame.add(mesh);
+
+                // Add to custom collision engine
+                const box = new THREE.Box3().setFromObject(mesh);
+                colliders.push(box);
+            });
+
+            // Add some creepy furniture (boxes)
+            const furnitureMat = new THREE.MeshStandardMaterial({color: 0x332211, roughness: 0.8});
+            
+            // A table
+            const tableGeo = new THREE.BoxGeometry(4, 0.2, 2);
+            const table = new THREE.Mesh(tableGeo, furnitureMat);
+            table.position.set(0, 2.5, -15);
+            table.castShadow = true; table.receiveShadow = true;
+            sceneGame.add(table);
+            colliders.push(new THREE.Box3().setFromObject(table));
+
+            // Table legs
+            for(let i=-1; i<=1; i+=2) {
+                for(let j=-1; j<=1; j+=2) {
+                    const legGeo = new THREE.BoxGeometry(0.2, 2.5, 0.2);
+                    const leg = new THREE.Mesh(legGeo, furnitureMat);
+                    leg.position.set(i*1.8, 1.25, -15 + j*0.8);
+                    leg.castShadow = true;
+                    sceneGame.add(leg);
+                    colliders.push(new THREE.Box3().setFromObject(leg));
+                }
+            }
+
+            // A creepy painting on the wall
+            const paintingGeo = new THREE.PlaneGeometry(3, 4);
+            const paintingMat = new THREE.MeshStandardMaterial({color: 0x110000, roughness: 0.5});
+            const painting = new THREE.Mesh(paintingGeo, paintingMat);
+            painting.position.set(-4.9, 5, -10.1);
+            painting.rotation.y = Math.PI; // Face outwards
+            sceneGame.add(painting);
+        }
+
+        // --- INPUT HANDLING ---
+        function onDocumentMouseMove(event) {
+            if (gameState === 'GAME' && document.pointerLockElement === document.body) {
+                // First person mouse look
+                const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+                const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+                yaw.rotation.y -= movementX * 0.002;
+                pitch.rotation.x -= movementY * 0.002;
+
+                // Clamp pitch
+                pitch.rotation.x = Math.max(-PI_2 + 0.1, Math.min(PI_2 - 0.1, pitch.rotation.x));
+            }
+        }
+
+        function onKeyDown(event) {
+            switch (event.code) {
+                case 'KeyW': keys.w = true; break;
+                case 'KeyA': keys.a = true; break;
+                case 'KeyS': keys.s = true; break;
+                case 'KeyD': keys.d = true; break;
+                case 'Space': 
+                    if (isGrounded && gameState === 'GAME') {
+                        velocity.y = jumpVelocity; 
+                        isGrounded = false;
                     }
-                });
-
-                const grid = document.getElementById('gridle-grid');
-                grid.ondragstart = (e) => {
-                    if (this.isGameOver) return;
-                    const c = e.target.closest('.cell[draggable="true"]');
-                    if (!c) return;
-                    this.draggedIdx = parseInt(c.dataset.index);
-                    c.classList.add('dragging');
-                };
-                grid.ondragend = (e) => {
-                    e.target.classList.remove('dragging');
-                    document.querySelectorAll('.cell').forEach(c => c.classList.remove('drag-over'));
-                };
-                grid.ondragover = (e) => {
-                    e.preventDefault();
-                    const c = e.target.closest('.cell.active');
-                    if (c && parseInt(c.dataset.index) !== this.draggedIdx) c.classList.add('drag-over');
-                };
-                grid.ondragleave = (e) => e.target.closest('.cell')?.classList.remove('drag-over');
-                grid.ondrop = (e) => {
-                    e.preventDefault();
-                    if (this.isGameOver || this.draggedIdx === null) return;
-                    const c = e.target.closest('.cell.active');
-                    if (!c) return;
-                    const targetIdx = parseInt(c.dataset.index);
-                    if (targetIdx !== this.draggedIdx && this.currentBoard[targetIdx] !== this.solution[targetIdx]) {
-                        this.swap(this.draggedIdx, targetIdx);
-                    }
-                    this.draggedIdx = null;
-                };
+                    break;
             }
+        }
 
-            changeHelpPage(dir) {
-                this.helpPage = Math.max(1, Math.min(3, this.helpPage + dir));
-                this.updateHelpUI();
+        function onKeyUp(event) {
+            switch (event.code) {
+                case 'KeyW': keys.w = false; break;
+                case 'KeyA': keys.a = false; break;
+                case 'KeyS': keys.s = false; break;
+                case 'KeyD': keys.d = false; break;
             }
+        }
 
-            updateHelpUI() {
-                // Scroll to top of modal content
-                const modal = document.getElementById('modal-help');
-                modal.scrollTop = 0;
-
-                // Show/Hide pages
-                document.querySelectorAll('.help-page').forEach((p, i) => {
-                    p.classList.toggle('hidden', (i + 1) !== this.helpPage);
-                });
-
-                // Update dots
-                const dots = document.getElementById('help-dots').children;
-                for (let i = 0; i < dots.length; i++) {
-                    dots[i].className = `w-2 h-2 rounded-full ${ (i + 1) === this.helpPage ? 'bg-slate-800' : 'bg-slate-200'}`;
-                }
-
-                // Update Buttons
-                const prev = document.getElementById('help-prev-btn');
-                const next = document.getElementById('help-next-btn');
-                const finish = document.getElementById('help-finish-btn');
-                const pagination = prev.parentElement;
-
-                prev.disabled = this.helpPage === 1;
-                
-                if (this.helpPage === 3) {
-                    pagination.classList.add('hidden');
-                    finish.classList.remove('hidden');
-                } else {
-                    pagination.classList.remove('hidden');
-                    finish.classList.add('hidden');
-                }
+        function requestPointerLock() {
+            if (gameState === 'GAME') {
+                document.body.requestPointerLock();
             }
+        }
 
-            startCountdown() {
-                const timer = document.getElementById('countdown-timer');
-                const update = () => {
-                    const now = new Date();
-                    const tomorrow = new Date(now);
-                    tomorrow.setHours(24,0,0,0);
-                    const d = tomorrow - now;
-                    const h = Math.floor(d/3600000), m = Math.floor((d%3600000)/60000), s = Math.floor((d%60000)/1000);
-                    timer.textContent = `Next Gridle in ${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                };
-                setInterval(update, 1000); update();
-            }
-
-            getDailyIndex() {
-                const anchor = new Date('2026-05-01T00:00:00');
-                return Math.floor((new Date() - anchor) / 86400000) + 1;
-            }
-
-            startGame(mode, dayNum = null) {
-                this.mode = mode;
-                const activeDayNum = dayNum || this.getDailyIndex();
-                const indicator = document.getElementById('level-indicator');
-                
-                document.getElementById('swaps-section').classList.remove('hidden');
-                document.getElementById('dictionary-section').classList.add('hidden');
-
-                if (mode === 'daily') {
-                    indicator.textContent = `Daily Gridle #${activeDayNum}`;
-                    this.currentMap = MAP_5;
-                    this.solution = [...PUZZLES_5[0].grid];
-                    this.swapsRemaining = 15;
-                    
-                    const savedState = JSON.parse(localStorage.getItem(`gridle_daily_${activeDayNum}`));
-                    if (savedState) {
-                        this.currentBoard = savedState.board;
-                        this.swapsRemaining = savedState.swaps;
-                        this.isGameOver = savedState.over;
-                    } else {
-                        this.isGameOver = false;
-                        this.createShuffledBoard(activeDayNum);
-                    }
-                } else {
-                    indicator.textContent = `Deluxe Gridle`;
-                    this.currentMap = MAP_7;
-                    this.solution = [...PUZZLES_7[0].grid];
-                    this.swapsRemaining = 25;
-                    this.isGameOver = false;
-                    this.createShuffledBoard(Math.random());
-                }
-
-                this.render();
-                if (this.isGameOver) this.endGame(this.currentBoard.every((c,i) => this.currentMap[i] === 0 || c === this.solution[i]));
-            }
-
-            createShuffledBoard(seedVal) {
-                let letters = this.solution.filter(c => c !== null);
-                
-                const rng = (s) => {
-                    let mask = 0xffffffff;
-                    let m_w = (123456789 + s) & mask;
-                    let m_z = (987654321 - s) & mask;
-                    return () => {
-                        m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
-                        m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
-                        return (((m_z << 16) + (m_w & 65535)) >>> 0) / 4294967296;
-                    };
-                };
-                
-                const myRng = rng(typeof seedVal === 'number' ? seedVal : 42);
-                
-                for (let i = letters.length - 1; i > 0; i--) {
-                    const j = Math.floor(myRng() * (i + 1));
-                    [letters[i], letters[j]] = [letters[j], letters[i]];
-                }
-                
-                this.currentBoard = new Array(this.currentMap.length).fill(null);
-                let lIdx = 0;
-                this.currentMap.forEach((isActive, i) => { if(isActive) this.currentBoard[i] = letters[lIdx++]; });
-            }
-
-            render() {
-                const grid = document.getElementById('gridle-grid');
-                grid.className = `gridle-grid bg-slate-50 p-3 rounded-xl shadow-inner ${this.currentMap.length === 25 ? 'grid-5' : 'grid-7'}`;
-                grid.innerHTML = '';
-                
-                this.currentBoard.forEach((char, i) => {
-                    const cell = document.createElement('div');
-                    cell.dataset.index = i;
-                    if (char === null) {
-                        cell.className = 'cell inactive';
-                    } else {
-                        cell.textContent = char;
-                        cell.className = 'cell active';
-                        if (char === this.solution[i]) {
-                            cell.classList.add('correct');
-                        } else {
-                            const row = Math.floor(i / (this.currentMap.length === 25 ? 5 : 7));
-                            const col = i % (this.currentMap.length === 25 ? 5 : 7);
-                            let present = false;
-                            const lineLen = this.currentMap.length === 25 ? 5 : 7;
-                            for (let c=0; c<lineLen; c++) if (this.solution[row*lineLen + c] === char) present = true;
-                            for (let r=0; r<lineLen; r++) if (this.solution[r*lineLen + col] === char) present = true;
-                            if (present) cell.classList.add('present');
-                            if (!this.isGameOver) cell.setAttribute('draggable', 'true');
-                        }
-                    }
-                    grid.appendChild(cell);
-                });
-                this.updateUI();
-            }
-
-            swap(i1, i2) {
-                const c1 = document.querySelector(`[data-index="${i1}"]`), c2 = document.querySelector(`[data-index="${i2}"]`);
-                c1.classList.add('swapping'); c2.classList.add('swapping');
-                [this.currentBoard[i1], this.currentBoard[i2]] = [this.currentBoard[i2], this.currentBoard[i1]];
-                setTimeout(() => {
-                    this.swapsRemaining--;
-                    this.render();
-                    this.check();
-                    if (this.mode === 'daily') this.saveDaily();
-                }, 300);
-            }
-
-            saveDaily() {
-                localStorage.setItem(`gridle_daily_${this.getDailyIndex()}`, JSON.stringify({
-                    board: this.currentBoard, swaps: this.swapsRemaining, over: this.isGameOver
-                }));
-            }
-
-            updateUI() {
-                const el = document.getElementById('swap-count');
-                el.textContent = this.swapsRemaining;
-                el.className = 'text-3xl font-bold ' + (this.swapsRemaining <= 3 ? 'text-red-500' : 'text-slate-800');
-            }
-
-            check() {
-                const win = this.currentBoard.every((c,i) => this.currentMap[i] === 0 || c === this.solution[i]);
-                if (win || this.swapsRemaining <= 0) {
-                    this.isGameOver = true;
-                    if (this.mode === 'daily') {
-                        this.saveStats(win);
-                        this.saveDaily();
-                    }
-                    this.endGame(win);
-                }
-            }
-
-            saveStats(win) {
-                this.stats.played++;
-                if (win) {
-                    const stars = Math.min(5, this.swapsRemaining);
-                    this.stats.stars += this.swapsRemaining;
-                    this.stats.streak++;
-                    this.stats.best = Math.max(this.stats.streak, this.stats.best);
-                    this.stats.dist[stars]++;
-                } else {
-                    this.stats.streak = 0;
-                    this.stats.dist.X++;
-                }
-                localStorage.setItem('gridle_stats', JSON.stringify(this.stats));
-            }
-
-            endGame(win) {
-                document.getElementById('swaps-section').classList.add('hidden');
-                const dict = document.getElementById('dictionary-section');
-                const list = document.getElementById('dictionary-list');
-                dict.classList.remove('hidden');
-                list.innerHTML = '';
-                
-                const p = this.currentMap.length === 25 ? PUZZLES_5[0] : PUZZLES_7[0];
-                p.defs.forEach(d => {
-                    const div = document.createElement('div');
-                    div.className = 'border-b border-gray-100 pb-4';
-                    div.innerHTML = `
-                        <div class="flex items-baseline gap-2 mb-1">
-                            <span class="text-xl font-bold uppercase text-slate-800">${d.word}</span>
-                            <span class="text-gray-400 text-sm italic">${d.phon}</span>
-                            <span class="text-xs opacity-50 font-bold">${d.type}</span>
-                        </div>
-                        <p class="text-sm opacity-80 mb-2">${d.def}</p>
-                        <p class="text-xs opacity-40 italic">"${d.ex}"</p>
-                    `;
-                    list.appendChild(div);
-                });
-
-                if (!win) {
-                    this.currentBoard = [...this.solution];
-                    this.render();
-                }
-            }
-
-            showStats() {
-                document.getElementById('stat-played').textContent = this.stats.played;
-                document.getElementById('stat-stars').textContent = this.stats.stars;
-                document.getElementById('stat-streak').textContent = this.stats.streak;
-                document.getElementById('stat-best').textContent = this.stats.best;
-                const dist = document.getElementById('star-distribution');
-                dist.innerHTML = '';
-                const keys = ['X',0,1,2,3,4,5], max = Math.max(...Object.values(this.stats.dist), 1);
-                keys.forEach(k => {
-                    const v = this.stats.dist[k], p = (v/max)*100;
-                    const row = document.createElement('div');
-                    row.className = 'flex items-center gap-2';
-                    row.innerHTML = `<div class="w-4 text-[10px] font-bold text-gray-400">${k}${k==='X'?'':'⭐'}</div>
-                        <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${Math.max(10,p)}%">${v}</div></div>`;
-                    dist.appendChild(row);
-                });
-                this.toggleModal('modal-stats', true);
-            }
-
-            showArchive() {
-                const list = document.getElementById('archive-list');
-                list.innerHTML = '';
-                const currentDay = this.getDailyIndex();
-                
-                for (let i = currentDay - 1; i >= 1; i--) {
-                    const btn = document.createElement('button');
-                    btn.className = 'w-full aspect-square flex items-center justify-center bg-gray-50 rounded-lg font-bold text-lg hover:bg-orange-100 hover:text-orange-600 transition-colors border border-gray-100';
-                    btn.textContent = i;
-                    btn.onclick = () => {
-                        this.startGame('daily', i);
-                        this.toggleModal('modal-archive', false);
-                    };
-                    list.appendChild(btn);
-                }
-                
-                if (currentDay <= 1) {
-                    list.innerHTML = '<p class="col-span-full text-center text-sm opacity-50">No archive yet.</p>';
-                }
-                
-                this.toggleModal('modal-archive', true);
-            }
-
-            toggleModal(id, show) { 
-                const el = document.getElementById(id);
-                if (!el) return;
-                
-                if (show) {
-                    el.classList.remove('hidden');
-                    if (id === 'modal-help') {
-                        this.helpPage = 1;
-                        this.updateHelpUI();
-                        requestAnimationFrame(() => {
-                            el.scrollTop = 0;
-                        });
-                    }
-                } else {
-                    el.classList.add('hidden');
-                }
-            }
-
-            toggleDrawer(show) {
-                const o = document.getElementById('side-menu-overlay'), c = document.getElementById('side-menu-content');
-                if (show) { 
-                    o.classList.remove('hidden'); 
-                    setTimeout(() => c.classList.remove('drawer-hidden'), 10); 
-                } else { 
-                    c.classList.add('drawer-hidden'); 
-                    setTimeout(() => o.classList.add('hidden'), 300); 
+        function onPointerLockChange() {
+            if (document.pointerLockElement === document.body) {
+                document.getElementById('instruction').style.display = 'none';
+                document.getElementById('crosshair').style.display = 'block';
+            } else {
+                if (gameState === 'GAME') {
+                    document.getElementById('instruction').style.display = 'block';
+                    document.getElementById('crosshair').style.display = 'none';
                 }
             }
         }
 
-        window.onload = () => new GridleGame();
+        // --- MENU LOGIC ---
+        function aimAt(index) {
+            // Helper for mouse hover simulating the laser pointing
+            if (gameState !== 'MENU') return;
+            
+            // Zielkoordinaten für die Menüpunkte im 3D Raum
+            if (index === 0) targetAim.set(-4, 4.5, 0); // Start
+            else if (index === 1) targetAim.set(-4, 3, 0); // Options
+            else if (index === 2) targetAim.set(-4, 1.5, 0); // Credits
+            else if (index === 3) targetAim.copy(cameraMenu.position); // Exit - Waffe zielt auf die Kamera!
+        }
+
+        function startGame() {
+            gameState = 'GAME';
+            document.getElementById('uiLayer').style.display = 'none';
+            document.getElementById('instruction').style.display = 'block';
+            yaw.position.set(0, 3, 0); // Reset player position
+            velocity.set(0,0,0);
+            
+            // Try to lock pointer immediately
+            document.body.requestPointerLock();
+        }
+
+        function showScreen(type) {
+            const overlay = document.getElementById('overlayScreens');
+            const title = document.getElementById('overlayTitle');
+            const content = document.getElementById('overlayContent');
+            
+            overlay.style.display = 'block';
+            title.innerText = type;
+            
+            if (type === 'Options') {
+                content.innerHTML = "Movement: WASD<br>Jump: Space<br>Look: Mouse<br><br>The game is intentionally very slow.";
+            } else if (type === 'Credits') {
+                content.innerHTML = "Created by AI.<br>Inspired by classic horror indies.<br>No monsters included.";
+            } else if (type === 'Exit') {
+                content.innerHTML = "You can't exit.<br>The house is waiting.";
+            }
+        }
+
+        function closeScreen() {
+            document.getElementById('overlayScreens').style.display = 'none';
+        }
+
+        function onWindowResize() {
+            cameraMenu.aspect = window.innerWidth / window.innerHeight;
+            cameraMenu.updateProjectionMatrix();
+            cameraGame.aspect = window.innerWidth / window.innerHeight;
+            cameraGame.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- COLLISION DETECTION ---
+        function checkCollisions(proposedPos) {
+            // Player bounding box (slim vertical cylinder roughly)
+            const playerBox = new THREE.Box3();
+            const size = 0.8; // Player radius
+            playerBox.min.set(proposedPos.x - size/2, proposedPos.y - 2, proposedPos.z - size/2);
+            playerBox.max.set(proposedPos.x + size/2, proposedPos.y + 1, proposedPos.z + size/2);
+
+            for (let i = 0; i < colliders.length; i++) {
+                if (playerBox.intersectsBox(colliders[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // --- MAIN LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = performance.now();
+            const delta = (time - lastTime) / 1000;
+            lastTime = time;
+
+            if (gameState === 'MENU') {
+                // Small breathing animation for lumberjack
+                lumberjack.position.y = Math.sin(time * 0.002) * 0.05;
+
+                // Komplexe Zielverfolgung für die Waffe und den Laserpointer
+                const worldPos = new THREE.Vector3();
+                rightArm.getWorldPosition(worldPos);
+                dummyArm.position.copy(worldPos);
+                dummyArm.lookAt(targetAim);
+                
+                // Rotation umrechnen und flüssig anwenden
+                const invParentQuat = lumberjack.quaternion.clone().invert();
+                const targetQuat = dummyArm.quaternion.clone().premultiply(invParentQuat);
+                
+                rightArm.quaternion.slerp(targetQuat, 0.1);
+
+                renderer.render(sceneMenu, cameraMenu);
+            } 
+            else if (gameState === 'GAME') {
+                // Physics and Movement (Very slow as requested)
+                velocity.x -= velocity.x * 10.0 * delta; // Friction
+                velocity.z -= velocity.z * 10.0 * delta;
+
+                velocity.y += gravity * delta; // Apply gravity
+
+                direction.z = Number(keys.w) - Number(keys.s);
+                direction.x = Number(keys.d) - Number(keys.a);
+                direction.normalize(); // consistent speed in all directions
+
+                if (keys.w || keys.s) velocity.z -= direction.z * moveSpeed * delta;
+                if (keys.a || keys.d) velocity.x -= direction.x * moveSpeed * delta;
+
+                // Calculate proposed movement
+                const controlObject = yaw;
+                
+                // Right vector
+                const right = new THREE.Vector3(1, 0, 0);
+                right.applyQuaternion(controlObject.quaternion);
+                
+                // Forward vector
+                const forward = new THREE.Vector3(0, 0, -1);
+                forward.applyQuaternion(controlObject.quaternion);
+
+                // XZ movement application
+                const moveX = right.x * velocity.x * delta + forward.x * velocity.z * delta;
+                const moveZ = right.z * velocity.x * delta + forward.z * velocity.z * delta;
+
+                // Collision Check X
+                let proposedPos = controlObject.position.clone();
+                proposedPos.x += moveX;
+                if (!checkCollisions(proposedPos)) {
+                    controlObject.position.x += moveX;
+                } else {
+                    velocity.x = 0;
+                }
+
+                // Collision Check Z
+                proposedPos = controlObject.position.clone();
+                proposedPos.z += moveZ;
+                if (!checkCollisions(proposedPos)) {
+                    controlObject.position.z += moveZ;
+                } else {
+                    velocity.z = 0;
+                }
+
+                // Apply Y movement (Jumping/Gravity)
+                controlObject.position.y += velocity.y * delta;
+
+                if (controlObject.position.y < 3) {
+                    velocity.y = 0;
+                    controlObject.position.y = 3;
+                    isGrounded = true;
+                }
+
+                // Head bobbing effect to make slow walking feel heavier
+                if ((keys.w || keys.a || keys.s || keys.d) && isGrounded) {
+                    pitch.position.y = Math.sin(time * 0.005) * 0.05;
+                } else {
+                    pitch.position.y = 0;
+                }
+
+                renderer.render(sceneGame, cameraGame);
+            }
+        }
     </script>
 </body>
 </html>
