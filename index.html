@@ -104,6 +104,22 @@
             padding: 1rem 0;
             text-align: left;
         }
+
+        /* Help Modal Specific Styles */
+        .help-cell {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .help-cell-empty { background-color: #f1f5f9; border: 1px solid #e2e8f0; color: #1e293b; }
+        .help-cell-correct { background-color: #6aaa64; color: white; }
+        .help-cell-present { background-color: #c9b458; color: white; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
@@ -207,7 +223,7 @@
 
     <!-- Stats Modal -->
     <div id="modal-stats" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay">
-        <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl relative">
+        <div class="bg-white rounded-2xl p-8 max-sm:p-4 max-w-sm w-full shadow-2xl relative">
             <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest">Statistics</h2>
             <table class="stats-table">
@@ -230,26 +246,125 @@
         </div>
     </div>
 
-    <!-- Help Modal -->
+    <!-- Help Modal (Updated based on image_4ca515.png) -->
     <div id="modal-help" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay overflow-y-auto">
         <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative my-10">
-            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-            <h2 class="text-2xl font-bold mb-6 text-center uppercase tracking-widest">How to Play</h2>
-            <div class="text-sm space-y-4 text-slate-600">
-                <p>Solve the <span class="font-bold">GRIDLE</span> in 15 swaps or fewer (25 for Deluxe).</p>
-                <p>Earn a star for every swap remaining ⭐</p>
-                <p class="font-bold border-b pb-1 uppercase text-xs">Letter Indicators</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-[#6aaa64] flex items-center justify-center text-white font-bold">G</div>
-                    <span class="text-xs">Correct place.</span>
+            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-6 text-center uppercase tracking-widest text-slate-800">How to Play</h2>
+            
+            <div class="text-sm space-y-4 text-slate-600 leading-relaxed">
+                <div class="space-y-2">
+                    <p>Solve the <span class="font-bold">GRIDLE</span> in 15 swaps or fewer.</p>
+                    <p>Every <span class="font-bold">GRIDLE</span> can be solved in a minimum of 10 swaps.</p>
+                    <p>You will earn a star for every swap you have remaining after the <span class="font-bold">GRIDLE</span> has been solved ⭐</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-[#c9b458] flex items-center justify-center text-white font-bold">Y</div>
-                    <span class="text-xs">In the word, wrong place.</span>
+                
+                <hr class="border-gray-200">
+                
+                <p>Rearrange the letters into the correct words, horizontally and vertically. Drag letters anywhere on the board. The letters will change colour to show whether they are in the correct position. The number of swaps remaining is displayed below the board.</p>
+                
+                <hr class="border-gray-200">
+
+                <div class="space-y-4 pt-2">
+                    <div class="flex flex-col items-center">
+                        <p class="mb-2 italic text-xs">This letter is in the correct place:</p>
+                        <div class="flex gap-1 justify-center">
+                            <div class="help-cell help-cell-correct">P</div>
+                            <div class="help-cell help-cell-empty">E</div>
+                            <div class="help-cell help-cell-empty">R</div>
+                            <div class="help-cell help-cell-empty">K</div>
+                            <div class="help-cell help-cell-empty">Y</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <p class="mb-2 italic text-xs">This letter is in the word, but in a different position:</p>
+                        <div class="flex gap-1 justify-center">
+                            <div class="help-cell help-cell-empty">K</div>
+                            <div class="help-cell help-cell-present">N</div>
+                            <div class="help-cell help-cell-empty">O</div>
+                            <div class="help-cell help-cell-empty">L</div>
+                            <div class="help-cell help-cell-empty">L</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <p class="mb-2 italic text-xs">This letter is in the vertical word, but in a different position:</p>
+                        <div class="flex flex-col gap-1 items-center">
+                            <div class="help-cell help-cell-empty">B</div>
+                            <div class="help-cell help-cell-present">M</div>
+                            <div class="help-cell help-cell-empty">U</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <p class="mb-2 italic text-xs">This letter is on a corner, so either the vertical word contains this letter or the horizontal word:</p>
+                        <div class="flex flex-col items-center">
+                            <div class="help-cell help-cell-empty mb-1">B</div>
+                            <div class="flex gap-1">
+                                <div class="help-cell help-cell-empty">B</div>
+                                <div class="help-cell help-cell-present">O</div>
+                                <div class="help-cell help-cell-empty">O</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-xs italic">Drag and drop letters anywhere on the board to swap them. You have only one attempt per day for the Daily Gridle!</p>
+
+                <div class="pt-6">
+                    <h3 class="text-lg font-bold text-center uppercase tracking-widest border-t border-b border-gray-200 py-2 mb-4">Special Cases</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <p class="font-bold text-xs uppercase mb-2">The same letter multiple times in one word</p>
+                            <p class="text-[11px] mb-3">In this case, the word must contain only one S, as the first is highlighted but the second is not. Neither of them are in the correct position.</p>
+                            <div class="flex gap-1 justify-center mb-3">
+                                <div class="help-cell help-cell-correct">H</div>
+                                <div class="help-cell help-cell-present">S</div>
+                                <div class="help-cell help-cell-present">A</div>
+                                <div class="help-cell help-cell-empty">S</div>
+                                <div class="help-cell help-cell-correct">E</div>
+                            </div>
+                            <p class="text-[11px] mb-3">Once we have an S in the correct place, the first S is no longer needed in this word, so it is no longer highlighted.</p>
+                            <div class="flex gap-1 justify-center">
+                                <div class="help-cell help-cell-correct">H</div>
+                                <div class="help-cell help-cell-empty">S</div>
+                                <div class="help-cell help-cell-correct">S</div>
+                                <div class="help-cell help-cell-present">A</div>
+                                <div class="help-cell help-cell-correct">E</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="font-bold text-xs uppercase mb-2">The Funky Dingo Situation</p>
+                            <p class="text-[11px] mb-3">In this case, the horizontal word must contain an N. Also, the vertical word must contain an N.</p>
+                            
+                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto mb-4 scale-90">
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">F</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">C</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">N</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">U</div>
+                                <div class="help-cell help-cell-correct">D</div><div class="help-cell help-cell-present">N</div><div class="help-cell help-cell-correct">L</div><div class="help-cell help-cell-correct">G</div><div class="help-cell help-cell-correct">O</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">I</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">K</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">Y</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">E</div>
+                            </div>
+
+                            <p class="text-[11px] mb-3">This does not necessarily mean that both of the Ns must be used in these two words. In this particular example, both words contain an N in the middle, and the other N belongs in CLONE.</p>
+
+                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto scale-90">
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">F</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">C</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">U</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">L</div>
+                                <div class="help-cell help-cell-correct">D</div><div class="help-cell help-cell-correct">I</div><div class="help-cell help-cell-correct">N</div><div class="help-cell help-cell-correct">G</div><div class="help-cell help-cell-correct">O</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">K</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">N</div>
+                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">Y</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">E</div>
+                            </div>
+                            
+                            <p class="text-[10px] mt-4 italic">The highlighted letters simply indicate that a letter (in this case N) is in the mystery word. It does not mean that this particular N has to satisfy that.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button class="close-modal mt-8 w-full py-3 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition">Got it</button>
+            
+            <button class="close-modal mt-8 w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition tracking-widest">Got it</button>
         </div>
     </div>
 
@@ -329,7 +444,6 @@
                     this.toggleModal('modal-help', false);
                     this.toggleModal('modal-stats', false);
                     this.toggleModal('modal-archive', false);
-                    // Ensure settings modal is also handled if it existed
                     const settingsModal = document.getElementById('modal-settings');
                     if (settingsModal) settingsModal.classList.add('hidden');
                 });
