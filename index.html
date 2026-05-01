@@ -246,79 +246,84 @@
         </div>
     </div>
 
-    <!-- Help Modal (Updated based on image_4ca515.png) -->
+    <!-- Help Modal (Paginated) -->
     <div id="modal-help" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 modal-overlay overflow-y-auto">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative my-10">
-            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative my-10 min-h-[400px] flex flex-col">
+            <button class="close-modal absolute top-4 right-4 text-gray-400 hover:text-slate-800 transition z-10">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
+            
             <h2 class="text-2xl font-bold mb-6 text-center uppercase tracking-widest text-slate-800">How to Play</h2>
             
-            <div class="text-sm space-y-4 text-slate-600 leading-relaxed">
-                <div class="space-y-2">
-                    <p>Solve the <span class="font-bold">GRIDLE</span> in 15 swaps or fewer.</p>
-                    <p>Every <span class="font-bold">GRIDLE</span> can be solved in a minimum of 10 swaps.</p>
-                    <p>You will earn a star for every swap you have remaining after the <span class="font-bold">GRIDLE</span> has been solved ⭐</p>
+            <!-- Page Container -->
+            <div id="help-content-pages" class="flex-grow">
+                <!-- Page 1: Basics -->
+                <div id="help-page-1" class="help-page space-y-4 text-sm text-slate-600 leading-relaxed">
+                    <div class="space-y-2">
+                        <p>Solve the <span class="font-bold">GRIDLE</span> in 15 swaps or fewer.</p>
+                        <p>Every <span class="font-bold">GRIDLE</span> can be solved in a minimum of 10 swaps.</p>
+                        <p>You will earn a star for every swap you have remaining after the <span class="font-bold">GRIDLE</span> has been solved ⭐</p>
+                    </div>
+                    <hr class="border-gray-200">
+                    <p>Rearrange the letters into the correct words, horizontally and vertically. Drag letters anywhere on the board. The letters will change colour to show whether they are in the correct position. The number of swaps remaining is displayed below the board.</p>
                 </div>
-                
-                <hr class="border-gray-200">
-                
-                <p>Rearrange the letters into the correct words, horizontally and vertically. Drag letters anywhere on the board. The letters will change colour to show whether they are in the correct position. The number of swaps remaining is displayed below the board.</p>
-                
-                <hr class="border-gray-200">
 
-                <div class="space-y-4 pt-2">
-                    <div class="flex flex-col items-center">
-                        <p class="mb-2 italic text-xs">This letter is in the correct place:</p>
-                        <div class="flex gap-1 justify-center">
-                            <div class="help-cell help-cell-correct">P</div>
-                            <div class="help-cell help-cell-empty">E</div>
-                            <div class="help-cell help-cell-empty">R</div>
-                            <div class="help-cell help-cell-empty">K</div>
-                            <div class="help-cell help-cell-empty">Y</div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <p class="mb-2 italic text-xs">This letter is in the word, but in a different position:</p>
-                        <div class="flex gap-1 justify-center">
-                            <div class="help-cell help-cell-empty">K</div>
-                            <div class="help-cell help-cell-present">N</div>
-                            <div class="help-cell help-cell-empty">O</div>
-                            <div class="help-cell help-cell-empty">L</div>
-                            <div class="help-cell help-cell-empty">L</div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <p class="mb-2 italic text-xs">This letter is in the vertical word, but in a different position:</p>
-                        <div class="flex flex-col gap-1 items-center">
-                            <div class="help-cell help-cell-empty">B</div>
-                            <div class="help-cell help-cell-present">M</div>
-                            <div class="help-cell help-cell-empty">U</div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <p class="mb-2 italic text-xs">This letter is on a corner, so either the vertical word contains this letter or the horizontal word:</p>
+                <!-- Page 2: Colors -->
+                <div id="help-page-2" class="help-page hidden space-y-4 text-sm text-slate-600 leading-relaxed">
+                    <div class="space-y-4 pt-2">
                         <div class="flex flex-col items-center">
-                            <div class="help-cell help-cell-empty mb-1">B</div>
-                            <div class="flex gap-1">
-                                <div class="help-cell help-cell-empty">B</div>
-                                <div class="help-cell help-cell-present">O</div>
+                            <p class="mb-2 italic text-xs">This letter is in the correct place:</p>
+                            <div class="flex gap-1 justify-center">
+                                <div class="help-cell help-cell-correct">P</div>
+                                <div class="help-cell help-cell-empty">E</div>
+                                <div class="help-cell help-cell-empty">R</div>
+                                <div class="help-cell help-cell-empty">K</div>
+                                <div class="help-cell help-cell-empty">Y</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <p class="mb-2 italic text-xs">This letter is in the word, but in a different position:</p>
+                            <div class="flex gap-1 justify-center">
+                                <div class="help-cell help-cell-empty">K</div>
+                                <div class="help-cell help-cell-present">N</div>
                                 <div class="help-cell help-cell-empty">O</div>
+                                <div class="help-cell help-cell-empty">L</div>
+                                <div class="help-cell help-cell-empty">L</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <p class="mb-2 italic text-xs">This letter is in the vertical word, but in a different position:</p>
+                            <div class="flex flex-col gap-1 items-center">
+                                <div class="help-cell help-cell-empty">B</div>
+                                <div class="help-cell help-cell-present">M</div>
+                                <div class="help-cell help-cell-empty">U</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <p class="mb-2 italic text-xs">This letter is on a corner, so either the vertical word contains this letter or the horizontal word:</p>
+                            <div class="flex flex-col items-center">
+                                <div class="help-cell help-cell-empty mb-1">B</div>
+                                <div class="flex gap-1">
+                                    <div class="help-cell help-cell-empty">B</div>
+                                    <div class="help-cell help-cell-present">O</div>
+                                    <div class="help-cell help-cell-empty">O</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-6">
+                <!-- Page 3: Special Cases -->
+                <div id="help-page-3" class="help-page hidden space-y-4 text-sm text-slate-600 leading-relaxed">
                     <h3 class="text-lg font-bold text-center uppercase tracking-widest border-t border-b border-gray-200 py-2 mb-4">Special Cases</h3>
                     
                     <div class="space-y-6">
                         <div class="text-center">
-                            <p class="font-bold text-xs uppercase mb-2">The same letter multiple times in one word</p>
-                            <p class="text-[11px] mb-3">In this case, the word must contain only one S, as the first is highlighted but the second is not. Neither of them are in the correct position.</p>
+                            <p class="font-bold text-xs uppercase mb-2">Same letter multiple times</p>
+                            <p class="text-[11px] mb-3">If a word only has one 'S', only one will be highlighted if neither are correct.</p>
                             <div class="flex gap-1 justify-center mb-3">
                                 <div class="help-cell help-cell-correct">H</div>
                                 <div class="help-cell help-cell-present">S</div>
@@ -326,45 +331,35 @@
                                 <div class="help-cell help-cell-empty">S</div>
                                 <div class="help-cell help-cell-correct">E</div>
                             </div>
-                            <p class="text-[11px] mb-3">Once we have an S in the correct place, the first S is no longer needed in this word, so it is no longer highlighted.</p>
-                            <div class="flex gap-1 justify-center">
-                                <div class="help-cell help-cell-correct">H</div>
-                                <div class="help-cell help-cell-empty">S</div>
-                                <div class="help-cell help-cell-correct">S</div>
-                                <div class="help-cell help-cell-present">A</div>
-                                <div class="help-cell help-cell-correct">E</div>
-                            </div>
                         </div>
 
                         <div class="text-center">
                             <p class="font-bold text-xs uppercase mb-2">The Funky Dingo Situation</p>
-                            <p class="text-[11px] mb-3">In this case, the horizontal word must contain an N. Also, the vertical word must contain an N.</p>
-                            
-                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto mb-4 scale-90">
+                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto mb-2 scale-75 origin-center">
                                 <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">F</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">C</div>
                                 <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">N</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">U</div>
                                 <div class="help-cell help-cell-correct">D</div><div class="help-cell help-cell-present">N</div><div class="help-cell help-cell-correct">L</div><div class="help-cell help-cell-correct">G</div><div class="help-cell help-cell-correct">O</div>
                                 <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">I</div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">K</div>
                                 <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">Y</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">E</div>
                             </div>
-
-                            <p class="text-[11px] mb-3">This does not necessarily mean that both of the Ns must be used in these two words. In this particular example, both words contain an N in the middle, and the other N belongs in CLONE.</p>
-
-                            <div class="grid grid-cols-5 gap-1 w-fit mx-auto scale-90">
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">F</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">C</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">U</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">L</div>
-                                <div class="help-cell help-cell-correct">D</div><div class="help-cell help-cell-correct">I</div><div class="help-cell help-cell-correct">N</div><div class="help-cell help-cell-correct">G</div><div class="help-cell help-cell-correct">O</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-empty">K</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">N</div>
-                                <div class="w-8 h-8"></div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">Y</div><div class="w-8 h-8"></div><div class="help-cell help-cell-correct">E</div>
-                            </div>
-                            
-                            <p class="text-[10px] mt-4 italic">The highlighted letters simply indicate that a letter (in this case N) is in the mystery word. It does not mean that this particular N has to satisfy that.</p>
+                            <p class="text-[10px] italic">A highlighted letter means it's in the mystery word, not necessarily at that exact cross.</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination Controls -->
+            <div class="mt-auto pt-6 flex justify-between items-center border-t border-gray-100">
+                <button id="help-prev-btn" class="px-4 py-2 text-slate-400 font-bold uppercase text-xs hover:text-slate-800 transition disabled:opacity-30" disabled>Back</button>
+                <div id="help-dots" class="flex gap-2">
+                    <div class="w-2 h-2 rounded-full bg-slate-800"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-200"></div>
+                </div>
+                <button id="help-next-btn" class="px-4 py-2 text-slate-800 font-bold uppercase text-xs hover:text-slate-600 transition">Next</button>
+            </div>
             
-            <button class="close-modal mt-8 w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition tracking-widest">Got it</button>
+            <button id="help-finish-btn" class="hidden mt-4 w-full py-4 bg-slate-800 text-white font-bold rounded-lg uppercase hover:bg-slate-700 transition tracking-widest">Got it</button>
         </div>
     </div>
 
@@ -413,6 +408,7 @@
                 this.swapsRemaining = 15;
                 this.isGameOver = false;
                 this.draggedIdx = null;
+                this.helpPage = 1;
 
                 this.stats = JSON.parse(localStorage.getItem('gridle_stats')) || {
                     played: 0, stars: 0, streak: 0, best: 0,
@@ -444,8 +440,25 @@
                     this.toggleModal('modal-help', false);
                     this.toggleModal('modal-stats', false);
                     this.toggleModal('modal-archive', false);
-                    const settingsModal = document.getElementById('modal-settings');
-                    if (settingsModal) settingsModal.classList.add('hidden');
+                });
+
+                // Help Pagination Listeners
+                document.getElementById('help-prev-btn').onclick = () => this.changeHelpPage(-1);
+                document.getElementById('help-next-btn').onclick = () => this.changeHelpPage(1);
+                document.getElementById('help-finish-btn').onclick = () => this.toggleModal('modal-help', false);
+
+                // Close modals on clicking overlay background
+                const overlays = ['modal-stats', 'modal-archive', 'modal-help', 'side-menu-overlay'];
+                overlays.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.onclick = (e) => {
+                            if (e.target === el) {
+                                if (id === 'side-menu-overlay') this.toggleDrawer(false);
+                                else this.toggleModal(id, false);
+                            }
+                        };
+                    }
                 });
 
                 const grid = document.getElementById('gridle-grid');
@@ -477,6 +490,44 @@
                     }
                     this.draggedIdx = null;
                 };
+            }
+
+            changeHelpPage(dir) {
+                this.helpPage = Math.max(1, Math.min(3, this.helpPage + dir));
+                this.updateHelpUI();
+            }
+
+            updateHelpUI() {
+                // Scroll to top of modal content
+                const modal = document.getElementById('modal-help');
+                modal.scrollTop = 0;
+
+                // Show/Hide pages
+                document.querySelectorAll('.help-page').forEach((p, i) => {
+                    p.classList.toggle('hidden', (i + 1) !== this.helpPage);
+                });
+
+                // Update dots
+                const dots = document.getElementById('help-dots').children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].className = `w-2 h-2 rounded-full ${ (i + 1) === this.helpPage ? 'bg-slate-800' : 'bg-slate-200'}`;
+                }
+
+                // Update Buttons
+                const prev = document.getElementById('help-prev-btn');
+                const next = document.getElementById('help-next-btn');
+                const finish = document.getElementById('help-finish-btn');
+                const pagination = prev.parentElement;
+
+                prev.disabled = this.helpPage === 1;
+                
+                if (this.helpPage === 3) {
+                    pagination.classList.add('hidden');
+                    finish.classList.remove('hidden');
+                } else {
+                    pagination.classList.remove('hidden');
+                    finish.classList.add('hidden');
+                }
             }
 
             startCountdown() {
@@ -712,11 +763,33 @@
                 this.toggleModal('modal-archive', true);
             }
 
-            toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
+            toggleModal(id, show) { 
+                const el = document.getElementById(id);
+                if (!el) return;
+                
+                if (show) {
+                    el.classList.remove('hidden');
+                    if (id === 'modal-help') {
+                        this.helpPage = 1;
+                        this.updateHelpUI();
+                        requestAnimationFrame(() => {
+                            el.scrollTop = 0;
+                        });
+                    }
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+
             toggleDrawer(show) {
                 const o = document.getElementById('side-menu-overlay'), c = document.getElementById('side-menu-content');
-                if (show) { o.classList.remove('hidden'); setTimeout(() => c.classList.remove('drawer-hidden'), 10); }
-                else { c.classList.add('drawer-hidden'); setTimeout(() => o.classList.add('hidden'), 300); }
+                if (show) { 
+                    o.classList.remove('hidden'); 
+                    setTimeout(() => c.classList.remove('drawer-hidden'), 10); 
+                } else { 
+                    c.classList.add('drawer-hidden'); 
+                    setTimeout(() => o.classList.add('hidden'), 300); 
+                }
             }
         }
 
