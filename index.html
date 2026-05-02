@@ -735,12 +735,13 @@
          * ACHIEVEMENT CHECK LOGIC
          */
         function checkMilestoneAchievements() {
-            const total = state.totalCookiesEarned;
+            // UPDATED: Now checking against CURRENT cookies bank, not total overall
+            const current = state.cookies; 
             
             // Check powers of 10 starting from 1 Million (10^6)
             for (let e = 6; e <= 33; e++) {
                 const threshold = Math.pow(10, e);
-                if (total >= threshold) {
+                if (current >= threshold) {
                     unlockAchievement(`milestone_${e}`);
                 } else {
                     // Stop once we find a milestone we haven't reached
@@ -1422,6 +1423,9 @@
             
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
+            
+            // UPDATED: Milestones now resettable upon prestige
+            state.achievements = state.achievements.filter(id => !id.startsWith('milestone_'));
             
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
