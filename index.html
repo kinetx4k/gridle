@@ -31,6 +31,49 @@
             to { background-position: 300px 300px; }
         }
 
+        /* Prestige Black Hole Animation */
+        #prestige-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle, #000 0%, #000 40%, transparent 100%);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .black-hole-active #prestige-overlay {
+            display: flex;
+            animation: hole-expand 4s forwards;
+            pointer-events: auto;
+        }
+
+        @keyframes hole-expand {
+            0% { transform: scale(0); opacity: 0; }
+            30% { transform: scale(1.5); opacity: 1; }
+            70% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .sucking-effect {
+            animation: suck-in 2s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+        }
+
+        @keyframes suck-in {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(0) rotate(1080deg); opacity: 0; filter: blur(20px); }
+        }
+
+        .spitting-effect {
+            animation: spit-out 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes spit-out {
+            0% { transform: scale(0) rotate(-1080deg); opacity: 0; filter: blur(20px); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+        }
+
         .cookie-container {
             perspective: 1000px;
         }
@@ -460,6 +503,13 @@
 </head>
 <body class="h-screen flex flex-col md:flex-row">
 
+    <!-- Black Hole Overlay -->
+    <div id="prestige-overlay">
+        <div class="w-64 h-64 bg-black rounded-full shadow-[0_0_100px_50px_rgba(255,255,255,0.1)] relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-tr from-purple-900/30 to-transparent animate-spin duration-[3s]"></div>
+        </div>
+    </div>
+
     <!-- Minecraft Toast -->
     <div id="achievement-toast">
         <div class="icon-box" id="toast-icon">🍪</div>
@@ -563,6 +613,9 @@
     </div>
 
     <div id="prestige-container">
+        <div id="total-prestige-count" class="text-[11px] text-purple-400 font-bold mb-2 border-b border-zinc-700 pb-1">
+            Total Prestige: 0
+        </div>
         <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
             Left: 100.00 B
         </div>
@@ -579,66 +632,68 @@
         <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Current Bonus: +0%</div>
     </div>
 
-    <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
-        <!-- The Bird -->
-        <div id="collector-bird">
-            <svg viewBox="0 0 100 100">
-                <path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#3b82f6" />
-                <circle cx="70" cy="45" r="5" fill="white" />
-                <circle cx="72" cy="45" r="2" fill="black" />
-                <path d="M80 50 L90 45 L90 55 Z" fill="#fbbf24" />
-                <path d="M50 50 L30 30" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
-                <path d="M50 50 L30 70" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
-            </svg>
-        </div>
-
-        <div class="text-center mb-8 z-10">
-            <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.00 Cookies</h1>
-            <p id="cps-display" class="text-xl text-orange-400">per second: 0</p>
-            <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Click Power: 1</p>
-        </div>
-
-        <div class="cookie-container z-10">
-            <svg id="main-cookie" width="300" height="300" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                <circle cx="60" cy="60" r="8" fill="#4b3621" />
-                <circle cx="140" cy="70" r="10" fill="#4b3621" />
-                <circle cx="80" cy="130" r="9" fill="#4b3621" />
-                <circle cx="120" cy="150" r="7" fill="#4b3621" />
-                <circle cx="160" cy="110" r="11" fill="#4b3621" />
-                <circle cx="50" cy="110" r="8" fill="#4b3621" />
-                <circle cx="100" cy="90" r="9" fill="#4b3621" />
-            </svg>
-        </div>
-
-        <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
-    </div>
-
-    <div id="shop-container" class="w-full md:w-96 bg-zinc-900 border-l border-zinc-800 flex flex-col">
-        <div class="p-4 stats-panel border-b border-zinc-800">
-            <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
-                <span>🛒</span> Market
-            </h2>
-            <div class="flex justify-between text-[11px] text-zinc-500">
-                <span>Clicks: <span id="stat-total-clicks">0</span></span>
-                <span>All-time: <span id="stat-all-time">0.00</span></span>
+    <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
+        <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
+            <!-- The Bird -->
+            <div id="collector-bird">
+                <svg viewBox="0 0 100 100">
+                    <path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#3b82f6" />
+                    <circle cx="70" cy="45" r="5" fill="white" />
+                    <circle cx="72" cy="45" r="2" fill="black" />
+                    <path d="M80 50 L90 45 L90 55 Z" fill="#fbbf24" />
+                    <path d="M50 50 L30 30" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
+                    <path d="M50 50 L30 70" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
+                </svg>
             </div>
+
+            <div class="text-center mb-8 z-10">
+                <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.00 Cookies</h1>
+                <p id="cps-display" class="text-xl text-orange-400">per second: 0</p>
+                <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Click Power: 1</p>
+            </div>
+
+            <div class="cookie-container z-10">
+                <svg id="main-cookie" width="300" height="300" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                    <circle cx="100" cy="100" r="80" fill="#cd853f" />
+                    <circle cx="60" cy="60" r="8" fill="#4b3621" />
+                    <circle cx="140" cy="70" r="10" fill="#4b3621" />
+                    <circle cx="80" cy="130" r="9" fill="#4b3621" />
+                    <circle cx="120" cy="150" r="7" fill="#4b3621" />
+                    <circle cx="160" cy="110" r="11" fill="#4b3621" />
+                    <circle cx="50" cy="110" r="8" fill="#4b3621" />
+                    <circle cx="100" cy="90" r="9" fill="#4b3621" />
+                </svg>
+            </div>
+
+            <div id="particle-container" class="absolute inset-0 pointer-events-none"></div>
         </div>
 
-        <!-- Tab Selector -->
-        <div class="flex bg-zinc-950">
-            <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Buildings</button>
-            <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Specials</button>
-            <button onclick="switchTab('achievements')" id="tab-achievements" class="tab-btn">Achievements</button>
-        </div>
+        <div id="shop-container" class="w-full md:w-96 bg-zinc-900 border-l border-zinc-800 flex flex-col">
+            <div class="p-4 stats-panel border-b border-zinc-800">
+                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
+                    <span>🛒</span> Market
+                </h2>
+                <div class="flex justify-between text-[11px] text-zinc-500">
+                    <span>Clicks: <span id="stat-total-clicks">0</span></span>
+                    <span>All-time: <span id="stat-all-time">0.00</span></span>
+                </div>
+            </div>
 
-        <div id="shop-items" class="flex-1 overflow-y-auto scroller p-4 space-y-3">
-            <!-- Items are generated here -->
-        </div>
+            <!-- Tab Selector -->
+            <div class="flex bg-zinc-950">
+                <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Buildings</button>
+                <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Specials</button>
+                <button onclick="switchTab('achievements')" id="tab-achievements" class="tab-btn">Achievements</button>
+            </div>
 
-        <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
-            Developed by <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
+            <div id="shop-items" class="flex-1 overflow-y-auto scroller p-4 space-y-3">
+                <!-- Items are generated here -->
+            </div>
+
+            <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
+                Developed by <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
+            </div>
         </div>
     </div>
 
@@ -657,10 +712,10 @@
             clickHeat: 0,
             multiplier: 1.0,
             prestigeLevel: 0,
+            totalPrestigeEarned: 0, // NEW Persistent counter
             prestigeBonus: 1.0, 
             goldenCookieTimer: 0,
             blueCookieSpawnTimer: 0,
-            randomGoldenSpawnTimer: 0,
             randomGoldenSpawnTimer: 0,
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
@@ -669,6 +724,7 @@
             showParticles: true,
             performanceWarningShown: false,
             totalPlaytime: 0, // Playtime in seconds
+            isPrestiging: false,
             // Powerup Timers
             powerups: {
                 production: { active: 0, cd: 0 },
@@ -999,6 +1055,7 @@
         const prestigeBtn = document.getElementById('prestige-btn');
         const currentBonusDisplay = document.getElementById('current-bonus-display');
         const prestigeNeeded = document.getElementById('prestige-needed');
+        const totalPrestigeDisplay = document.getElementById('total-prestige-count');
 
         function initShop() {
             shopItems.innerHTML = '';
@@ -1115,6 +1172,7 @@
         }
 
         function clickCookie(e) {
+            if (state.isPrestiging) return;
             const amount = state.clickPower * state.multiplier * state.prestigeBonus;
             addCookies(amount);
             state.totalClicks++;
@@ -1244,6 +1302,7 @@
         }
 
         function spawnSpecialCookie(type, x, y, vx = 0, vy = 0) {
+            if (state.isPrestiging) return;
             const wrapper = document.createElement('div');
             wrapper.className = `special-cookie-wrapper ${type}-cookie`;
             const cookieArea = document.getElementById('cookie-area');
@@ -1324,6 +1383,7 @@
         }
 
         function updateSpecialPhysics() {
+            if (state.isPrestiging) return;
             const ground = window.innerHeight - 80;
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
@@ -1423,30 +1483,65 @@
             }
         }
 
-        function prestige() {
-            if (state.cookies < PRESTIGE_THRESHOLD) return;
+        async function prestige() {
+            if (state.cookies < PRESTIGE_THRESHOLD || state.isPrestiging) return;
+            
+            state.isPrestiging = true;
             unlockAchievement('first_prestige');
             
             const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             const extraBonus = newBonusPoints * 0.01; 
             
+            // Start Black Hole Animation
+            document.body.classList.add('black-hole-active');
+            const wrapper = document.getElementById('main-content-wrapper');
+            wrapper.classList.add('sucking-effect');
+
+            // Wait for "Suck" Phase
+            await new Promise(r => setTimeout(r, 2000));
+
+            // RESET GAME STATE IN BACKGROUND
+            state.totalPrestigeEarned += state.prestigeLevel + 1;
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
             
-            // UPDATED: Milestones now resettable upon prestige
+            // Resettable achievements
             state.achievements = state.achievements.filter(id => !id.startsWith('milestone_'));
             
-            state.cookies = 0; state.cps = 0; state.clickPower = 1;
-            state.unlockedUpgrades = 1; state.clickHeat = 0;
+            state.cookies = 0; 
+            state.cps = 0; 
+            state.clickPower = 1;
+            state.unlockedUpgrades = 1; 
+            state.clickHeat = 0;
             
-            // NEW: Reset Bird on Prestige
+            // CERTAINLY Reset Bird
             state.hasBird = false;
             if (collectorBird) collectorBird.style.display = 'none';
+
+            // Clear special cookies
+            [...activeSpecialCookies].forEach(c => removeCookie(c.id));
 
             buildings.forEach(b => b.count = 0);
             specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
             
-            initShop(); updateUI(); saveGame();
+            initShop(); 
+            updateUI(); 
+
+            // Wait for Black Hole to stay full a bit
+            await new Promise(r => setTimeout(r, 500));
+
+            // Start "Spit" Phase
+            wrapper.classList.remove('sucking-effect');
+            wrapper.classList.add('spitting-effect');
+
+            await new Promise(r => setTimeout(r, 1500));
+            
+            // Clean up
+            document.body.classList.remove('black-hole-active');
+            wrapper.classList.remove('spitting-effect');
+            state.isPrestiging = false;
+            
+            saveGame();
         }
 
         function showResetModal() {
@@ -1485,6 +1580,8 @@
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             
+            if (totalPrestigeDisplay) totalPrestigeDisplay.innerText = `Total Prestige: ${state.totalPrestigeEarned}`;
+
             if (state.clickHeat >= 100) {
                 state.multiplier = 5.0;
                 unlockAchievement('multiplier_5');
@@ -1636,6 +1733,7 @@
         }
 
         function runTick() {
+            if (state.isPrestiging) return;
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
             if (delta < 0.001) return;
