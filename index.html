@@ -712,7 +712,7 @@
             clickHeat: 0,
             multiplier: 1.0,
             prestigeLevel: 0,
-            totalPrestigeEarned: 0, // NEW Persistent counter
+            totalPrestigeEarned: 0, 
             prestigeBonus: 1.0, 
             goldenCookieTimer: 0,
             blueCookieSpawnTimer: 0,
@@ -792,22 +792,18 @@
          * ACHIEVEMENT CHECK LOGIC
          */
         function checkMilestoneAchievements() {
-            // UPDATED: Now checking against CURRENT cookies bank, not total overall
             const current = state.cookies; 
             
-            // Check powers of 10 starting from 1 Million (10^6)
             for (let e = 6; e <= 33; e++) {
                 const threshold = Math.pow(10, e);
                 if (current >= threshold) {
                     unlockAchievement(`milestone_${e}`);
                 } else {
-                    // Stop once we find a milestone we haven't reached
                     break;
                 }
             }
         }
 
-        // Buildings - Starting set
         let buildings = [
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
@@ -822,7 +818,6 @@
             { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Special Upgrades & Powerups
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
@@ -833,9 +828,6 @@
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
 
-        /**
-         * PERFORMANCE & PARTICLES & STARTUP
-         */
         function closeStartupModal(disable) {
             document.getElementById('startup-modal').style.display = 'none';
             if (disable) {
@@ -881,17 +873,12 @@
             }
         }
 
-        /**
-         * ACHIEVEMENT SYSTEM
-         */
         function unlockAchievement(id) {
             if (state.achievements.includes(id)) return;
             state.achievements.push(id);
             
-            // Update CPS for milestone boost immediately
             if (id.startsWith('milestone_')) calculateCPS();
 
-            // Check if it's dynamic or static
             let ach;
             if (id.startsWith('milestone_')) {
                 ach = getMilestoneInfo(parseInt(id.split('_')[1]));
@@ -921,15 +908,11 @@
             }, 5000);
         }
 
-        /**
-         * SETTINGS LOGIC
-         */
         function toggleSettings() {
             const dropdown = document.getElementById('settings-dropdown');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Click outside closes menu
         window.onclick = function(event) {
             if (!event.target.closest('#settings-menu')) {
                 document.getElementById('settings-dropdown').style.display = 'none';
@@ -963,7 +946,7 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     applySaveData(data);
-                    location.reload(); // Reload for clean initialization
+                    location.reload(); 
                 } catch (err) {
                     console.error("Load failed", err);
                 }
@@ -983,12 +966,9 @@
             });
             calculateCPS();
             updateParticleUI();
-            saveGame(); // Sync with LocalStorage
+            saveGame(); 
         }
 
-        /**
-         * UI & GAME LOGIC
-         */
         function switchTab(tab) {
             state.activeTab = tab;
             document.getElementById('tab-buildings').classList.toggle('active', tab === 'buildings');
@@ -1061,7 +1041,6 @@
             shopItems.innerHTML = '';
             
             if (state.activeTab === 'achievements') {
-                // 1. Show all static achievements from list
                 achievementsList.forEach(ach => {
                     const isUnlocked = state.achievements.includes(ach.id);
                     const card = document.createElement('div');
@@ -1077,7 +1056,6 @@
                     shopItems.appendChild(card);
                 });
 
-                // 2. Calculate and show ALL unlocked milestones
                 let maxE = 0;
                 for (let e = 6; e <= 33; e++) {
                     const id = `milestone_${e}`;
@@ -1098,7 +1076,6 @@
                     }
                 }
 
-                // 3. Show NEXT goal milestone (Dynamic Growth)
                 const nextE = Math.max(6, maxE + 1);
                 const nextAch = getMilestoneInfo(nextE);
                 const card = document.createElement('div');
@@ -1177,7 +1154,6 @@
             addCookies(amount);
             state.totalClicks++;
             
-            // Achievement: First Click
             unlockAchievement('first_click');
             
             state.clickHeat = Math.min(100, state.clickHeat + 5);
@@ -1191,7 +1167,6 @@
             state.cookies += amount;
             state.totalCookiesEarned += amount;
             
-            // Dynamic Achievement check
             checkMilestoneAchievements();
         }
 
@@ -1217,7 +1192,6 @@
             const sp = specials[index];
             const currentPrice = getPrice(sp);
             
-            // Handle Powerups
             if (sp.type === 'powerup') {
                 if (state.cookies >= currentPrice && state.powerups[sp.powerupId].cd <= 0) {
                     state.cookies -= currentPrice;
@@ -1230,7 +1204,6 @@
                 return;
             }
 
-            // Normal Specials
             if (sp.type !== 'click' && sp.count > 0) return;
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
@@ -1258,12 +1231,10 @@
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
 
-            // NEW: Milestone boost (5% for each achievement currently unlocked in this run)
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
             const milestoneBoost = 1 + (milestoneCount * 0.05);
             baseCps *= milestoneBoost;
 
-            // Apply 5x Production Powerup
             if (state.powerups.production.active > 0) {
                 baseCps *= 5;
             }
@@ -1306,7 +1277,6 @@
             const wrapper = document.createElement('div');
             wrapper.className = `special-cookie-wrapper ${type}-cookie`;
             const cookieArea = document.getElementById('cookie-area');
-            const areaRect = cookieArea.getBoundingClientRect();
             
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
@@ -1492,20 +1462,16 @@
             const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             const extraBonus = newBonusPoints * 0.01; 
             
-            // Start Black Hole Animation
             document.body.classList.add('black-hole-active');
             const wrapper = document.getElementById('main-content-wrapper');
             wrapper.classList.add('sucking-effect');
 
-            // Wait for "Suck" Phase
             await new Promise(r => setTimeout(r, 2000));
 
-            // RESET GAME STATE IN BACKGROUND
             state.totalPrestigeEarned += state.prestigeLevel + 1;
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
             
-            // Resettable achievements
             state.achievements = state.achievements.filter(id => !id.startsWith('milestone_'));
             
             state.cookies = 0; 
@@ -1514,11 +1480,9 @@
             state.unlockedUpgrades = 1; 
             state.clickHeat = 0;
             
-            // CERTAINLY Reset Bird
             state.hasBird = false;
             if (collectorBird) collectorBird.style.display = 'none';
 
-            // Clear special cookies
             [...activeSpecialCookies].forEach(c => removeCookie(c.id));
 
             buildings.forEach(b => b.count = 0);
@@ -1527,16 +1491,13 @@
             initShop(); 
             updateUI(); 
 
-            // Wait for Black Hole to stay full a bit
             await new Promise(r => setTimeout(r, 500));
 
-            // Start "Spit" Phase
             wrapper.classList.remove('sucking-effect');
             wrapper.classList.add('spitting-effect');
 
             await new Promise(r => setTimeout(r, 1500));
             
-            // Clean up
             document.body.classList.remove('black-hole-active');
             wrapper.classList.remove('spitting-effect');
             state.isPrestiging = false;
@@ -1565,20 +1526,19 @@
         function updateUI() {
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
             
-            // CALCULATE BOOST FOR DISPLAY
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
             const boostPercent = milestoneCount * 5;
             const totalCps = state.cps * state.multiplier * state.prestigeBonus;
 
             if (cpsDisplay) {
-                // Update display to show per second AND the green boost percentage
                 cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${boostPercent}% Boost</span>`;
             }
+
+            document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
 
             if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
-            document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             
             if (totalPrestigeDisplay) totalPrestigeDisplay.innerText = `Total Prestige: ${state.totalPrestigeEarned}`;
 
@@ -1733,12 +1693,19 @@
         }
 
         function runTick() {
-            if (state.isPrestiging) return;
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
-            if (delta < 0.001) return;
+            if (delta < 0.001) {
+                updateUI();
+                return;
+            }
             state.lastTick = now;
             
+            if (state.isPrestiging) {
+                updateUI();
+                return;
+            }
+
             state.totalPlaytime += delta;
 
             state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
