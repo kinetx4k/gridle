@@ -311,7 +311,8 @@
             prestigeLevel: 0,
             prestigeBonus: 1.0, 
             goldenCookieTimer: 0,
-            blueCookieSpawnTimer: 0
+            blueCookieSpawnTimer: 0,
+            randomGoldenSpawnTimer: 0
         };
 
         const PRESTIGE_THRESHOLD = 100000000000;
@@ -760,6 +761,16 @@
                     state.goldenCookieTimer = 0;
                 }
             } else state.goldenCookieTimer = 0;
+            
+            // Random Golden Cookie Spawn (Very rare)
+            state.randomGoldenSpawnTimer += delta;
+            if (state.randomGoldenSpawnTimer >= 1.0) {
+                if (Math.random() < 0.002) { // 0.2% chance per second
+                    spawnSpecialCookie('golden');
+                }
+                state.randomGoldenSpawnTimer = 0;
+            }
+
             state.blueCookieSpawnTimer += delta;
             if (state.blueCookieSpawnTimer >= 1.0) {
                 if (Math.random() < 0.01) spawnSpecialCookie('blue');
