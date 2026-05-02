@@ -948,7 +948,8 @@
                 wingsEl: wrapper.querySelector('.wings'),
                 type: type, x: startX, y: startY, vx: vx, vy: vy,
                 gravity: 0.12, friction: 0.98, bounce: 0.6,
-                state: 'falling', timer: 0, settledAt: 0, id: Math.random(), flyVx: 0
+                state: 'falling', timer: 0, settledAt: 0, id: Math.random(), flyVx: 0,
+                radius: 30
             };
 
             cookieObj.hitbox.onclick = (e) => triggerCookie(cookieObj, e?.clientX, e?.clientY);
@@ -993,13 +994,63 @@
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
 
+            // Collision Detection Loop (Complex Elastic Collision Implementation)
+            for (let i = 0; i < activeSpecialCookies.length; i++) {
+                for (let j = i + 1; j < activeSpecialCookies.length; j++) {
+                    const c1 = activeSpecialCookies[i];
+                    const c2 = activeSpecialCookies[j];
+
+                    // Only collide if not flying away
+                    if (c1.state === 'flying' || c2.state === 'flying') continue;
+
+                    const dx = c2.x - c1.x;
+                    const dy = c2.y - c1.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const minDistance = c1.radius + c2.radius;
+
+                    if (distance < minDistance) {
+                        // Collision response - simple position correction
+                        const overlap = minDistance - distance;
+                        const nx = dx / distance; // Normal X
+                        const ny = dy / distance; // Normal Y
+
+                        // Move cookies apart based on overlap
+                        const moveX = nx * overlap * 0.5;
+                        const moveY = ny * overlap * 0.5;
+
+                        if (c1.state === 'falling') {
+                            c1.x -= moveX;
+                            c1.y -= moveY;
+                        }
+                        if (c2.state === 'falling') {
+                            c2.x += moveX;
+                            c2.y += moveY;
+                        }
+
+                        // Velocity exchange (Elastic)
+                        const relativeVelocityX = c1.vx - c2.vx;
+                        const relativeVelocityY = c1.vy - c2.vy;
+                        const dotProduct = relativeVelocityX * nx + relativeVelocityY * ny;
+
+                        if (dotProduct > 0) {
+                            const impulse = 2 * dotProduct / 2; // Assuming equal mass
+                            c1.vx -= impulse * nx;
+                            c1.vy -= impulse * ny;
+                            c2.vx += impulse * nx;
+                            c2.vy += impulse * ny;
+                        }
+                    }
+                }
+            }
+
             activeSpecialCookies.forEach(c => {
                 if (c.state === 'falling') {
                     c.vy += c.gravity; c.x += c.vx; c.y += c.vy;
                     if (c.y >= ground) {
                         c.y = ground; c.vy *= -c.bounce; c.vx *= 0.8;
                         if (Math.abs(c.vy) < 1) {
-                            c.state = 'settled'; c.timer = 3.0;
+                            c.state = 'settled'; 
+                            c.timer = 5.0; // Updated from 3.0 to 5.0 seconds
                         }
                     }
                     if (c.x < 0) { c.x = 0; c.vx *= -1; }
