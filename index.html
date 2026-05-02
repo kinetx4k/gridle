@@ -661,6 +661,7 @@
             goldenCookieTimer: 0,
             blueCookieSpawnTimer: 0,
             randomGoldenSpawnTimer: 0,
+            randomGoldenSpawnTimer: 0,
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
@@ -1463,7 +1464,17 @@
 
         function updateUI() {
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            if (cpsDisplay) cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
+            
+            // CALCULATE BOOST FOR DISPLAY
+            const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
+            const boostPercent = milestoneCount * 5;
+            const totalCps = state.cps * state.multiplier * state.prestigeBonus;
+
+            if (cpsDisplay) {
+                // Update display to show per second AND the green boost percentage
+                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${boostPercent}% Boost</span>`;
+            }
+
             if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
