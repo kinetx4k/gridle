@@ -14,6 +14,13 @@
             color: #ffffff;
             overflow: hidden;
             user-select: none;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Golden Frenzy Effect */
+        body.golden-frenzy {
+            background-color: #433200;
+            background-image: radial-gradient(circle, #b8860b22 0%, #1a1a1a 100%);
         }
 
         .cookie-container {
@@ -32,6 +39,20 @@
 
         #main-cookie:active {
             transform: scale(0.95);
+        }
+
+        /* Shake Animation for Frenzy */
+        @keyframes wobble {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-2deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        #main-cookie.shaking {
+            animation: wobble 0.1s infinite;
+            filter: drop-shadow(0 0 30px #ffd700);
         }
 
         .particle {
@@ -520,6 +541,15 @@
             frenzyBar.style.width = state.clickHeat + '%';
             multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
             
+            // Visual Effects for x3 and x5
+            if (state.multiplier >= 3.0) {
+                document.body.classList.add('golden-frenzy');
+                mainCookie.classList.add('shaking');
+            } else {
+                document.body.classList.remove('golden-frenzy');
+                mainCookie.classList.remove('shaking');
+            }
+
             if (state.multiplier >= 5) {
                 frenzyBar.classList.add('animate-pulse');
             } else {
@@ -623,8 +653,8 @@
                 addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             }
 
-            // Golden Cookies logic
-            if (state.multiplier >= 5.0) {
+            // Golden Cookies logic - Changed threshold to 3.0
+            if (state.multiplier >= 3.0) {
                 state.goldenCookieTimer += delta;
                 if (state.goldenCookieTimer >= 5) {
                     spawnGoldenCookie();
