@@ -213,7 +213,7 @@
     <!-- Prestige Progress Area -->
     <div id="prestige-container">
         <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
-            Noch: 100.0 B
+            Left: 100.0 B
         </div>
         <div class="flex justify-between text-[10px] mb-1">
             <span>PRESTIGE PROGRESS</span>
@@ -658,7 +658,7 @@
 
             // Prestige UI
             const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
-            prestigeNeeded.innerText = `Noch: ${formatNumber(remaining)}`;
+            prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
 
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
             prestigeBar.style.width = prestigeProg + '%';
@@ -666,7 +666,7 @@
             
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 prestigeBtn.classList.remove('hidden');
-                prestigeNeeded.innerText = "Balken voll!";
+                prestigeNeeded.innerText = "Ready to Prestige!";
             } else {
                 prestigeBtn.classList.add('hidden');
             }
