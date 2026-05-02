@@ -717,6 +717,7 @@
             goldenCookieTimer: 0,
             blueCookieSpawnTimer: 0,
             randomGoldenSpawnTimer: 0,
+            randomGoldenSpawnTimer: 0,
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
@@ -1777,10 +1778,14 @@
             }
         }
 
-        function gameLoop() {
-            runTick();
+        // Logic loop that runs even in the background via setInterval.
+        // Most browsers throttle background intervals to ~1Hz, 
+        // but the delta-time calculation ensures accurate growth.
+        setInterval(runTick, 16); 
+
+        function renderLoop() {
             updateFPS();
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(renderLoop);
         }
 
         setInterval(saveGame, 30000);
@@ -1812,7 +1817,7 @@
         initShop();
         updateParticleUI();
         updateUI();
-        gameLoop();
+        renderLoop();
     </script>
 </body>
 </html>
