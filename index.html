@@ -297,6 +297,21 @@
         }
 
         /**
+         * Helper to get stars for an upgrade level based on milestones
+         */
+        function getStarsForCount(count) {
+            let stars = "";
+            if (count >= 1000) stars = "⭐⭐⭐⭐⭐⭐⭐";
+            else if (count >= 500) stars = "⭐⭐⭐⭐⭐⭐";
+            else if (count >= 200) stars = "⭐⭐⭐⭐⭐";
+            else if (count >= 100) stars = "⭐⭐⭐⭐";
+            else if (count >= 50) stars = "⭐⭐⭐";
+            else if (count >= 25) stars = "⭐⭐";
+            else if (count >= 10) stars = "⭐";
+            return stars;
+        }
+
+        /**
          * Generates new upgrades for infinite mode
          */
         function generateNextUpgrade() {
@@ -602,10 +617,11 @@
                     priceLabel.innerText = formatNumber(currentPrice);
                     countLabel.innerText = up.count;
 
-                    // Milestone Boost Logic
+                    // Milestone Boost Logic with Stars
                     const effMult = getUpgradeEfficiencyMult(up.count);
+                    const stars = getStarsForCount(up.count);
                     if (effMult > 1) {
-                        boostLabel.innerText = `Boost: x${effMult}`;
+                        boostLabel.innerText = `${stars} Boost: x${effMult}`;
                         boostLabel.classList.remove('hidden');
                     } else {
                         boostLabel.classList.add('hidden');
