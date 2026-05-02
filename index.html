@@ -354,10 +354,10 @@
             <hr style="margin: 15px 0; border: 0.5px solid #444;">
             <p>Examples:</p>
             <div class="guess-row" style="margin-top:10px">
-                <span>Nigeria</span>
-                <div class="guess-data"><span>3,000km</span><span>↗️</span><span>60%</span></div>
+                <span>Austria</span>
+                <div class="guess-data"><span>0km</span><span>🎉</span><span>100%</span></div>
             </div>
-            <p style="font-size: 12px; margin-top:5px">Target is 3,000km North-East of Nigeria.</p>
+            <p style="font-size: 12px; margin-top:5px">Target is 0km away from Austria (Success!).</p>
         </div>
     </div>
 
@@ -413,18 +413,21 @@
 
         // --- Data ---
         const countries = [
+            { name: "Austria", iso: "AT", lat: 47.5162, lon: 14.5501, svg: "https://upload.wikimedia.org/wikipedia/commons/4/41/Austria_location_map.svg" },
             { name: "Nigeria", iso: "NG", lat: 9.082, lon: 8.675, svg: "https://upload.wikimedia.org/wikipedia/commons/2/23/Nigeria_location_map.svg" },
             { name: "Germany", iso: "DE", lat: 51.165, lon: 10.451, svg: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Germany_location_map.svg" },
             { name: "USA", iso: "US", lat: 37.090, lon: -95.712, svg: "https://upload.wikimedia.org/wikipedia/commons/a/a5/USA_location_map.svg" },
             { name: "Japan", iso: "JP", lat: 36.204, lon: 138.252, svg: "https://upload.wikimedia.org/wikipedia/commons/2/24/Japan_location_map.svg" },
             { name: "Brazil", iso: "BR", lat: -14.235, lon: -51.925, svg: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Brazil_location_map.svg" },
             { name: "Australia", iso: "AU", lat: -25.274, lon: 133.775, svg: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Australia_location_map.svg" },
-            { name: "France", iso: "FR", lat: 46.227, lon: 2.213, svg: "https://upload.wikimedia.org/wikipedia/commons/c/c5/France_location_map.svg" }
+            { name: "France", iso: "FR", lat: 46.227, lon: 2.213, svg: "https://upload.wikimedia.org/wikipedia/commons/c/c5/France_location_map.svg" },
+            { name: "Canada", iso: "CA", lat: 56.1304, lon: -106.3468, svg: "https://upload.wikimedia.org/wikipedia/commons/6/67/Canada_location_map.svg" },
+            { name: "Italy", iso: "IT", lat: 41.8719, lon: 12.5674, svg: "https://upload.wikimedia.org/wikipedia/commons/3/32/Italy_location_map.svg" }
         ];
 
         // --- State Management ---
         let gameState = {
-            currentDate: new Date("2026-05-02"),
+            currentDate: new Date(),
             targetCountry: null,
             guesses: [],
             isGameOver: false,
@@ -442,24 +445,34 @@
         // --- Core Functions ---
 
         function initGame() {
-            // Determine target
+            // Set time to midnight UTC for "Same for everyone" logic
+            const dayStart = new Date(gameState.currentDate);
+            dayStart.setUTCHours(0,0,0,0);
+            
+            // Determine target using deterministic seed based on days since epoch
             if (gameState.isPractice) {
                 gameState.targetCountry = countries[Math.floor(Math.random() * countries.length)];
                 document.getElementById('current-date-display').innerText = "PRACTICE MODE";
                 gameState.maxGuesses = Infinity;
             } else {
-                const dayIndex = Math.floor((gameState.currentDate.getTime() / 86400000)) % countries.length;
-                gameState.targetCountry = countries[dayIndex];
+                const daysSinceEpoch = Math.floor(dayStart.getTime() / 86400000);
+                const dailyIndex = daysSinceEpoch % countries.length;
+                gameState.targetCountry = countries[dailyIndex];
+                
                 document.getElementById('current-date-display').innerText = gameState.currentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 gameState.maxGuesses = 6;
             }
 
-            // Update UI
-            document.getElementById('silhouette').style.webkitMaskImage = `url('${gameState.targetCountry.svg}')`;
-            document.getElementById('silhouette').style.maskImage = `url('${gameState.targetCountry.svg}')`;
+            // Update UI elements
+            const silhouette = document.getElementById('silhouette');
+            silhouette.style.webkitMaskImage = `url('${gameState.targetCountry.svg}')`;
+            silhouette.style.maskImage = `url('${gameState.targetCountry.svg}')`;
+            
+            // Clear previous game data
             document.getElementById('guesses-list').innerHTML = '';
             gameState.guesses = [];
             gameState.isGameOver = false;
+            
             updateGuessCounter();
             renderCalendar();
             renderStats();
@@ -471,12 +484,13 @@
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                      math.sin(dLon/2) * Math.sin(dLon/2);
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return Math.round(R * c);
         }
 
         function getDirectionEmoji(lat1, lon1, lat2, lon2) {
+            if (lat1 === lat2 && lon1 === lon2) return "🎉";
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
             const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
@@ -539,7 +553,8 @@
 
         function updateGuessCounter() {
             const count = gameState.isPractice ? "∞" : gameState.maxGuesses;
-            document.getElementById('guess-counter').innerText = `GUESS ${gameState.guesses.length + (gameState.isGameOver ? 0 : 1)}/${count}`;
+            const current = gameState.guesses.length + (gameState.isGameOver ? 0 : 1);
+            document.getElementById('guess-counter').innerText = `GUESS ${current}/${count}`;
         }
 
         function endGame(win) {
@@ -550,7 +565,9 @@
                     gameState.stats.wins++;
                     gameState.stats.streak++;
                     gameState.stats.maxStreak = Math.max(gameState.stats.streak, gameState.stats.maxStreak);
-                    gameState.stats.distribution[gameState.guesses.length - 1]++;
+                    if (gameState.guesses.length <= 6) {
+                        gameState.stats.distribution[gameState.guesses.length - 1]++;
+                    }
                 } else {
                     gameState.stats.streak = 0;
                 }
@@ -593,7 +610,7 @@
                     <div style="display:flex; align-items:center; gap:10px">
                         <span style="width:10px">${i+1}</span>
                         <div class="distribution-bar" style="flex-grow:1">
-                            <div class="bar-fill" style="width:${width}%">${val}</div>
+                            <div class="bar-fill" style="width:${Math.max(5, width)}%">${val}</div>
                         </div>
                     </div>
                 `;
@@ -603,14 +620,15 @@
         function renderCalendar() {
             const cal = document.getElementById('calendar');
             cal.innerHTML = '';
+            const today = new Date();
             for(let i = -13; i <= 0; i++) {
-                const d = new Date();
+                const d = new Date(today);
                 d.setDate(d.getDate() + i);
-                const day = d.getDate();
-                const isToday = i === 0;
+                const dayNum = d.getDate();
+                
                 const el = document.createElement('div');
-                el.className = `cal-day ${isToday ? 'today' : ''}`;
-                el.innerText = day;
+                el.className = `cal-day ${i === 0 ? 'today' : ''}`;
+                el.innerText = dayNum;
                 el.onclick = () => {
                     gameState.currentDate = d;
                     gameState.isPractice = false;
@@ -622,21 +640,21 @@
             }
         }
 
-        // --- Autocomplete Logic ---
-        const input = document.getElementById('guess-input');
-        input.addEventListener('input', () => {
-            const val = input.value.toLowerCase();
+        // --- Autocomplete & Input Logic ---
+        const inputField = document.getElementById('guess-input');
+        inputField.addEventListener('input', () => {
+            const val = inputField.value.toLowerCase();
             const list = document.getElementById('autocomplete-list');
             list.innerHTML = '';
             if (!val) { list.style.display = 'none'; return; }
             
             const filtered = countries.filter(c => c.name.toLowerCase().includes(val));
-            filtered.forEach(c => {
+            filtered.forEach((c, idx) => {
                 const item = document.createElement('div');
-                item.className = 'autocomplete-item';
+                item.className = 'autocomplete-item' + (idx === 0 ? ' active' : '');
                 item.innerText = c.name;
                 item.onclick = () => {
-                    input.value = c.name;
+                    inputField.value = c.name;
                     list.style.display = 'none';
                     makeGuess();
                 };
@@ -652,27 +670,36 @@
             let active = list.querySelector('.active');
             let activeIdx = Array.from(items).indexOf(active);
 
+            // W / S for selection
             if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
+                e.preventDefault();
                 if (activeIdx > 0) {
                     if (active) active.classList.remove('active');
                     items[activeIdx - 1].classList.add('active');
+                    items[activeIdx - 1].scrollIntoView({ block: 'nearest' });
                 }
             } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+                e.preventDefault();
                 if (activeIdx < items.length - 1) {
                     if (active) active.classList.remove('active');
                     items[activeIdx + 1].classList.add('active');
+                    items[activeIdx + 1].scrollIntoView({ block: 'nearest' });
                 }
-            } else if (e.key === ' ' || e.key === 'Enter') {
-                if (active) {
+            } 
+            // Space or Enter to select
+            else if (e.key === ' ' || e.key === 'Enter') {
+                if (active && list.style.display !== 'none') {
+                    e.preventDefault();
                     active.click();
-                } else if (document.activeElement !== input) {
-                    input.focus();
+                } else if (document.activeElement !== inputField) {
+                    e.preventDefault();
+                    inputField.focus();
                 }
             }
         });
 
-        // Start
-        initGame();
+        // Initialize on Load
+        window.onload = initGame;
     </script>
 </body>
 </html>
