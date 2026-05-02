@@ -522,6 +522,21 @@
             0%, 100% { transform: translateX(0); }
             50% { transform: translateX(5px); }
         }
+
+        .format-btn {
+            background: #3f3f46;
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #52525b;
+            transition: all 0.2s;
+        }
+
+        .format-btn.active {
+            background: #d2691e;
+            border-color: #f97316;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
@@ -567,6 +582,15 @@
             <div class="px-3 py-2 text-[11px] text-zinc-400 border-b border-zinc-700 mb-1 font-bold flex justify-between items-center">
                 <span>Playtime:</span>
                 <span id="stat-playtime" class="text-orange-400">0h 0m 0s</span>
+            </div>
+
+            <div class="px-3 py-2 border-b border-zinc-700">
+                <div class="text-[10px] text-zinc-500 mb-2 font-bold">NUMBER FORMAT</div>
+                <div class="flex gap-1 justify-between">
+                    <button id="fmt-short" onclick="setNumberFormat('short')" class="format-btn active">1 B</button>
+                    <button id="fmt-long" onclick="setNumberFormat('long')" class="format-btn">1 Billion</button>
+                    <button id="fmt-full" onclick="setNumberFormat('full')" class="format-btn">1,000,000</button>
+                </div>
             </div>
             
             <button onclick="switchTab('achievements'); toggleSettings();" class="settings-btn text-white hover:text-yellow-400">
@@ -773,6 +797,7 @@
             heatResist: 0,
             quantumChipLevel: 0,
             nanoOvenLevel: 0,
+            numberFormat: 'short', // Added format setting
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -869,6 +894,15 @@
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
+
+        function setNumberFormat(format) {
+            state.numberFormat = format;
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('fmt-' + format).classList.add('active');
+            updateUI();
+            initShop();
+            saveGame();
+        }
 
         function closeStartupModal(disable) {
             document.getElementById('startup-modal').style.display = 'none';
@@ -1186,15 +1220,23 @@
         }
 
         function formatNumber(num) {
-            if (num >= 1e24) return (num / 1e24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Y';
-            if (num >= 1e21) return (num / 1e21).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Z';
-            if (num >= 1e18) return (num / 1e18).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' E';
-            if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Q';
-            if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' T';
-            if (num >= 1e9) return (num / 1e9).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' B';
-            if (num >= 1000000) return (num / 1000000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' M';
-            if (num >= 1000) return (num / 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' k';
-            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            // Updated Format Logic
+            if (state.numberFormat === 'full') {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            const shortWords = ["", " k", " M", " B", " T", " Qa", " Qi", " Sx", " Sp", " Oc", " No", " Dc"];
+            const longWords = ["", " Thousand", " Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion"];
+            
+            let words = state.numberFormat === 'long' ? longWords : shortWords;
+
+            if (num < 1000) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            let exponent = Math.floor(Math.log10(Math.abs(num)) / 3);
+            if (exponent >= words.length) exponent = words.length - 1;
+
+            let shortValue = num / Math.pow(10, exponent * 3);
+            return shortValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + words[exponent];
         }
 
         function clickCookie(e) {
@@ -1433,50 +1475,6 @@
             const ground = window.innerHeight - 80;
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
-
-            for (let i = 0; i < activeSpecialCookies.length; i++) {
-                for (let j = i + 1; j < activeSpecialCookies.length; j++) {
-                    const c1 = activeSpecialCookies[i];
-                    const c2 = activeSpecialCookies[j];
-
-                    if (c1.state === 'flying' || c2.state === 'flying') continue;
-
-                    const dx = c2.x - c1.x;
-                    const dy = c2.y - c1.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const minDistance = c1.radius + c2.radius;
-
-                    if (distance < minDistance && distance > 0.1) {
-                        const overlap = minDistance - distance;
-                        const nx = dx / distance; 
-                        const ny = dy / distance; 
-
-                        const moveX = nx * overlap * 0.5;
-                        const moveY = ny * overlap * 0.5;
-
-                        if (c1.state === 'falling') {
-                            c1.x -= moveX;
-                            c1.y -= moveY;
-                        }
-                        if (c2.state === 'falling') {
-                            c2.x += moveX;
-                            c2.y += moveY;
-                        }
-
-                        const relativeVelocityX = c1.vx - c2.vx;
-                        const relativeVelocityY = c1.vy - c2.vy;
-                        const dotProduct = relativeVelocityX * nx + relativeVelocityY * ny;
-
-                        if (dotProduct > 0) {
-                            const impulse = 2 * dotProduct / 2; 
-                            c1.vx -= impulse * nx;
-                            c1.vy -= impulse * ny;
-                            c2.vx += impulse * nx;
-                            c2.vy += impulse * ny;
-                        }
-                    }
-                }
-            }
 
             activeSpecialCookies.forEach(c => {
                 if (c.state === 'falling') {
@@ -1851,6 +1849,7 @@
                 try {
                     const data = JSON.parse(saved);
                     applySaveData(data);
+                    setNumberFormat(state.numberFormat || 'short');
                 } catch (e) { console.error("Load failed", e); }
             }
         }
@@ -1935,7 +1934,7 @@
                 
                 const startup = document.getElementById('startup-modal');
                 if (startup && startup.style.display === 'none') {
-                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) {
+                    if (fps < 57 && state.showParticles && !state.performanceWarningShown) {
                         showPerformanceModal();
                     }
                 }
