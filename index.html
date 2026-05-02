@@ -94,9 +94,92 @@
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
         }
+
+        /* Click Meter Styles */
+        #frenzy-meter-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 24px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        #frenzy-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            transition: width 0.1s linear;
+        }
+
+        .multiplier-tag {
+            position: absolute;
+            right: 10px;
+            top: 0;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 24px;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        /* Golden Cookie */
+        .golden-cookie {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 15px #ffd700);
+            z-index: 150;
+            animation: fall-down 4s linear forwards;
+        }
+
+        @keyframes fall-down {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
+        }
+
+        /* Prestige Bar */
+        #prestige-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #444;
+            padding: 8px;
+            border-radius: 8px;
+            z-index: 100;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
+
+    <!-- Frenzy Meter Area -->
+    <div id="frenzy-meter-container">
+        <div id="frenzy-bar"></div>
+        <div id="multiplier-display" class="multiplier-tag">x1.0</div>
+    </div>
+
+    <!-- Prestige Progress Area -->
+    <div id="prestige-container">
+        <div class="flex justify-between text-[10px] mb-1">
+            <span>PRESTIGE PROGRESS</span>
+            <span id="prestige-percent">0%</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+            <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
+        </div>
+        <button id="prestige-btn" onclick="prestige()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
+            PRESTIGE NOW!
+        </button>
+        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Current Bonus: +0%</div>
+    </div>
 
     <!-- Left Section: Cookie Clicking Area -->
     <div class="flex-1 flex flex-col items-center justify-center p-8 relative">
@@ -156,10 +239,18 @@
             totalClicks: 0,
             cps: 0,
             lastTick: Date.now(),
-            unlockedUpgrades: 1 
+            unlockedUpgrades: 1,
+            // New Features
+            clickHeat: 0,
+            multiplier: 1.0,
+            prestigeLevel: 0,
+            prestigeBonus: 1.0, // 1.0 = no bonus, 1.5 = 50% extra
+            goldenCookieTimer: 0
         };
 
-        let upgrades = [
+        const PRESTIGE_THRESHOLD = 1000000000000; // 1 Trillion
+
+        let baseUpgrades = [
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake more cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
             { id: 'farm', name: 'Farm', description: 'Grows cookie plants from cookie seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
@@ -169,6 +260,8 @@
             { id: 'temple', name: 'Temple', description: 'Full of cookie gods.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
             { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' }
         ];
+
+        let upgrades = JSON.parse(JSON.stringify(baseUpgrades));
 
         /**
          * Generiert neue Upgrades für den Endlos-Modus
@@ -200,6 +293,14 @@
         const particleContainer = document.getElementById('particle-container');
         const statTotalClicks = document.getElementById('stat-total-clicks');
         const statAllTime = document.getElementById('stat-all-time');
+        
+        // New UI Elements
+        const frenzyBar = document.getElementById('frenzy-bar');
+        const multiplierDisplay = document.getElementById('multiplier-display');
+        const prestigeBar = document.getElementById('prestige-bar');
+        const prestigePercent = document.getElementById('prestige-percent');
+        const prestigeBtn = document.getElementById('prestige-btn');
+        const currentBonusDisplay = document.getElementById('current-bonus-display');
 
         /**
          * Initialisiert den Shop basierend auf freigeschalteten Upgrades
@@ -247,10 +348,14 @@
          * Cookie-Klick Logik
          */
         function clickCookie(e) {
-            addCookies(1.0);
+            const amount = 1.0 * state.multiplier * state.prestigeBonus;
+            addCookies(amount);
             state.totalClicks++;
             
-            createParticle(e.clientX, e.clientY, "+1");
+            // Increment Heat
+            state.clickHeat = Math.min(100, state.clickHeat + 5);
+            
+            createParticle(e.clientX, e.clientY, `+${amount.toFixed(1)}`);
             spawnFloatingCookie();
             updateUI();
             saveGame();
@@ -335,18 +440,111 @@
             setTimeout(() => f.remove(), 2000);
         }
 
+        function spawnGoldenCookie() {
+            const g = document.createElement('div');
+            g.className = 'golden-cookie';
+            const x = 50 + Math.random() * (window.innerWidth - 150);
+            g.style.left = x + 'px';
+            
+            g.innerHTML = `
+                <svg viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="#ffd700" />
+                    <circle cx="100" cy="100" r="80" fill="#ffcc00" />
+                    <circle cx="60" cy="60" r="8" fill="#d4af37" />
+                    <circle cx="140" cy="140" r="10" fill="#d4af37" />
+                </svg>
+            `;
+            
+            g.onclick = (e) => {
+                const bonus = Math.max(10, state.cps * 60); // 1 minute of CPS
+                addCookies(bonus);
+                createParticle(e.clientX, e.clientY, `GOLDEN! +${formatNumber(bonus)}`);
+                g.remove();
+            };
+
+            document.body.appendChild(g);
+            setTimeout(() => { if(g) g.remove(); }, 4000);
+        }
+
+        /**
+         * Prestige System
+         */
+        function prestige() {
+            if (state.cookies < PRESTIGE_THRESHOLD) return;
+
+            // Calculate bonus: 1% base + progress bonus (logarithmic/linear mix)
+            // Every Trillion adds significantly to the bonus
+            const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            const extraBonus = newBonusPoints * 0.01; // 1% per Trillion
+
+            state.prestigeBonus += extraBonus;
+            state.prestigeLevel++;
+
+            // Reset Game
+            state.cookies = 0;
+            state.cps = 0;
+            state.unlockedUpgrades = 1;
+            state.clickHeat = 0;
+            upgrades = JSON.parse(JSON.stringify(baseUpgrades));
+
+            initShop();
+            updateUI();
+            saveGame();
+
+            // Notify
+            const p = document.createElement('div');
+            p.className = 'fixed inset-0 flex items-center justify-center bg-black/80 z-[200] text-center p-10';
+            p.innerHTML = `
+                <div>
+                    <h2 class="text-4xl font-bold text-purple-400 mb-4">PRESTIGE ASCENSION!</h2>
+                    <p class="text-xl">You have ascended to level ${state.prestigeLevel}.</p>
+                    <p class="text-2xl text-orange-400 mt-2">Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="mt-8 px-6 py-2 bg-purple-600 rounded-full font-bold">CONTINUE BAKING</button>
+                </div>
+            `;
+            document.body.appendChild(p);
+        }
+
         /**
          * Aktualisiert das User Interface
          */
         function updateUI() {
             cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            cpsDisplay.innerText = `per second: ${formatNumber(state.cps)}`;
+            cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
             
             statTotalClicks.innerText = state.totalClicks;
             statAllTime.innerText = formatNumber(state.totalCookiesEarned);
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
 
+            // Multiplier Logic
+            if (state.clickHeat >= 100) state.multiplier = 5.0;
+            else if (state.clickHeat >= 60) state.multiplier = 3.0;
+            else if (state.clickHeat >= 25) state.multiplier = 1.5;
+            else state.multiplier = 1.0;
+
+            frenzyBar.style.width = state.clickHeat + '%';
+            multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
+            
+            if (state.multiplier >= 5) {
+                frenzyBar.classList.add('animate-pulse');
+            } else {
+                frenzyBar.classList.remove('animate-pulse');
+            }
+
+            // Prestige UI
+            const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
+            prestigeBar.style.width = prestigeProg + '%';
+            prestigePercent.innerText = Math.floor(prestigeProg) + '%';
+            
+            if (state.cookies >= PRESTIGE_THRESHOLD) {
+                prestigeBtn.classList.remove('hidden');
+            } else {
+                prestigeBtn.classList.add('hidden');
+            }
+            currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
+
+            // Shop Items
             for (let i = 0; i < state.unlockedUpgrades; i++) {
                 const up = upgrades[i];
                 if (!up) continue;
@@ -387,9 +585,12 @@
                     const data = JSON.parse(saved);
                     state = { ...state, ...data.state };
                     
+                    // Reset multipliers for a clean start
+                    state.clickHeat = 0;
+                    state.multiplier = 1.0;
+                    
                     // Upgrades wiederherstellen
                     data.upgradeCounts.forEach((savedUp, index) => {
-                        // Falls mehr Upgrades gespeichert wurden als vorhanden, neue generieren
                         while (index >= upgrades.length) {
                             generateNextUpgrade();
                         }
@@ -398,7 +599,6 @@
                         }
                     });
                     
-                    // Sicherstellen, dass die Anzahl der freigeschalteten Upgrades stimmt
                     while (state.unlockedUpgrades > upgrades.length) {
                         generateNextUpgrade();
                     }
@@ -420,11 +620,26 @@
             const delta = (now - state.lastTick) / 1000;
             state.lastTick = now;
 
+            // Passive decay of click heat
+            state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
+
+            // Passive cookie generation
             if (state.cps > 0) {
-                addCookies(state.cps * delta);
-                updateUI();
+                addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             }
 
+            // Golden Cookies Logic
+            if (state.multiplier >= 5.0) {
+                state.goldenCookieTimer += delta;
+                if (state.goldenCookieTimer >= 5) {
+                    spawnGoldenCookie();
+                    state.goldenCookieTimer = 0;
+                }
+            } else {
+                state.goldenCookieTimer = 0;
+            }
+
+            updateUI();
             requestAnimationFrame(gameLoop);
         }
 
