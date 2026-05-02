@@ -1,538 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORLDLE - Guess the Country</title>
-    <style>
-        :root {
-            --bg-color: #0b1322;
-            --text-color: #ffffff;
-            --primary-green: #7eb342;
-            --secondary-bg: #1a2a44;
-            --border-color: #2c3e50;
-            --highlight-color: #3498db;
-            --guess-bar-bg: #2d384d;
-            --empty-slot-bg: #162235;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Amountle — how many are inside?</title>
+  <meta name="description" content="The daily estimation game. Watch objects drop and guess the count — five rounds, eight seconds each." />
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#080808" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://amountle.dev" />
+  <meta property="og:title" content="Amountle — how many are inside?" />
+  <meta property="og:description" content="The daily estimation game. Watch objects drop and guess the count — five rounds, eight seconds each." />
+  <meta property="og:image" content="https://amountle.dev/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-        /* --- Header --- */
-        header {
-            width: 100%;
-            max-width: 500px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Amountle — how many are inside?" />
+  <meta name="twitter:description" content="The daily estimation game. Watch objects drop and guess the count — five rounds, eight seconds each." />
+  <meta name="twitter:image" content="https://amountle.dev/og.png" />
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .logo span { color: var(--primary-green); }
-
-        .header-icons {
-            display: flex;
-            gap: 15px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        /* --- Game Area --- */
-        .game-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            flex-grow: 1;
-        }
-
-        /* Date/Mode Nav */
-        .nav-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .selector-box {
-            background: var(--secondary-bg);
-            padding: 8px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-grow: 0.8;
-            justify-content: center;
-        }
-
-        .nav-arrow {
-            background: #2d384d;
-            color: #5d6d7e;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* Silhouette */
-        .silhouette-box {
-            width: 250px;
-            height: 250px;
-            background-color: white;
-            mask-size: contain;
-            mask-repeat: no-repeat;
-            mask-position: center;
-            -webkit-mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            -webkit-mask-position: center;
-            margin: 10px 0;
-        }
-
-        /* Input Area */
-        .input-group {
-            width: 100%;
-            display: flex;
-            gap: 10px;
-            position: relative;
-        }
-
-        #guess-input {
-            flex-grow: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid var(--primary-green);
-            background: rgba(255,255,255,0.05);
-            color: white;
-            outline: none;
-            font-size: 16px;
-        }
-
-        .btn-guess {
-            background-color: #f8f9fa;
-            color: #2c3e50;
-            border: none;
-            padding: 0 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #autocomplete-list {
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            width: 100%;
-            background: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 10;
-            display: none;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #2c3e50; }
-        .autocomplete-item:hover, .autocomplete-item.active { background: var(--highlight-color); }
-
-        /* --- Guesses (The Pills) --- */
-        .guesses-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .guess-data-row {
-            display: flex;
-            gap: 5px;
-            width: 100%;
-        }
-
-        .pill {
-            background: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .pill-name { flex: 2.5; }
-        .pill-dist { flex: 1.5; }
-        .pill-dir { flex: 0.8; background: #3498db; color: white; border: none; }
-        .pill-prox { flex: 1; }
-
-        /* --- Counter & Slots --- */
-        .status-bar {
-            width: 100%;
-            height: 38px;
-            background: var(--guess-bar-bg);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 13px;
-            color: #bdc3c7;
-            letter-spacing: 1px;
-        }
-
-        .empty-slot {
-            width: 100%;
-            height: 14px;
-            background: var(--empty-slot-bg);
-            border-radius: 10px;
-            opacity: 0.6;
-        }
-
-        /* --- Modals --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 100; justify-content: center; align-items: center;
-        }
-
-        .modal-content {
-            background: var(--secondary-bg);
-            width: 90%; max-width: 450px;
-            padding: 25px; border-radius: 15px;
-            position: relative; max-height: 85vh; overflow-y: auto;
-        }
-
-        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .stat-box { text-align: center; }
-        .stat-box .v { font-size: 22px; font-weight: bold; }
-        .stat-box .l { font-size: 10px; color: #999; text-transform: uppercase; }
-
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .cal-day { padding: 8px; background: #2c3e50; text-align: center; cursor: pointer; border-radius: 5px; font-size: 12px; }
-        .cal-day.today { border: 2px solid var(--primary-green); }
-
-        .footer { margin-top: auto; padding: 25px; text-align: center; font-size: 13px; color: #7f8c8d; font-weight: bold; }
-    </style>
+  <!-- Google Search Console -->
+  <meta name="google-site-verification" content="LiRfOVu8Mu1wV6BS5WliwBuA2G0BhI7ts9GxwfVK5I8" />
+  <link rel="canonical" href="https://amountle.dev/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=block" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-52JSXMFRK2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-52JSXMFRK2');
+  </script>
+  <!-- Microsoft Clarity -->
+  <script>
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "vk10fklk5t");
+  </script>
+  <script type="module" crossorigin src="/assets/index-BzUMjuTW.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DjOK3sGb.css">
 </head>
 <body>
+<div id="app">
+  <div id="card">
 
-    <header>
-        <div class="header-icons" onclick="toggleModal('modal-help')">👤</div>
-        <div class="logo">🌍 WOR<span>L</span>DLE</div>
-        <div class="header-icons">
-            <span onclick="toggleModal('modal-stats')">📊</span>
-            <span onclick="toggleModal('modal-settings')">≡</span>
+    <!-- ── SCREEN: Start ───────────────────────────── -->
+    <div id="screen-start" class="screen hidden">
+      <div id="start-inner">
+        <div id="start-logo">AMOUNTLE</div>
+        <h2 id="start-tagline">how many<br>are inside?</h2>
+        <div id="start-btn-row">
+          <div id="start-mode-btns">
+            <button id="btn-fill-home" class="hidden">fill mode</button>
+            <button id="btn-start">play today's</button>
+          </div>
+          <button id="btn-results" class="hidden">results</button>
+          <button id="btn-fill-results" class="hidden">fill results</button>
         </div>
-    </header>
-
-    <div class="game-container">
-        <div class="nav-controls">
-            <button class="nav-arrow" onclick="changeDay(-1)">◀</button>
-            <div class="selector-box">🎉 Country ▾</div>
-            <button class="nav-arrow" onclick="changeDay(1)">▶</button>
+        <p id="start-meta"></p>
+        <div id="start-footer">
+          <button id="btn-how">how to play</button>
+          <span class="start-sep">·</span>
+          <button id="btn-lb">leaderboard</button>
+          <span class="start-sep">·</span>
+          <button id="btn-streak">streak</button>
+          <span class="start-sep">·</span>
+          <button id="btn-fill">fill</button>
+          <span class="start-sep">·</span>
+          <button id="btn-vote">vote <span class="new-badge" id="vote-cta" style="display:none">new</span></button>
+        </div>
+        <!-- Streak strip — card below footer, hidden when no streak -->
+        <div id="streak-strip" class="hidden">
+          <div id="streak-strip-top">
+            <span id="streak-strip-badge">🔥 <span id="streak-strip-count">0</span></span>
+            <span id="streak-strip-label">day streak</span>
+          </div>
+          <div id="streak-strip-days"></div>
+        </div>
+        <!-- Avatar + support button — native only, stacked at bottom -->
+        <div id="start-support-stack" class="native-only hidden">
+          <div id="start-avatar"></div>
+          <button id="btn-support">support ♥</button>
         </div>
 
-        <div id="silhouette" class="silhouette-box"></div>
 
-        <div class="input-group">
-            <input type="text" id="guess-input" placeholder="Country, territory..." autocomplete="off">
-            <button class="btn-guess" onclick="makeGuess()">🌐 Guess</button>
-            <div id="autocomplete-list"></div>
-        </div>
 
-        <div class="guesses-container" id="guesses-list">
-            <!-- Dynamic rows will appear here -->
-        </div>
-
-        <div id="status-bar-container" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
-            <div class="status-bar" id="guess-counter-bar">GUESS 1 / 6</div>
-            <div class="empty-slot"></div>
-            <div class="empty-slot"></div>
-            <div class="empty-slot"></div>
-            <div class="empty-slot"></div>
-            <div class="empty-slot"></div>
-        </div>
+      </div>
     </div>
 
-    <div class="footer">
-        WORLDLE - Guess the Country | Daily Geography Game
-    </div>
+    <!-- ── Tutorial overlay ─────────────────────────── -->
+    <div id="tut-overlay" class="hidden">
+      <div class="overlay-header">
+        <span class="overlay-title">how to play</span>
+        <button class="btn-overlay-close" id="btn-tut-close">✕</button>
+      </div>
+      <div id="tut-body">
 
-    <!-- Modals (Help, Stats, Settings) -->
-    <div id="modal-help" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="toggleModal('modal-help')">&times;</span>
-            <h2>How to play</h2>
-            <p style="margin: 10px 0;">Guess the WORLDLE in 6 guesses.</p>
-            <hr style="border: 0.5px solid #444; margin: 15px 0;">
-            <p>Example:</p>
-            <div class="guess-data-row" style="margin-top: 10px;">
-                <div class="pill pill-name">AUSTRIA</div>
-                <div class="pill pill-dist">0km</div>
-                <div class="pill pill-dir" style="background:#27ae60">🎉</div>
-                <div class="pill pill-prox">100%</div>
+        <!-- Visual summary -->
+        <div id="tut-visual">
+          <div id="tut-stats">
+            <div class="tut-stat"><span class="tut-stat-n">5</span><span class="tut-stat-l">rounds</span></div>
+            <div class="tut-stat"><span class="tut-stat-n">:08</span><span class="tut-stat-l">seconds each</span></div>
+            <div class="tut-stat"><span class="tut-stat-n">500</span><span class="tut-stat-l">max score</span></div>
+          </div>
+          <div id="tut-scale">
+            <p class="tut-scale-title">scoring</p>
+            <div class="tut-scale-row">
+              <span class="tut-scale-label">exact</span>
+              <div class="tut-scale-track"><div class="tut-scale-fill" style="width:100%"></div></div>
+              <span class="tut-scale-pts">100 + ⅓ count</span>
             </div>
-            <p style="font-size: 12px; margin-top:10px; color: #999;">Correct! The target was Austria.</p>
-        </div>
-    </div>
-
-    <div id="modal-stats" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="toggleModal('modal-stats')">&times;</span>
-            <h2>Statistics</h2>
-            <div class="stats-grid" id="stats-view">
-                <div class="stat-box"><div class="v" id="s-p">0</div><div class="l">Played</div></div>
-                <div class="stat-box"><div class="v" id="s-w">0%</div><div class="l">Win %</div></div>
-                <div class="stat-box"><div class="v" id="s-s">0</div><div class="l">Streak</div></div>
-                <div class="stat-box"><div class="v" id="s-m">0</div><div class="l">Max</div></div>
+            <div class="tut-scale-row">
+              <span class="tut-scale-label">±25%</span>
+              <div class="tut-scale-track"><div class="tut-scale-fill" style="width:56%"></div></div>
+              <span class="tut-scale-pts">~56 pts</span>
             </div>
-            <h3>Archive</h3>
-            <div class="calendar-grid" id="calendar"></div>
-        </div>
-    </div>
-
-    <div id="modal-settings" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="toggleModal('modal-settings')">&times;</span>
-            <h2>Settings</h2>
-            <div style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
-                <span>Practice Mode (Infinite)</span>
-                <input type="checkbox" id="practice-check" onchange="togglePractice()" style="width:20px; height:20px;">
+            <div class="tut-scale-row">
+              <span class="tut-scale-label">±50%</span>
+              <div class="tut-scale-track"><div class="tut-scale-fill" style="width:2%"></div></div>
+              <span class="tut-scale-pts">0 pts</span>
             </div>
+            <p class="tut-scale-note">the bonus rewards harder rounds — if 150 objects drop and you nail it, that's 100 + 50</p>
+          </div>
         </div>
+
+        <!-- Rules -->
+        <div id="tut-rules">
+          <div class="tut-step">
+            <span class="tut-step-n">1</span>
+            <span>Objects drop into a container. Watch them pile up and count.</span>
+          </div>
+          <div class="tut-step">
+            <span class="tut-step-n">2</span>
+            <span>Once they settle, you have 8 seconds to type your best guess.</span>
+          </div>
+          <div class="tut-step">
+            <span class="tut-step-n">3</span>
+            <span>The closer you are, the more points. A new puzzle drops every day.</span>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <script>
-        // --- Game Data ---
-        const countries = [
-            { name: "Austria", lat: 47.516, lon: 14.550, svg: "https://upload.wikimedia.org/wikipedia/commons/4/41/Austria_location_map.svg" },
-            { name: "Nigeria", lat: 9.082, lon: 8.675, svg: "https://upload.wikimedia.org/wikipedia/commons/2/23/Nigeria_location_map.svg" },
-            { name: "Botswana", lat: -22.328, lon: 24.684, svg: "https://upload.wikimedia.org/wikipedia/commons/7/71/Botswana_location_map.svg" },
-            { name: "Germany", lat: 51.165, lon: 10.451, svg: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Germany_location_map.svg" },
-            { name: "Japan", lat: 36.204, lon: 138.252, svg: "https://upload.wikimedia.org/wikipedia/commons/2/24/Japan_location_map.svg" },
-            { name: "Brazil", lat: -14.235, lon: -51.925, svg: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Brazil_location_map.svg" },
-            { name: "Canada", lat: 56.130, lon: -106.346, svg: "https://upload.wikimedia.org/wikipedia/commons/6/67/Canada_location_map.svg" }
-        ];
+    <!-- ── Bottom-left FAB row ───────────────────────── -->
+    <div id="fab-row">
+      <button id="btn-achievements" aria-label="Achievements">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+      </button>
+      <button id="btn-stats" aria-label="Your Stats">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/>
+        </svg>
+      </button>
+      <a id="btn-discord" href="https://discord.gg/T2fhrzDrME" target="_blank" rel="noopener" aria-label="Join Discord">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+        </svg>
+      </a>
+      <span class="fab-spacer"></span>
+      <a id="btn-appstore" href="https://apps.apple.com/app/id6760197242" target="_blank" rel="noopener" aria-label="App Store">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 814 1000" width="18" height="18" fill="currentColor">
+          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-42.3-150.3-109.7C14.6 794 1 716.3 1 641.8c0-219.7 117.1-336.5 232.6-336.5 86.4 0 140.4 55.4 192.3 55.4 50 0 112.7-58.6 203.2-58.6 37.7 0 130.7 3.3 197.4 100.6zm-162.3-181.6c43.4-50.9 74.5-121.4 74.5-191.8 0-9.7-.6-19.5-2.6-27.9-69.8 2.6-152.4 46.4-201.3 103.4-37.7 41.5-74.5 112-74.5 183.8 0 10.9 1.9 21.8 2.6 25.3 4.5.6 11.6 1.9 18.8 1.9 63.4 0 140.4-41.5 182.5-94.7z"/>
+        </svg>
+      </a>
+      <a id="start-bmc" href="https://buymeacoffee.com/isaacaudet" target="_blank" rel="noopener" aria-label="Buy me a coffee">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+          <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+        </svg>
+      </a>
+      <a id="btn-github" href="https://github.com/isaacaudet" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+      <button id="btn-settings" class="native-only hidden" aria-label="Settings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
 
-        let state = {
-            date: new Date(),
-            target: null,
-            guesses: [],
-            isGameOver: false,
-            isPractice: false,
-            stats: JSON.parse(localStorage.getItem('w_stats')) || { p: 0, w: 0, s: 0, m: 0, d: [0,0,0,0,0,0] }
-        };
+    <!-- ── Achievements overlay ─────────────────────── -->
+    <div id="ach-overlay" class="hidden">
+      <div class="overlay-header">
+        <span class="overlay-title">achievements</span>
+        <button class="btn-overlay-close" id="btn-ach-close">✕</button>
+      </div>
+      <div id="ach-list"></div>
+    </div>
 
-        // --- Logic ---
+    <!-- ── Stats overlay ──────────────────────────────── -->
+    <div id="stats-overlay" class="hidden">
+      <div class="overlay-header">
+        <span class="overlay-title">your stats</span>
+        <button class="btn-overlay-close" id="btn-stats-close">✕</button>
+      </div>
+      <div id="stats-body"></div>
+    </div>
 
-        function init() {
-            const dayIdx = Math.floor(state.date.getTime() / 86400000) % countries.length;
-            state.target = state.isPractice ? countries[Math.floor(Math.random() * countries.length)] : countries[dayIdx];
-            
-            document.getElementById('silhouette').style.webkitMaskImage = `url('${state.target.svg}')`;
-            document.getElementById('silhouette').style.maskImage = `url('${state.target.svg}')`;
-            
-            state.guesses = [];
-            state.isGameOver = false;
-            document.getElementById('guesses-list').innerHTML = '';
-            refreshUI();
-            renderCalendar();
-        }
 
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
-            return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-        }
+    <!-- ── Vote overlay ────────────────────────────────── -->
+    <div id="vote-overlay" class="hidden">
+      <div class="overlay-header">
+        <span class="overlay-title" id="vote-overlay-title">vote on the next shape</span>
+        <button class="btn-overlay-close" id="btn-vote-close">✕</button>
+      </div>
+      <div id="vote-body"></div>
+    </div>
 
-        function getDirEmoji(lat1, lon1, lat2, lon2) {
-            if (lat1 === lat2 && lon1 === lon2) return "🎉";
-            const y = Math.sin((lon2-lon1)*Math.PI/180) * Math.cos(lat2*Math.PI/180);
-            const x = Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180) - Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos((lon2-lon1)*Math.PI/180);
-            const brng = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-            return ["⬆️","↗️","➡️","↘️","⬇️","↙️","⬅️","↖️","⬆️"][Math.round(brng/45)];
-        }
+    <!-- ── Support overlay: injected by initSupportOverlay() on iOS only ── -->
 
-        function makeGuess() {
-            if (state.isGameOver) return;
-            const input = document.getElementById('guess-input');
-            const country = countries.find(c => c.name.toLowerCase() === input.value.trim().toLowerCase());
-            
-            if (!country || state.guesses.some(g => g.name === country.name)) return;
+    <!-- ── Leaderboard overlay ──────────────────────── -->
+    <div id="lb-overlay" class="hidden">
+      <div class="overlay-header">
+        <div id="lb-header-left">
+          <span class="overlay-title">leaderboard</span>
+          <span id="lb-header-count"></span>
+        </div>
+        <button id="btn-lb-jump" class="hidden">my rank</button>
+        <button class="btn-overlay-close" id="btn-lb-close">✕</button>
+      </div>
+      <div id="lb-tabs">
+        <button class="lb-tab lb-tab--active" id="lb-tab-daily">daily</button>
+        <button class="lb-tab" id="lb-tab-fill">fill</button>
+        <button class="lb-tab" id="lb-tab-streak">streak</button>
+      </div>
+      <div id="lb-overlay-list"></div>
+    </div>
 
-            const d = calculateDistance(country.lat, country.lon, state.target.lat, state.target.lon);
-            const dir = getDirEmoji(country.lat, country.lon, state.target.lat, state.target.lon);
-            const prox = Math.max(0, 100 - Math.round((d / 20000) * 100));
+    <!-- ── SCREEN: Game ────────────────────────────── -->
+    <div id="screen-game" class="screen hidden">
 
-            const g = { name: country.name, dist: d, dir: dir, prox: prox };
-            state.guesses.push(g);
-            renderGuess(g);
-            input.value = '';
-            
-            if (country.name === state.target.name) end(true);
-            else if (!state.isPractice && state.guesses.length >= 6) end(false);
-            
-            refreshUI();
-        }
+      <div id="game-header">
+        <span id="game-logo">AMOUNTLE</span>
+        <button id="btn-tut-skip" class="hidden">skip tutorial</button>
+        <div id="header-right">
+          <div id="round-dots">
+            <span class="dot" data-i="0"></span>
+            <span class="dot" data-i="1"></span>
+            <span class="dot" data-i="2"></span>
+            <span class="dot" data-i="3"></span>
+            <span class="dot" data-i="4"></span>
+          </div>
+          <span id="streak-counter" class="hidden"></span>
+          <button id="btn-fastfwd" class="hidden" aria-label="Fast forward">▶▶</button>
+          <button id="btn-mute" aria-label="Toggle sound"></button>
+        </div>
+      </div>
 
-        function renderGuess(g) {
-            const row = document.createElement('div');
-            row.className = 'guess-data-row';
-            row.innerHTML = `
-                <div class="pill pill-name">${g.name.toUpperCase()}</div>
-                <div class="pill pill-dist">${g.dist.toLocaleString()}km</div>
-                <div class="pill pill-dir">${g.dir}</div>
-                <div class="pill pill-prox">${g.prox}%</div>
-            `;
-            document.getElementById('guesses-list').appendChild(row);
-        }
+      <div id="timer-track">
+        <div id="timer-bar"></div>
+      </div>
 
-        function refreshUI() {
-            const count = state.isPractice ? "∞" : "6";
-            const current = state.guesses.length + (state.isGameOver ? 0 : 1);
-            document.getElementById('guess-counter-bar').innerText = `GUESS ${current} / ${count}`;
-            
-            // Render empty slots
-            const container = document.getElementById('status-bar-container');
-            const existingSlots = container.querySelectorAll('.empty-slot');
-            existingSlots.forEach(s => s.remove());
-            
-            if (!state.isPractice) {
-                const remaining = 6 - state.guesses.length - (state.isGameOver ? 0 : 1);
-                for(let i=0; i<remaining; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'empty-slot';
-                    container.appendChild(slot);
-                }
-            }
-            
-            // Stats UI
-            document.getElementById('s-p').innerText = state.stats.p;
-            document.getElementById('s-w').innerText = (state.stats.p ? Math.round(state.stats.w/state.stats.p*100) : 0) + "%";
-            document.getElementById('s-s').innerText = state.stats.s;
-            document.getElementById('s-m').innerText = state.stats.m;
-        }
+      <div id="canvas-wrap">
+        <canvas id="game-canvas"></canvas>
+        <div id="fps-counter" style="position:absolute;top:6px;left:8px;font:bold 10px/1.5 monospace;color:#0f0;text-shadow:0 0 4px #000;pointer-events:none;z-index:999;white-space:pre;display:none"></div>
+        <!-- Fill mode shape preview porthole (canvas injected by showFillPorthole) -->
+        <div id="fill-preview" class="hidden"></div>
+        <!-- Controls hint (bottom-right corner of canvas) -->
+        <div id="controls-hint" class="hidden"></div>
+        <!-- Rotate hint -->
+        <div id="rotate-hint">↻ drag to spin</div>
+        <!-- Tutorial step overlay -->
+        <div id="tutorial-step" class="hidden">
+          <div id="tut-step-body">
+            <p id="tut-mode-label">practice round</p>
+            <p id="tut-step-msg">tap to drop · hold to pour</p>
+            <p id="tut-step-sub">fill to match the target</p>
+            <button id="tut-step-cta">got it</button>
+          </div>
+          <div id="tut-target-body">
+            <p id="tut-target-label">practice round</p>
+            <p id="tut-target-msg">this is your target</p>
+            <button id="tut-target-cta">got it</button>
+            <div id="tut-target-arrow"></div>
+          </div>
+        </div>
+        <!-- Count reveal overlay -->
+        <div id="count-overlay">
+          <p id="count-label">counting</p>
+          <div id="count-number">0</div>
+        </div>
+        <!-- Round result overlay (slides up over canvas) -->
+        <div id="round-result-overlay">
+          <div id="rr-grade"></div>
+          <div id="rr-detail"></div>
+          <div id="rr-points"></div>
+        </div>
+      </div>
 
-        function end(win) {
-            state.isGameOver = true;
-            if (!state.isPractice) {
-                state.stats.p++;
-                if (win) {
-                    state.stats.w++; state.stats.s++;
-                    state.stats.m = Math.max(state.stats.s, state.stats.m);
-                    state.stats.d[state.guesses.length-1]++;
-                } else state.stats.s = 0;
-                localStorage.setItem('w_stats', JSON.stringify(state.stats));
-            }
-            setTimeout(() => alert(win ? "Correct! 🏆" : "Game Over! It was " + state.target.name), 200);
-        }
+      <div id="game-bottom">
+        <div id="bottom-row">
+          <p id="prompt">how many?</p>
+          <span id="timer-display">:08</span>
+        </div>
+        <div id="fill-target-display" class="hidden"></div>
+        <button id="btn-fill-done" class="hidden">submit</button>
+        <div id="input-row">
+          <button id="btn-dec" disabled>−</button>
+          <input type="number" id="guess-input" placeholder="—" min="1" max="999" autocomplete="off" inputmode="none" disabled />
+          <button id="btn-inc" disabled>+</button>
+        </div>
+        <button id="btn-submit" disabled>submit</button>
+        <p id="hint-text">dropping…</p>
+        <div id="numpad">
+          <button class="np-btn" data-val="1">1</button>
+          <button class="np-btn" data-val="2">2</button>
+          <button class="np-btn" data-val="3">3</button>
+          <button class="np-btn" data-val="4">4</button>
+          <button class="np-btn" data-val="5">5</button>
+          <button class="np-btn" data-val="6">6</button>
+          <button class="np-btn" data-val="7">7</button>
+          <button class="np-btn" data-val="8">8</button>
+          <button class="np-btn" data-val="9">9</button>
+          <button class="np-btn" id="np-back">⌫</button>
+          <button class="np-btn" data-val="0">0</button>
+          <button class="np-btn" id="np-submit">✓</button>
+        </div>
+      </div>
 
-        // --- UI Utils ---
-        function toggleModal(id) {
-            const m = document.getElementById(id);
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        }
+    </div>
 
-        function togglePractice() {
-            state.isPractice = document.getElementById('practice-check').checked;
-            init();
-        }
+    <!-- ── SCREEN: End ─────────────────────────────── -->
+    <div id="screen-end" class="screen hidden">
+      <div id="end-inner">
+        <div id="end-logo">AMOUNTLE</div>
+        <div id="end-score-wrap">
+          <span id="end-score">—</span><span id="end-max">/500</span>
+        </div>
+        <p id="end-stats"></p>
+        <p id="end-streak"></p>
+        <button id="btn-dist-toggle">distribution ›</button>
+        <div id="end-middle">
+          <div id="end-rounds"></div>
+          <div id="score-dist"></div>
+        </div>
+        <div id="end-actions">
+          <button id="btn-share">copy result</button>
+          <button id="btn-fill-mode" class="hidden">fill mode</button>
+          <button id="btn-play-again">streak mode</button>
+        </div>
+        <button id="btn-home-end">home</button>
+        <div id="leaderboard-wrap" class="hidden">
+          <div id="lb-submit-row">
+            <input type="text" id="lb-name" placeholder="your name" maxlength="20" autocomplete="off" spellcheck="false" />
+            <button id="lb-btn">post</button>
+          </div>
+          <div id="lb-list"></div>
+        </div>
+      </div>
+    </div>
 
-        function changeDay(n) {
-            if (state.isPractice) return;
-            state.date.setDate(state.date.getDate() + n);
-            init();
-        }
+  <!-- Fill mode tutorial overlay (shown first time only) -->
+  <div id="fill-tutorial" class="hidden">
+    <div id="fill-tut-body">
+      <p class="fill-tut-title">fill mode</p>
+      <div class="fill-tut-step">
+        <span class="fill-tut-n">1</span>
+        <span>You'll see a target count. Fill the container as close to that number as possible.</span>
+      </div>
+      <div class="fill-tut-step">
+        <span class="fill-tut-n">2</span>
+        <span>Tap to drop one. Hold to pour fast.</span>
+      </div>
+      <div class="fill-tut-step">
+        <span class="fill-tut-n">3</span>
+        <span>No submit button — when the timer runs out, your count is locked in.</span>
+      </div>
+      <button id="btn-fill-tut-go">let's go</button>
+    </div>
+  </div>
 
-        function renderCalendar() {
-            const cal = document.getElementById('calendar');
-            cal.innerHTML = '';
-            const t = new Date();
-            for(let i=-13; i<=0; i++) {
-                const d = new Date(t); d.setDate(d.getDate()+i);
-                const el = document.createElement('div');
-                el.className = `cal-day ${i===0?'today':''}`;
-                el.innerText = d.getDate();
-                el.onclick = () => { state.date = d; state.isPractice = false; toggleModal('modal-stats'); init(); };
-                cal.appendChild(el);
-            }
-        }
+  <!-- Game-on splash (tutorial → real game transition) -->
+  <div id="game-on-splash">
+    <span id="game-on-text">GAME ON</span>
+    <span id="game-on-sub">good luck!</span>
+  </div>
 
-        // --- Controls (WASD & Space) ---
-        const input = document.getElementById('guess-input');
-        input.addEventListener('input', () => {
-            const list = document.getElementById('autocomplete-list');
-            const val = input.value.toLowerCase();
-            list.innerHTML = '';
-            if (!val) { list.style.display='none'; return; }
-            const filtered = countries.filter(c => c.name.toLowerCase().includes(val));
-            filtered.forEach((c, i) => {
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item' + (i===0?' active':'');
-                item.innerText = c.name;
-                item.onclick = () => { input.value = c.name; list.style.display='none'; makeGuess(); };
-                list.appendChild(item);
-            });
-            list.style.display = filtered.length ? 'block' : 'none';
-        });
-
-        document.addEventListener('keydown', (e) => {
-            const list = document.getElementById('autocomplete-list');
-            const items = list.querySelectorAll('.autocomplete-item');
-            let active = list.querySelector('.active');
-            let idx = Array.from(items).indexOf(active);
-
-            if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (idx > 0) { active.classList.remove('active'); items[idx-1].classList.add('active'); }
-            } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (idx < items.length-1) { active.classList.remove('active'); items[idx+1].classList.add('active'); }
-            } else if (e.key === ' ' || e.key === 'Enter') {
-                if (active && list.style.display !== 'none') { e.preventDefault(); active.click(); }
-                else if (document.activeElement !== input) { e.preventDefault(); input.focus(); }
-            }
-        });
-
-        init();
-    </script>
+  </div>
+</div>
 </body>
 </html>
