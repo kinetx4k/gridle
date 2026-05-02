@@ -458,8 +458,9 @@
         
         let keysPressed = {};
 
-        // Buildings - Starting set
+        // Buildings - Starting set (Stronger Grip moved here)
         let buildings = [
+            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪', baseCps: 0 },
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
             { id: 'farm', name: 'Farm', description: 'Grows cookie plants from seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
@@ -475,7 +476,6 @@
 
         // Special Upgrades
         let specials = [
-            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' }
         ];
 
@@ -631,11 +631,12 @@
                 card.onclick = () => state.activeTab === 'buildings' ? buyBuilding(i) : buySpecial(i);
                 
                 let bonusText = "";
-                if (state.activeTab === 'buildings') {
+                if (item.type === 'click') {
+                    bonusText = `Power x${item.factor}`;
+                } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
-                    if (item.type === 'click') bonusText = `Power x${item.factor}`;
-                    else bonusText = "One-time purchase";
+                    bonusText = "One-time purchase";
                 }
                 
                 card.innerHTML = `
@@ -654,6 +655,14 @@
                     <div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count}</div>
                 `;
                 shopItems.appendChild(card);
+            }
+
+            // More coming soon for Specials
+            if (state.activeTab === 'special') {
+                const moreLabel = document.createElement('div');
+                moreLabel.className = 'text-center text-zinc-500 text-[10px] py-4 italic';
+                moreLabel.innerText = 'More coming soon...';
+                shopItems.appendChild(moreLabel);
             }
         }
 
@@ -688,6 +697,12 @@
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 up.count++;
+                
+                // Handle click power upgrades in buildings tab
+                if (up.type === 'click') {
+                    state.clickPower *= up.factor;
+                }
+
                 if (index === state.unlockedUpgrades - 1 && up.count >= 5) {
                     state.unlockedUpgrades++;
                     if (state.unlockedUpgrades > buildings.length) generateNextUpgrade();
@@ -721,6 +736,7 @@
 
         function calculateCPS() {
             state.cps = buildings.reduce((sum, up) => {
+                if (up.type === 'click') return sum;
                 const mult = getUpgradeEfficiencyMult(up.count);
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
