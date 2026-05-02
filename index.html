@@ -919,8 +919,14 @@
             wrapper.className = `special-cookie-wrapper ${type}-cookie`;
             const cookieArea = document.getElementById('cookie-area');
             const areaRect = cookieArea.getBoundingClientRect();
-            let startX = x !== undefined ? x : areaRect.left + 50 + Math.random() * (areaRect.width - 100);
+            
+            // Fixed Spawning: Use provided coordinates or calculate random within screen bounds properly
+            const shopContainer = document.getElementById('shop-container');
+            const shopLeftBound = shopContainer.getBoundingClientRect().left;
+            
+            let startX = x !== undefined ? x : 50 + Math.random() * (shopLeftBound - 150);
             let startY = y !== undefined ? y : -100;
+            
             const colorMap = { 'red': '#ff0000', 'golden': '#ffd700', 'blue': '#00aaff', 'green': '#00ff44' };
             const shadowMap = { 'red': '#cc0000', 'golden': '#ffcc00', 'blue': '#0077ff', 'green': '#00cc33' };
 
@@ -960,17 +966,18 @@
             const x = clickX || cookieObj.x + 30;
             const y = clickY || cookieObj.y + 30;
             
+            // Use the absolute current coordinates of the destroyed cookie as spawn point for fragments
             if (cookieObj.type === 'red') {
                 unlockAchievement('red_click');
-                for(let i=0; i<3; i++) spawnSpecialCookie('blue', cookieObj.x, cookieObj.y, (Math.random()-0.5)*15, -6 - Math.random()*6);
+                for(let i=0; i<3; i++) spawnSpecialCookie('blue', x - 30, y - 30, (Math.random()-0.5)*15, -6 - Math.random()*6);
                 createParticle(x, y, "RED CHAOS!");
             } else if (cookieObj.type === 'blue') {
                 unlockAchievement('blue_click');
-                for(let i=0; i<3; i++) spawnSpecialCookie('green', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
+                for(let i=0; i<3; i++) spawnSpecialCookie('green', x - 30, y - 30, (Math.random()-0.5)*10, -5 - Math.random()*5);
                 createParticle(x, y, "SPLIT!");
             } else if (cookieObj.type === 'green') {
                 unlockAchievement('green_click');
-                for(let i=0; i<3; i++) spawnSpecialCookie('golden', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
+                for(let i=0; i<3; i++) spawnSpecialCookie('golden', x - 30, y - 30, (Math.random()-0.5)*10, -5 - Math.random()*5);
                 createParticle(x, y, "FRAGMENTS!");
             } else if (cookieObj.type === 'golden') {
                 unlockAchievement('golden_click');
@@ -1008,7 +1015,7 @@
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     const minDistance = c1.radius + c2.radius;
 
-                    if (distance < minDistance) {
+                    if (distance < minDistance && distance > 0.1) {
                         // Collision response - simple position correction
                         const overlap = minDistance - distance;
                         const nx = dx / distance; // Normal X
@@ -1053,6 +1060,7 @@
                             c.timer = 5.0; // Updated from 3.0 to 5.0 seconds
                         }
                     }
+                    // Screen Boundaries
                     if (c.x < 0) { c.x = 0; c.vx *= -1; }
                     if (c.x > shopLeftBound - 60) { c.x = shopLeftBound - 60; c.vx *= -1; }
                 } else if (c.state === 'settled') {
@@ -1193,9 +1201,6 @@
                         }
                     }
                 });
-            } else {
-                // If tab is achievements, refresh periodically if needed
-                // (though logic usually refreshes on state change)
             }
         }
 
