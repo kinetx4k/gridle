@@ -14,20 +14,22 @@
             color: #ffffff;
             overflow: hidden;
             user-select: none;
-            transition: background-color 0.1s linear; /* Smooth color transition */
+            transition: background-color 0.2s ease; /* Fluid color transition */
             position: relative;
+            /* Constant cookie pattern background */
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 10c-16.5 0-30 13.5-30 30s13.5 30 30 30 30-13.5 30-30-13.5-30-30-30zm-10 15c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm15 10c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm-12 18c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm20 5c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4z' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/svg%3E");
         }
 
         body.golden-frenzy {
-            /* Cookie pattern removed, only a light radial glow remains */
             background-image: 
+                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 10c-16.5 0-30 13.5-30 30s13.5 30 30 30 30-13.5 30-30-13.5-30-30-30zm-10 15c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm15 10c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm-12 18c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zm20 5c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4z' fill='%23ffffff' fill-opacity='0.03'/%3E%3C/svg%3E"),
                 radial-gradient(circle, rgba(255, 68, 68, 0.15) 0%, transparent 100%);
             animation: frenzy-bg-slide 10s linear infinite;
         }
 
         @keyframes frenzy-bg-slide {
-            from { background-position: 0 0; }
-            to { background-position: 300px 300px; }
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 80px 80px, 300px 300px; }
         }
 
         /* Prestige Black Hole Animation */
@@ -78,7 +80,7 @@
         }
 
         #main-cookie {
-            transition: transform 0.1s ease-in-out;
+            transition: transform 0.1s ease-in-out, filter 0.3s ease;
             cursor: pointer;
             filter: drop-shadow(0 0 20px rgba(210, 105, 30, 0.4));
         }
@@ -714,15 +716,18 @@
 
             <div class="cookie-container z-10">
                 <svg id="main-cookie" width="300" height="300" viewBox="0 0 200 200">
-                    <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                    <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                    <circle cx="60" cy="60" r="8" fill="#4b3621" />
-                    <circle cx="140" cy="70" r="10" fill="#4b3621" />
-                    <circle cx="80" cy="130" r="9" fill="#4b3621" />
-                    <circle cx="120" cy="150" r="7" fill="#4b3621" />
-                    <circle cx="160" cy="110" r="11" fill="#4b3621" />
-                    <circle cx="50" cy="110" r="8" fill="#4b3621" />
-                    <circle cx="100" cy="90" r="9" fill="#4b3621" />
+                    <!-- Base Layer -->
+                    <circle id="cookie-bottom" cx="100" cy="100" r="90" fill="#d2691e" />
+                    <!-- Main Surface -->
+                    <circle id="cookie-top" cx="100" cy="100" r="80" fill="#cd853f" />
+                    <!-- Chips -->
+                    <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
+                    <circle class="chip" cx="140" cy="70" r="10" fill="#4b3621" />
+                    <circle class="chip" cx="80" cy="130" r="9" fill="#4b3621" />
+                    <circle class="chip" cx="120" cy="150" r="7" fill="#4b3621" />
+                    <circle class="chip" cx="160" cy="110" r="11" fill="#4b3621" />
+                    <circle class="chip" cx="50" cy="110" r="8" fill="#4b3621" />
+                    <circle class="chip" cx="100" cy="90" r="9" fill="#4b3621" />
                 </svg>
             </div>
 
@@ -1217,7 +1222,8 @@
             
             unlockAchievement('first_click');
             
-            state.clickHeat = Math.min(100, state.clickHeat + 5);
+            // Harder to gain heat (reduced from +5 to +3.5)
+            state.clickHeat = Math.min(100, state.clickHeat + 3.5);
             createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
             spawnFloatingCookie();
             updateUI();
@@ -1614,7 +1620,7 @@
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             
-            // Thresholds updated for 10x multiplier
+            // Multiplier Thresholds & Difficulty Logic
             if (state.clickHeat >= 95) {
                 state.multiplier = 10.0;
                 unlockAchievement('multiplier_10');
@@ -1630,9 +1636,34 @@
             else if (state.clickHeat >= 25) state.multiplier = 1.5;
             else state.multiplier = 1.0;
 
+            // Visual Cookie Evolution (Baking / Burning)
+            const bottom = document.getElementById('cookie-bottom');
+            const top = document.getElementById('cookie-top');
+            const chips = document.querySelectorAll('.chip');
+            const mainCookieSVG = document.getElementById('main-cookie');
+
+            if (state.multiplier >= 10.0) {
+                // Burnt Look
+                bottom.setAttribute('fill', '#1a1a1a');
+                top.setAttribute('fill', '#2d1a10');
+                chips.forEach(c => c.setAttribute('fill', '#000000'));
+                mainCookieSVG.style.filter = 'drop-shadow(0 0 30px rgba(255, 0, 0, 0.6))';
+            } else if (state.multiplier >= 5.0) {
+                // Brown / Baked Look
+                bottom.setAttribute('fill', '#8b4513');
+                top.setAttribute('fill', '#a0522d');
+                chips.forEach(c => c.setAttribute('fill', '#3e2723'));
+                mainCookieSVG.style.filter = 'drop-shadow(0 0 20px rgba(210, 105, 30, 0.5))';
+            } else {
+                // Default Look
+                bottom.setAttribute('fill', '#d2691e');
+                top.setAttribute('fill', '#cd853f');
+                chips.forEach(c => c.setAttribute('fill', '#4b3621'));
+                mainCookieSVG.style.filter = 'drop-shadow(0 0 20px rgba(210, 105, 30, 0.4))';
+            }
+
             /**
              * DYNAMIC BACKGROUND COLOR LOGIC
-             * Interpolates: Grey (0%) -> Yellow (50%) -> Red (100%)
              */
             const heatRatio = state.clickHeat / 100;
             let r, g, b;
@@ -1715,11 +1746,11 @@
                         const countEl = document.getElementById(`count-${item.id}`);
                         if (countEl) countEl.innerText = item.count || 0;
 
-                        const priceEl = document.getElementById(`price-${item.id}`);
+                        const priceEl = document.getElementById('price-' + item.id);
                         if (priceEl) priceEl.innerText = formatNumber(price);
 
                         if (state.activeTab === 'buildings') {
-                            const bonusLabel = document.getElementById(`bonus-${item.id}`);
+                            const bonusLabel = document.getElementById('bonus-' + item.id);
                             const effMult = getUpgradeEfficiencyMult(item.count);
                             const stars = getStarsForCount(item.count);
                             if (effMult > 1) {
@@ -1821,7 +1852,8 @@
 
             state.totalPlaytime += delta;
 
-            state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
+            // Increased decay (from 15 to 25) to make maintaining 10x harder
+            state.clickHeat = Math.max(0, state.clickHeat - (25 * delta));
             
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
@@ -1891,8 +1923,6 @@
         }
 
         // Logic loop that runs even in the background via setInterval.
-        // Most browsers throttle background intervals to ~1Hz, 
-        // but the delta-time calculation ensures accurate growth.
         setInterval(runTick, 16); 
 
         function renderLoop() {
