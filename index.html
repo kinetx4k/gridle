@@ -158,15 +158,29 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
-        /* Golden Cookie */
-        .golden-cookie {
+        /* Special Cookies */
+        .special-cookie {
             position: absolute;
             width: 60px;
             height: 60px;
             cursor: pointer;
-            filter: drop-shadow(0 0 15px #ffd700);
             z-index: 150;
             animation: fall-down 4s linear forwards;
+        }
+
+        .golden-cookie { filter: drop-shadow(0 0 15px #ffd700); }
+        .blue-cookie { filter: drop-shadow(0 0 15px #00aaff); }
+        .green-cookie { filter: drop-shadow(0 0 15px #00ff44); }
+
+        /* Jump animation for split cookies */
+        @keyframes cookie-burst {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            50% { transform: translate(var(--bx), var(--by)) scale(1.2); opacity: 1; }
+            100% { transform: translate(var(--bx), 200px) scale(0.8); opacity: 0; }
+        }
+
+        .bursting {
+            animation: cookie-burst 2s ease-out forwards !important;
         }
 
         @keyframes fall-down {
@@ -278,7 +292,8 @@
             multiplier: 1.0,
             prestigeLevel: 0,
             prestigeBonus: 1.0, 
-            goldenCookieTimer: 0
+            goldenCookieTimer: 0,
+            blueCookieSpawnTimer: 0
         };
 
         const PRESTIGE_THRESHOLD = 100000000000; // 100 Billion (milliarden)
@@ -508,30 +523,66 @@
             setTimeout(() => f.remove(), 2000);
         }
 
-        function spawnGoldenCookie() {
+        /**
+         * Spawning special cookies (Golden, Blue, Green)
+         */
+        function spawnSpecialCookie(type, x, y, isBurst = false) {
             const g = document.createElement('div');
-            g.className = 'golden-cookie';
-            const x = 50 + Math.random() * (window.innerWidth - 150);
-            g.style.left = x + 'px';
+            const colorMap = {
+                'golden': '#ffd700',
+                'blue': '#00aaff',
+                'green': '#00ff44'
+            };
+            const shadowMap = {
+                'golden': '#ffcc00',
+                'blue': '#0077ff',
+                'green': '#00cc33'
+            };
+
+            g.className = `special-cookie ${type}-cookie ${isBurst ? 'bursting' : ''}`;
+            
+            if (!isBurst) {
+                const posX = 50 + Math.random() * (window.innerWidth - 150);
+                g.style.left = posX + 'px';
+            } else {
+                g.style.left = x + 'px';
+                g.style.top = y + 'px';
+                // Random burst directions
+                const bx = (Math.random() - 0.5) * 300;
+                const by = -100 - Math.random() * 200;
+                g.style.setProperty('--bx', bx + 'px');
+                g.style.setProperty('--by', by + 'px');
+            }
             
             g.innerHTML = `
                 <svg viewBox="0 0 200 200">
-                    <circle cx="100" cy="100" r="90" fill="#ffd700" />
-                    <circle cx="100" cy="100" r="80" fill="#ffcc00" />
-                    <circle cx="60" cy="60" r="8" fill="#d4af37" />
-                    <circle cx="140" cy="140" r="10" fill="#d4af37" />
+                    <circle cx="100" cy="100" r="90" fill="${colorMap[type]}" />
+                    <circle cx="100" cy="100" r="80" fill="${shadowMap[type]}" />
+                    <circle cx="60" cy="60" r="8" fill="rgba(0,0,0,0.2)" />
+                    <circle cx="140" cy="140" r="10" fill="rgba(0,0,0,0.2)" />
                 </svg>
             `;
             
             g.onclick = (e) => {
-                const bonus = Math.max(10, state.cps * 60); 
-                addCookies(bonus);
-                createParticle(e.clientX, e.clientY, `GOLDEN! +${formatNumber(bonus)}`);
+                e.stopPropagation();
+                if (type === 'blue') {
+                    // Split into 3 green
+                    for(let i=0; i<3; i++) spawnSpecialCookie('green', e.clientX, e.clientY, true);
+                    createParticle(e.clientX, e.clientY, "SPLIT!");
+                } else if (type === 'green') {
+                    // Split into 3 golden
+                    for(let i=0; i<3; i++) spawnSpecialCookie('golden', e.clientX, e.clientY, true);
+                    createParticle(e.clientX, e.clientY, "FRAGMENTS!");
+                } else if (type === 'golden') {
+                    const bonus = Math.max(10, state.cps * 60); 
+                    addCookies(bonus);
+                    createParticle(e.clientX, e.clientY, `GOLDEN! +${formatNumber(bonus)}`);
+                }
                 g.remove();
             };
 
             document.body.appendChild(g);
-            setTimeout(() => { if(g) g.remove(); }, 4000);
+            setTimeout(() => { if(g) g.remove(); }, isBurst ? 2000 : 4000);
         }
 
         /**
@@ -699,15 +750,12 @@
 
         /**
          * Core Engine Tick function
-         * Handles both active animation and background processing
          */
         function runTick() {
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
             
-            // Ignore tiny ticks or negative drifts
             if (delta < 0.001) return;
-            
             state.lastTick = now;
 
             // Decay Heat
@@ -718,15 +766,24 @@
                 addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             }
 
-            // Golden Cookies logic - Changed threshold to 3.0
+            // Golden Cookies logic
             if (state.multiplier >= 3.0) {
                 state.goldenCookieTimer += delta;
                 if (state.goldenCookieTimer >= 5) {
-                    spawnGoldenCookie();
+                    spawnSpecialCookie('golden');
                     state.goldenCookieTimer = 0;
                 }
             } else {
                 state.goldenCookieTimer = 0;
+            }
+
+            // Blue Cookie 1% probability check (once per second)
+            state.blueCookieSpawnTimer += delta;
+            if (state.blueCookieSpawnTimer >= 1.0) {
+                if (Math.random() < 0.01) {
+                    spawnSpecialCookie('blue');
+                }
+                state.blueCookieSpawnTimer = 0;
             }
 
             updateUI();
@@ -741,13 +798,9 @@
         }
 
         /**
-         * Background Loop (setInterval)
-         * Ensures tab title updates even when inactive/throttled
+         * Background Loop
          */
-        setInterval(() => {
-            runTick();
-        }, 1000);
-
+        setInterval(() => { runTick(); }, 1000);
         setInterval(saveGame, 30000);
 
         // Event Listeners
