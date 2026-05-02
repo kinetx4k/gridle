@@ -142,23 +142,24 @@
         </div>
 
         <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
-            Cookie Clicker Clone &bull; 2024
+            Developed by <a href="https://discord.com/users/1056147064569987163" target="_blank" class="text-orange-400 hover:underline font-bold">kinetx</a>
         </div>
     </div>
 
     <script>
-        // Game State
-        const state = {
+        /**
+         * Game State und Variablen
+         */
+        let state = {
             cookies: 0.0,
             totalCookiesEarned: 0.0,
             totalClicks: 0,
             cps: 0,
             lastTick: Date.now(),
-            unlockedUpgrades: 1 // Only the first one is visible at start
+            unlockedUpgrades: 1 
         };
 
-        // Upgrade Definitions
-        const upgrades = [
+        let upgrades = [
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake more cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
             { id: 'farm', name: 'Farm', description: 'Grows cookie plants from cookie seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
@@ -169,13 +170,15 @@
             { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' }
         ];
 
-        // Generator for infinite upgrades
+        /**
+         * Generiert neue Upgrades für den Endlos-Modus
+         */
         function generateNextUpgrade() {
             const last = upgrades[upgrades.length - 1];
             const icons = ['🚀', '🌌', '⚡', '🤖', '👑', '🔮', '💎', '🪐', '🧬', '🛸'];
             const names = ['Ship', 'Galaxy', 'Energy', 'Bot', 'Empire', 'Portal', 'Gem', 'Planet', 'Clone', 'Alien'];
             
-            const nextIndex = upgrades.length - 8; // Offset because we had 8 original ones
+            const nextIndex = upgrades.length - 8; 
             const icon = icons[nextIndex % icons.length];
             const name = names[nextIndex % names.length] + ' ' + (Math.floor(nextIndex / names.length) + 2);
             
@@ -190,7 +193,6 @@
             });
         }
 
-        // DOM Elements
         const cookieDisplay = document.getElementById('cookie-count');
         const cpsDisplay = document.getElementById('cps-display');
         const mainCookie = document.getElementById('main-cookie');
@@ -199,7 +201,9 @@
         const statTotalClicks = document.getElementById('stat-total-clicks');
         const statAllTime = document.getElementById('stat-all-time');
 
-        // Initialize Shop - Only shows unlocked upgrades
+        /**
+         * Initialisiert den Shop basierend auf freigeschalteten Upgrades
+         */
         function initShop() {
             shopItems.innerHTML = '';
             for (let i = 0; i < state.unlockedUpgrades; i++) {
@@ -227,7 +231,9 @@
             }
         }
 
-        // Formatter for large numbers (Now with decimals)
+        /**
+         * Formatiert große Zahlen lesbar
+         */
         function formatNumber(num) {
             if (num >= 1e15) return (num / 1e15).toFixed(3) + ' Q';
             if (num >= 1e12) return (num / 1e12).toFixed(3) + ' T';
@@ -237,15 +243,17 @@
             return num.toFixed(1);
         }
 
-        // Logic
+        /**
+         * Cookie-Klick Logik
+         */
         function clickCookie(e) {
             addCookies(1.0);
             state.totalClicks++;
             
-            // Visual feedback
             createParticle(e.clientX, e.clientY, "+1");
             spawnFloatingCookie();
             updateUI();
+            saveGame();
         }
 
         function addCookies(amount) {
@@ -253,6 +261,9 @@
             state.totalCookiesEarned += amount;
         }
 
+        /**
+         * Kauf Logik für Upgrades
+         */
         function buyUpgrade(index) {
             const upgrade = upgrades[index];
             const currentPrice = getPrice(upgrade);
@@ -261,10 +272,8 @@
                 state.cookies -= currentPrice;
                 upgrade.count++;
                 
-                // Unlock logic: If last visible bought 5 times, unlock next
                 if (index === state.unlockedUpgrades - 1 && upgrade.count >= 5) {
                     state.unlockedUpgrades++;
-                    // If we reached the end of hardcoded upgrades, generate a new one
                     if (state.unlockedUpgrades > upgrades.length) {
                         generateNextUpgrade();
                     }
@@ -273,6 +282,7 @@
                 
                 calculateCPS();
                 updateUI();
+                saveGame();
             }
         }
 
@@ -284,6 +294,9 @@
             state.cps = upgrades.reduce((sum, up) => sum + (up.count * up.baseCps), 0);
         }
 
+        /**
+         * Partikeleffekte
+         */
         function createParticle(x, y, text) {
             const p = document.createElement('div');
             p.className = 'particle text-orange-400';
@@ -301,7 +314,6 @@
             f.style.width = size + 'px';
             f.style.height = size + 'px';
             
-            // Random direction
             const angle = Math.random() * Math.PI * 2;
             const dist = 100 + Math.random() * 100;
             f.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
@@ -323,19 +335,18 @@
             setTimeout(() => f.remove(), 2000);
         }
 
+        /**
+         * Aktualisiert das User Interface
+         */
         function updateUI() {
-            // Main displays
             cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
             cpsDisplay.innerText = `per second: ${formatNumber(state.cps)}`;
             
-            // Stats
             statTotalClicks.innerText = state.totalClicks;
             statAllTime.innerText = formatNumber(state.totalCookiesEarned);
 
-            // Tab / Document Title Update
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
 
-            // Upgrades availability
             for (let i = 0; i < state.unlockedUpgrades; i++) {
                 const up = upgrades[i];
                 if (!up) continue;
@@ -358,7 +369,52 @@
             }
         }
 
-        // Game Loop (Real-time update)
+        /**
+         * Speichersystem (LocalStorage)
+         */
+        function saveGame() {
+            const saveData = {
+                state: state,
+                upgradeCounts: upgrades.map(u => ({ id: u.id, count: u.count }))
+            };
+            localStorage.setItem('kinetx_cookie_save', JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('kinetx_cookie_save');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state = { ...state, ...data.state };
+                    
+                    // Upgrades wiederherstellen
+                    data.upgradeCounts.forEach((savedUp, index) => {
+                        // Falls mehr Upgrades gespeichert wurden als vorhanden, neue generieren
+                        while (index >= upgrades.length) {
+                            generateNextUpgrade();
+                        }
+                        if (upgrades[index]) {
+                            upgrades[index].count = savedUp.count;
+                        }
+                    });
+                    
+                    // Sicherstellen, dass die Anzahl der freigeschalteten Upgrades stimmt
+                    while (state.unlockedUpgrades > upgrades.length) {
+                        generateNextUpgrade();
+                    }
+                    
+                    calculateCPS();
+                    initShop();
+                    updateUI();
+                } catch (e) {
+                    console.error("Fehler beim Laden des Spielstands", e);
+                }
+            }
+        }
+
+        /**
+         * Haupt-Game Loop
+         */
         function gameLoop() {
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
@@ -372,7 +428,10 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Events
+        // Automatische Speicherung alle 30 Sekunden
+        setInterval(saveGame, 30000);
+
+        // Event Listener
         mainCookie.addEventListener('mousedown', (e) => {
             clickCookie(e);
         });
@@ -397,7 +456,8 @@
             }
         });
 
-        // Initialize
+        // Start
+        loadGame();
         initShop();
         updateUI();
         gameLoop();
