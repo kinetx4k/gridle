@@ -320,7 +320,6 @@
             display: none;
         }
 
-        /* Drone Styles */
         #golden-drone {
             position: absolute;
             width: 60px;
@@ -743,7 +742,6 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Drone Entity -->
             <div id="golden-drone">
                 <div class="drone-cooldown-ring">
                     <div id="drone-fill" class="drone-cooldown-fill"></div>
@@ -858,7 +856,7 @@
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
-            hasGoldDrone: false,
+            goldDroneCount: 0, // Changed to count for multiple drones
             goldDroneTimer: 0,
             achievements: [],
             showParticles: true,
@@ -1250,10 +1248,7 @@
                 const item = list[i];
                 if (!item) continue;
 
-                // Hidden Logic for unique one-time bird
                 if (item.id === 'sp-bird' && state.hasBird) continue;
-                // Hidden Logic for one-time gold drone
-                if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
                 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1274,6 +1269,8 @@
                     bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
+                } else if (item.type === 'gold-drone') {
+                    bonusText = `Speed: +${state.goldDroneCount} Drones`;
                 } else {
                     bonusText = "One-time purchase";
                 }
@@ -1382,7 +1379,7 @@
                     unlockAchievement('bird_buy');
                 }
                 if (sp.type === 'gold-drone') {
-                    state.hasGoldDrone = true;
+                    state.goldDroneCount++;
                 }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
@@ -1409,6 +1406,7 @@
             if (item.type === 'quantum-chip') scaling = 3.0;
             if (item.type === 'nano-oven') scaling = 4.0;
             if (item.type === 'heat-resist') scaling = 2.0;
+            if (item.type === 'gold-drone') scaling = 10.0; // Tenfold price scaling
 
             let price = Math.floor(item.basePrice * Math.pow(scaling, item.count || 0));
             
@@ -1556,50 +1554,6 @@
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
 
-            for (let i = 0; i < activeSpecialCookies.length; i++) {
-                for (let j = i + 1; j < activeSpecialCookies.length; j++) {
-                    const c1 = activeSpecialCookies[i];
-                    const c2 = activeSpecialCookies[j];
-
-                    if (c1.state === 'flying' || c2.state === 'flying') continue;
-
-                    const dx = c2.x - c1.x;
-                    const dy = c2.y - c1.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const minDistance = c1.radius + c2.radius;
-
-                    if (distance < minDistance && distance > 0.1) {
-                        const overlap = minDistance - distance;
-                        const nx = dx / distance; 
-                        const ny = dy / distance; 
-
-                        const moveX = nx * overlap * 0.5;
-                        const moveY = ny * overlap * 0.5;
-
-                        if (c1.state === 'falling') {
-                            c1.x -= moveX;
-                            c1.y -= moveY;
-                        }
-                        if (c2.state === 'falling') {
-                            c2.x += moveX;
-                            c2.y += moveY;
-                        }
-
-                        const relativeVelocityX = c1.vx - c2.vx;
-                        const relativeVelocityY = c1.vy - c2.vy;
-                        const dotProduct = relativeVelocityX * nx + relativeVelocityY * ny;
-
-                        if (dotProduct > 0) {
-                            const impulse = 2 * dotProduct / 2; 
-                            c1.vx -= impulse * nx;
-                            c1.vy -= impulse * ny;
-                            c2.vx += impulse * nx;
-                            c2.vy += impulse * ny;
-                        }
-                    }
-                }
-            }
-
             activeSpecialCookies.forEach(c => {
                 if (c.state === 'falling') {
                     c.vy += c.gravity; c.x += c.vx; c.y += c.vy;
@@ -1650,8 +1604,7 @@
                 }
             }
 
-            // Drone Position Update
-            if (state.hasGoldDrone && goldenDrone) {
+            if (state.goldDroneCount > 0 && goldenDrone) {
                 goldenDrone.style.display = 'block';
                 const time = Date.now() / 1000;
                 goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`;
@@ -1705,7 +1658,7 @@
             state.nanoOvenLevel = 0;
             
             state.hasBird = false;
-            state.hasGoldDrone = false;
+            state.goldDroneCount = 0;
             if (collectorBird) collectorBird.style.display = 'none';
             if (goldenDrone) goldenDrone.style.display = 'none';
 
@@ -1882,8 +1835,7 @@
 
             updatePowerupHotbar();
 
-            // Drone Visual Update
-            if (state.hasGoldDrone) {
+            if (state.goldDroneCount > 0) {
                 const droneFill = document.getElementById('drone-fill');
                 const droneCookie = document.getElementById('drone-cookie');
                 const progress = (state.goldDroneTimer / 15) * 100;
@@ -2035,11 +1987,10 @@
 
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
-            // Golden Drone Tick
-            if (state.hasGoldDrone) {
-                state.goldDroneTimer += delta;
+            if (state.goldDroneCount > 0) {
+                // Timer runs faster based on drone count
+                state.goldDroneTimer += delta * state.goldDroneCount;
                 if (state.goldDroneTimer >= 15) {
-                    // Spawn a random special cookie
                     const pool = ['golden', 'blue', 'green', 'red'];
                     const weights = [0.6, 0.2, 0.15, 0.05];
                     let r = Math.random();
