@@ -49,6 +49,55 @@
             transform: scale(0.95);
         }
 
+        /* Achievement Notification (Minecraft Style) */
+        #achievement-toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            background: #2a2a2a;
+            border: 4px solid #000;
+            padding: 12px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #achievement-toast.visible {
+            top: 20px;
+        }
+
+        #achievement-toast .icon-box {
+            width: 48px;
+            height: 48px;
+            background: #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid #666;
+        }
+
+        #achievement-toast .text-content {
+            flex: 1;
+        }
+
+        #achievement-toast .toast-title {
+            color: #ffff00;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        #achievement-toast .toast-name {
+            color: #ffffff;
+            font-size: 16px;
+        }
+
         /* Number display styling to prevent jumping/wiggling */
         #cookie-count {
             font-variant-numeric: tabular-nums;
@@ -165,6 +214,7 @@
             position: relative;
         }
 
+        .red-cookie { filter: drop-shadow(0 0 15px #ff0000); }
         .golden-cookie { filter: drop-shadow(0 0 15px #ffd700); }
         .blue-cookie { filter: drop-shadow(0 0 15px #00aaff); }
         .green-cookie { filter: drop-shadow(0 0 15px #00ff44); }
@@ -301,9 +351,45 @@
         .settings-btn:hover {
             background: #3f3f46;
         }
+
+        .achievement-card {
+            background: #1f1f1f;
+            border: 2px solid #333;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .achievement-card.unlocked {
+            border-color: #ffff00;
+            background: #2a2a1a;
+        }
+
+        .achievement-card .icon {
+            font-size: 24px;
+            opacity: 0.3;
+            grayscale: 1;
+        }
+
+        .achievement-card.unlocked .icon {
+            opacity: 1;
+            grayscale: 0;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
+
+    <!-- Minecraft Toast -->
+    <div id="achievement-toast">
+        <div class="icon-box" id="toast-icon">🍪</div>
+        <div class="text-content">
+            <div class="toast-title">Achievement Get!</div>
+            <div class="toast-name" id="toast-name">New Progress</div>
+        </div>
+    </div>
 
     <!-- Settings Menu Top Left -->
     <div id="settings-menu">
@@ -311,6 +397,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <div id="settings-dropdown" class="settings-dropdown">
+            <button onclick="switchTab('achievements'); toggleSettings();" class="settings-btn text-white hover:text-yellow-400">
+                <span>🏆</span> Achievements
+            </button>
+            <div class="h-[1px] bg-zinc-700 my-1"></div>
             <button onclick="saveToFile()" class="settings-btn text-white hover:text-orange-400">
                 <span>💾</span> Save to file (.json)
             </button>
@@ -412,10 +502,11 @@
         <div class="flex bg-zinc-950">
             <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Buildings</button>
             <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Specials</button>
+            <button onclick="switchTab('achievements')" id="tab-achievements" class="tab-btn">Achievements</button>
         </div>
 
         <div id="shop-items" class="flex-1 overflow-y-auto scroller p-4 space-y-3">
-            <!-- Buildings are generated here -->
+            <!-- Items are generated here -->
         </div>
 
         <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
@@ -442,14 +533,31 @@
             goldenCookieTimer: 0,
             blueCookieSpawnTimer: 0,
             randomGoldenSpawnTimer: 0,
+            redCookieSpawnTimer: 0,
             activeTab: 'buildings',
-            hasBird: false
+            hasBird: false,
+            achievements: [] // IDs of unlocked achievements
         };
 
         const PRESTIGE_THRESHOLD = 100000000000;
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
+
+        // Achievements Definition
+        const achievementsList = [
+            { id: 'first_click', name: 'Cookie Rookie', description: 'Click your first cookie.', icon: '🍪' },
+            { id: 'golden_click', name: 'Golden Touch', description: 'Click your first Golden Cookie.', icon: '🪙' },
+            { id: 'blue_click', name: 'Sky High', description: 'Click your first Blue Cookie.', icon: '🧊' },
+            { id: 'green_click', name: 'Nature Lover', description: 'Click your first Green Cookie.', icon: '🌿' },
+            { id: 'red_click', name: 'The Chosen One', description: 'Click your first Red Cookie.', icon: '🔥' },
+            { id: 'millionaire', name: 'Millionaire', description: 'Reach 1,000,000 cookies.', icon: '💰' },
+            { id: 'billionaire', name: 'Billionaire', description: 'Reach 1,000,000,000 cookies.', icon: '🏛️' },
+            { id: 'first_prestige', name: 'The New You', description: 'Perform your first Prestige.', icon: '🌌' },
+            { id: 'multiplier_3', name: 'Getting Hot', description: 'Reach a 3x multiplier.', icon: '⚡' },
+            { id: 'multiplier_5', name: 'Absolute Fire', description: 'Reach a 5x multiplier.', icon: '♨️' },
+            { id: 'bird_buy', name: 'Bird Watcher', description: 'Buy the Collector Bird.', icon: '🐦' }
+        ];
 
         // Buildings - Starting set
         let buildings = [
@@ -474,6 +582,33 @@
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
+
+        /**
+         * ACHIEVEMENT SYSTEM
+         */
+        function unlockAchievement(id) {
+            if (state.achievements.includes(id)) return;
+            state.achievements.push(id);
+            const ach = achievementsList.find(a => a.id === id);
+            if (ach) {
+                showAchievementNotification(ach);
+                saveGame();
+            }
+        }
+
+        function showAchievementNotification(ach) {
+            const toast = document.getElementById('achievement-toast');
+            const iconEl = document.getElementById('toast-icon');
+            const nameEl = document.getElementById('toast-name');
+
+            iconEl.innerText = ach.icon;
+            nameEl.innerText = ach.name;
+
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 5000);
+        }
 
         /**
          * SETTINGS LOGIC
@@ -546,6 +681,7 @@
             state.activeTab = tab;
             document.getElementById('tab-buildings').classList.toggle('active', tab === 'buildings');
             document.getElementById('tab-special').classList.toggle('active', tab === 'special');
+            document.getElementById('tab-achievements').classList.toggle('active', tab === 'achievements');
             initShop();
         }
 
@@ -611,6 +747,24 @@
         function initShop() {
             shopItems.innerHTML = '';
             
+            if (state.activeTab === 'achievements') {
+                achievementsList.forEach(ach => {
+                    const isUnlocked = state.achievements.includes(ach.id);
+                    const card = document.createElement('div');
+                    card.className = `achievement-card ${isUnlocked ? 'unlocked' : ''}`;
+                    card.innerHTML = `
+                        <div class="icon">${ach.icon}</div>
+                        <div class="flex-1">
+                            <div class="font-bold text-sm ${isUnlocked ? 'text-yellow-400' : 'text-zinc-500'}">${ach.name}</div>
+                            <div class="text-[10px] text-zinc-500">${ach.description}</div>
+                        </div>
+                        ${isUnlocked ? '<div class="text-yellow-400 text-xs">✓</div>' : ''}
+                    `;
+                    shopItems.appendChild(card);
+                });
+                return;
+            }
+
             let list = state.activeTab === 'buildings' ? buildings : specials;
             let unlockLimit = state.activeTab === 'buildings' ? state.unlockedUpgrades : list.length;
 
@@ -649,30 +803,25 @@
                 `;
                 shopItems.appendChild(card);
             }
-
-            // More coming soon for Specials
-            if (state.activeTab === 'special') {
-                const moreLabel = document.createElement('div');
-                moreLabel.className = 'text-center text-zinc-500 text-[10px] py-4 italic';
-                moreLabel.innerText = 'More coming soon...';
-                shopItems.appendChild(moreLabel);
-            }
         }
 
-        // Updated formatNumber to ensure a dot as decimal separator
         function formatNumber(num) {
-            if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' Q';
-            if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' T';
-            if (num >= 1e9) return (num / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' B';
-            if (num >= 1000000) return (num / 1000000).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' M';
-            if (num >= 1000) return (num / 1000).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' k';
-            return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+            if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Q';
+            if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' T';
+            if (num >= 1e9) return (num / 1e9).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' B';
+            if (num >= 1000000) return (num / 1000000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' M';
+            if (num >= 1000) return (num / 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' k';
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         function clickCookie(e) {
             const amount = state.clickPower * state.multiplier * state.prestigeBonus;
             addCookies(amount);
             state.totalClicks++;
+            
+            // Achievement: First Click
+            unlockAchievement('first_click');
+            
             state.clickHeat = Math.min(100, state.clickHeat + 5);
             createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
             spawnFloatingCookie();
@@ -683,6 +832,10 @@
         function addCookies(amount) {
             state.cookies += amount;
             state.totalCookiesEarned += amount;
+            
+            // Achievements: Money
+            if (state.totalCookiesEarned >= 1000000) unlockAchievement('millionaire');
+            if (state.totalCookiesEarned >= 1000000000) unlockAchievement('billionaire');
         }
 
         function buyBuilding(index) {
@@ -711,7 +864,10 @@
                 state.cookies -= currentPrice;
                 sp.count++;
                 if (sp.type === 'click') state.clickPower *= sp.factor;
-                if (sp.type === 'bird') state.hasBird = true;
+                if (sp.type === 'bird') {
+                    state.hasBird = true;
+                    unlockAchievement('bird_buy');
+                }
                 initShop();
                 updateUI();
                 saveGame();
@@ -765,8 +921,8 @@
             const areaRect = cookieArea.getBoundingClientRect();
             let startX = x !== undefined ? x : areaRect.left + 50 + Math.random() * (areaRect.width - 100);
             let startY = y !== undefined ? y : -100;
-            const colorMap = { 'golden': '#ffd700', 'blue': '#00aaff', 'green': '#00ff44' };
-            const shadowMap = { 'golden': '#ffcc00', 'blue': '#0077ff', 'green': '#00cc33' };
+            const colorMap = { 'red': '#ff0000', 'golden': '#ffd700', 'blue': '#00aaff', 'green': '#00ff44' };
+            const shadowMap = { 'red': '#cc0000', 'golden': '#ffcc00', 'blue': '#0077ff', 'green': '#00cc33' };
 
             wrapper.innerHTML = `
                 <svg class="wings" viewBox="0 0 100 40">
@@ -802,13 +958,21 @@
         function triggerCookie(cookieObj, clickX, clickY) {
             const x = clickX || cookieObj.x + 30;
             const y = clickY || cookieObj.y + 30;
-            if (cookieObj.type === 'blue') {
+            
+            if (cookieObj.type === 'red') {
+                unlockAchievement('red_click');
+                for(let i=0; i<3; i++) spawnSpecialCookie('blue', cookieObj.x, cookieObj.y, (Math.random()-0.5)*15, -6 - Math.random()*6);
+                createParticle(x, y, "RED CHAOS!");
+            } else if (cookieObj.type === 'blue') {
+                unlockAchievement('blue_click');
                 for(let i=0; i<3; i++) spawnSpecialCookie('green', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
                 createParticle(x, y, "SPLIT!");
             } else if (cookieObj.type === 'green') {
+                unlockAchievement('green_click');
                 for(let i=0; i<3; i++) spawnSpecialCookie('golden', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
                 createParticle(x, y, "FRAGMENTS!");
             } else if (cookieObj.type === 'golden') {
+                unlockAchievement('golden_click');
                 const bonus = Math.max(10, state.cps * 60); 
                 addCookies(bonus);
                 createParticle(x, y, `GOLDEN! +${formatNumber(bonus)}`);
@@ -879,6 +1043,7 @@
 
         function prestige() {
             if (state.cookies < PRESTIGE_THRESHOLD) return;
+            unlockAchievement('first_prestige');
             const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             const extraBonus = newBonusPoints * 0.01; 
             state.prestigeBonus += extraBonus;
@@ -916,8 +1081,14 @@
             statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             
-            if (state.clickHeat >= 100) state.multiplier = 5.0;
-            else if (state.clickHeat >= 60) state.multiplier = 3.0;
+            if (state.clickHeat >= 100) {
+                state.multiplier = 5.0;
+                unlockAchievement('multiplier_5');
+            }
+            else if (state.clickHeat >= 60) {
+                state.multiplier = 3.0;
+                unlockAchievement('multiplier_3');
+            }
             else if (state.clickHeat >= 25) state.multiplier = 1.5;
             else state.multiplier = 1.0;
             
@@ -926,7 +1097,6 @@
             
             if (state.multiplier >= 3.0) {
                 document.body.classList.add('golden-frenzy');
-                // Shaking effect logic removed for stability
             } else {
                 document.body.classList.remove('golden-frenzy');
             }
@@ -946,32 +1116,36 @@
             
             currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
-            let list = state.activeTab === 'buildings' ? buildings : specials;
-            list.forEach(item => {
-                const card = document.getElementById(`upgrade-${item.id}`);
-                if (card) {
-                    const price = getPrice(item);
-                    if (state.cookies >= price) card.classList.remove('disabled');
-                    else card.classList.add('disabled');
-                    
-                    const countEl = document.getElementById(`count-${item.id}`);
-                    if (countEl) countEl.innerText = item.count;
+            if (state.activeTab !== 'achievements') {
+                let list = state.activeTab === 'buildings' ? buildings : specials;
+                list.forEach(item => {
+                    const card = document.getElementById(`upgrade-${item.id}`);
+                    if (card) {
+                        const price = getPrice(item);
+                        if (state.cookies >= price) card.classList.remove('disabled');
+                        else card.classList.add('disabled');
+                        
+                        const countEl = document.getElementById(`count-${item.id}`);
+                        if (countEl) countEl.innerText = item.count;
 
-                    // Update prices visually in the shop
-                    const priceEl = document.getElementById(`price-${item.id}`);
-                    if (priceEl) priceEl.innerText = formatNumber(price);
+                        const priceEl = document.getElementById(`price-${item.id}`);
+                        if (priceEl) priceEl.innerText = formatNumber(price);
 
-                    if (state.activeTab === 'buildings') {
-                        const boostLabel = document.getElementById(`boost-${item.id}`);
-                        const effMult = getUpgradeEfficiencyMult(item.count);
-                        const stars = getStarsForCount(item.count);
-                        if (effMult > 1) {
-                            boostLabel.innerText = `${stars} Boost: x${effMult}`;
-                            boostLabel.classList.remove('hidden');
-                        } else boostLabel.classList.add('hidden');
+                        if (state.activeTab === 'buildings') {
+                            const boostLabel = document.getElementById(`boost-${item.id}`);
+                            const effMult = getUpgradeEfficiencyMult(item.count);
+                            const stars = getStarsForCount(item.count);
+                            if (effMult > 1) {
+                                boostLabel.innerText = `${stars} Boost: x${effMult}`;
+                                boostLabel.classList.remove('hidden');
+                            } else boostLabel.classList.add('hidden');
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                // If tab is achievements, refresh periodically if needed
+                // (though logic usually refreshes on state change)
+            }
         }
 
         function saveGame() {
@@ -1000,6 +1174,7 @@
             state.lastTick = now;
             state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
+            
             if (state.multiplier >= 3.0) {
                 state.goldenCookieTimer += delta;
                 if (state.goldenCookieTimer >= 5) {
@@ -1007,16 +1182,25 @@
                     state.goldenCookieTimer = 0;
                 }
             } else state.goldenCookieTimer = 0;
+            
             state.randomGoldenSpawnTimer += delta;
             if (state.randomGoldenSpawnTimer >= 1.0) {
                 if (Math.random() < 0.002) spawnSpecialCookie('golden');
                 state.randomGoldenSpawnTimer = 0;
             }
+            
             state.blueCookieSpawnTimer += delta;
             if (state.blueCookieSpawnTimer >= 1.0) {
                 if (Math.random() < 0.01) spawnSpecialCookie('blue');
                 state.blueCookieSpawnTimer = 0;
             }
+
+            state.redCookieSpawnTimer += delta;
+            if (state.redCookieSpawnTimer >= 1.0) {
+                if (Math.random() < 0.001) spawnSpecialCookie('red');
+                state.redCookieSpawnTimer = 0;
+            }
+
             updateSpecialPhysics();
             updateUI();
         }
