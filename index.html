@@ -312,21 +312,21 @@
 </head>
 <body class="h-screen flex flex-col md:flex-row">
 
-    <!-- Einstellungsmenü Oben Links -->
+    <!-- Settings Menu Top Left -->
     <div id="settings-menu">
         <button onclick="toggleSettings()" class="bg-zinc-800/80 hover:bg-zinc-700 p-3 rounded-full border border-zinc-700 transition backdrop-blur-sm group">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <div id="settings-dropdown" class="settings-dropdown">
             <button onclick="saveToFile()" class="settings-btn text-white hover:text-orange-400">
-                <span>💾</span> Speichern (.json)
+                <span>💾</span> Save to file (.json)
             </button>
             <button onclick="triggerFileLoad()" class="settings-btn text-white hover:text-green-400">
-                <span>📂</span> Laden (.json)
+                <span>📂</span> Load from file (.json)
             </button>
             <div class="h-[1px] bg-zinc-700 my-1"></div>
             <button onclick="showResetModal()" class="settings-btn text-red-400 hover:bg-red-500/10">
-                <span>⚠️</span> Vollständiger Reset
+                <span>⚠️</span> Full Reset
             </button>
         </div>
         <input type="file" id="file-loader" class="hidden" accept=".json" onchange="loadFromFile(event)">
@@ -341,35 +341,35 @@
     <div id="reset-modal">
         <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-red-600 max-w-md w-full text-center shadow-2xl">
             <h2 class="text-3xl font-bold text-red-500 mb-4">DANGER! 🛑</h2>
-            <p class="text-zinc-400 mb-6">Dies wird ALLES zurücksetzen. Gebäude, Upgrades, Cookies und Fortschritt gehen verloren.</p>
-            <p class="text-white font-bold mb-2">Tippe "CONFIRM" zum Bestätigen:</p>
+            <p class="text-zinc-400 mb-6">This will reset EVERYTHING. Buildings, Upgrades, Cookies and Progress will be lost.</p>
+            <p class="text-white font-bold mb-2">Type "CONFIRM" to proceed:</p>
             <input type="text" id="reset-confirm-input" class="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-center font-bold tracking-widest outline-none focus:border-red-500 transition mb-6" placeholder="...">
             <div class="flex gap-4">
-                <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">ABBRECHEN</button>
-                <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">ALLES LÖSCHEN</button>
+                <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">CANCEL</button>
+                <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">RESET ALL</button>
             </div>
         </div>
     </div>
 
     <div id="prestige-container">
         <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
-            Noch: 100.000 B
+            Left: 100.000 B
         </div>
         <div class="flex justify-between text-[10px] mb-1">
-            <span>PRESTIGE FORTSCHRITT</span>
+            <span>PRESTIGE PROGRESS</span>
             <span id="prestige-percent">0%</span>
         </div>
         <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
             <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
         </div>
         <button id="prestige-btn" onclick="prestige()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
-            PRESTIGE JETZT!
+            PRESTIGE NOW!
         </button>
-        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Aktueller Bonus: +0%</div>
+        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Current Bonus: +0%</div>
     </div>
 
     <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
-        <!-- Der Vogel -->
+        <!-- The Bird -->
         <div id="collector-bird">
             <svg viewBox="0 0 100 100">
                 <path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#3b82f6" />
@@ -383,8 +383,8 @@
 
         <div class="text-center mb-8 z-10">
             <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.000 Cookies</h1>
-            <p id="cps-display" class="text-xl text-orange-400">pro Sekunde: 0</p>
-            <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Klick Power: 1</p>
+            <p id="cps-display" class="text-xl text-orange-400">per second: 0</p>
+            <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Click Power: 1</p>
         </div>
 
         <div class="cookie-container z-10">
@@ -407,32 +407,32 @@
     <div id="shop-container" class="w-full md:w-96 bg-zinc-900 border-l border-zinc-800 flex flex-col">
         <div class="p-4 stats-panel border-b border-zinc-800">
             <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
-                <span>🛒</span> Markt
+                <span>🛒</span> Market
             </h2>
             <div class="flex justify-between text-[11px] text-zinc-500">
-                <span>Klicks: <span id="stat-total-clicks">0</span></span>
-                <span>Gesamt: <span id="stat-all-time">0.000</span></span>
+                <span>Clicks: <span id="stat-total-clicks">0</span></span>
+                <span>All-time: <span id="stat-all-time">0.000</span></span>
             </div>
         </div>
 
         <!-- Tab Selector -->
         <div class="flex bg-zinc-950">
-            <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Gebäude</button>
-            <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Spezial</button>
+            <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Buildings</button>
+            <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Specials</button>
         </div>
 
         <div id="shop-items" class="flex-1 overflow-y-auto scroller p-4 space-y-3">
-            <!-- Gebäude werden hier generiert -->
+            <!-- Buildings are generated here -->
         </div>
 
         <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
-            Entwickelt von <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
+            Developed by <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
         </div>
     </div>
 
     <script>
         /**
-         * SPIELZUSTAND
+         * GAME STATE
          */
         let state = {
             cookies: 0.0,
@@ -458,39 +458,39 @@
         
         let keysPressed = {};
 
-        // Gebäude - Start-Set
+        // Buildings - Starting set
         let buildings = [
-            { id: 'cursor', name: 'Klicker', description: 'Klickt alle 10 Sekunden automatisch.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
-            { id: 'grandma', name: 'Oma', description: 'Eine nette Oma, die Kekse backt.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
-            { id: 'farm', name: 'Farm', description: 'Baut Keks-Pflanzen aus Samen an.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
-            { id: 'mine', name: 'Mine', description: 'Baut Keksteig und Schokostückchen ab.', basePrice: 12000, baseCps: 47, count: 0, icon: '⛏️' },
-            { id: 'factory', name: 'Fabrik', description: 'Produziert Kekse in Massen.', basePrice: 130000, baseCps: 260, count: 0, icon: '🏭' },
-            { id: 'bank', name: 'Bank', description: 'Erwirtschaftet Kekse durch Zinsen.', basePrice: 1400000, baseCps: 1400, count: 0, icon: '🏦' },
-            { id: 'temple', name: 'Tempel', description: 'Voller Keks-Götter.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
-            { id: 'wizard', name: 'Zauberturm', description: 'Beschwört Kekse mit Magie.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' },
-            { id: 'ship', name: 'Raumschiff', description: 'Bringt Kekse vom Keksplaneten.', basePrice: 5100000000, baseCps: 260000, count: 0, icon: '🚀' },
-            { id: 'alchemy', name: 'Labor', description: 'Verwandelt Gold in Kekse.', basePrice: 75000000000, baseCps: 1600000, count: 0, icon: '⚗️' },
-            { id: 'portal', name: 'Portal', description: 'Öffnet eine Tür zum Keks-Universum.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
+            { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
+            { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
+            { id: 'farm', name: 'Farm', description: 'Grows cookie plants from seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
+            { id: 'mine', name: 'Mine', description: 'Mines cookie dough and chocolate chips.', basePrice: 12000, baseCps: 47, count: 0, icon: '⛏️' },
+            { id: 'factory', name: 'Factory', description: 'Mass produces cookies.', basePrice: 130000, baseCps: 260, count: 0, icon: '🏭' },
+            { id: 'bank', name: 'Bank', description: 'Generates cookies from interest.', basePrice: 1400000, baseCps: 1400, count: 0, icon: '🏦' },
+            { id: 'temple', name: 'Temple', description: 'Full of cookie gods.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
+            { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' },
+            { id: 'ship', name: 'Shipment', description: 'Brings cookies from the cookie planet.', basePrice: 5100000000, baseCps: 260000, count: 0, icon: '🚀' },
+            { id: 'alchemy', name: 'Alchemy Lab', description: 'Turns gold into cookies.', basePrice: 75000000000, baseCps: 1600000, count: 0, icon: '⚗️' },
+            { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Spezial-Upgrades
+        // Special Upgrades
         let specials = [
-            { id: 'sp-clicker', type: 'click', name: 'Fester Griff', description: 'Verdoppelt die Basis-Klickkraft.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
-            { id: 'sp-bird', type: 'bird', name: 'Sammler-Vogel', description: 'Ein Vogel, der spezielle Kekse einsammelt.', basePrice: 1000000000, count: 0, icon: '🐦' }
+            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
+            { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' }
         ];
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
 
         /**
-         * EINSTELLUNGEN LOGIK
+         * SETTINGS LOGIC
          */
         function toggleSettings() {
             const dropdown = document.getElementById('settings-dropdown');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Klick außerhalb schließt Menü
+        // Click outside closes menu
         window.onclick = function(event) {
             if (!event.target.closest('#settings-menu')) {
                 document.getElementById('settings-dropdown').style.display = 'none';
@@ -524,9 +524,9 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     applySaveData(data);
-                    location.reload(); // Neuladen um alles sauber zu initialisieren
+                    location.reload(); // Reload for clean initialization
                 } catch (err) {
-                    console.error("Laden fehlgeschlagen", err);
+                    console.error("Load failed", err);
                 }
             };
             reader.readAsText(file);
@@ -543,11 +543,11 @@
                 if (specials[index]) specials[index].count = savedSp.count;
             });
             calculateCPS();
-            saveGame(); // In LocalStorage spiegeln
+            saveGame(); // Sync with LocalStorage
         }
 
         /**
-         * UI & SPIEL LOGIK
+         * UI & GAME LOGIC
          */
         function switchTab(tab) {
             state.activeTab = tab;
@@ -578,8 +578,8 @@
 
         function generateNextUpgrade() {
             const last = buildings[buildings.length - 1];
-            const prefixPool = ['Quanten', 'Kosmisch', 'Hyper', 'Galaktisch', 'Unendlich', 'Göttlich', 'Chrono', 'Leeren', 'Nebula', 'Omega'];
-            const entityPool = ['Synthesizer', 'Motor', 'Netzwerk', 'Dyson Sphäre', 'Imperium', 'Gott', 'Fraktal', 'Singularität', 'Puls', 'Kern'];
+            const prefixPool = ['Quantum', 'Cosmic', 'Hyper', 'Galactic', 'Infinite', 'Divine', 'Chrono', 'Void', 'Nebula', 'Omega'];
+            const entityPool = ['Synthesizer', 'Engine', 'Network', 'Dyson Sphere', 'Empire', 'God', 'Fractal', 'Singularity', 'Pulse', 'Core'];
             const iconPool = ['🧬', '🪐', '⚡', '🤖', '🔱', '🧿', '💎', '🛸', '💥', '✨'];
 
             const randPrefix = prefixPool[Math.floor(Math.random() * prefixPool.length)];
@@ -591,7 +591,7 @@
             buildings.push({
                 id: 'gen-' + buildings.length,
                 name: name,
-                description: `Ein legendärer ${name} aus einer anderen Dimension.`,
+                description: `A legendary ${name} from another dimension.`,
                 basePrice: last.basePrice * 15.5,
                 baseCps: last.baseCps * 8.2,
                 count: 0,
@@ -632,10 +632,10 @@
                 
                 let bonusText = "";
                 if (state.activeTab === 'buildings') {
-                    bonusText = `Jedes +${formatNumber(item.baseCps)} CPS`;
+                    bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
                     if (item.type === 'click') bonusText = `Power x${item.factor}`;
-                    else bonusText = "Einmaliger Kauf";
+                    else bonusText = "One-time purchase";
                 }
                 
                 card.innerHTML = `
@@ -803,7 +803,7 @@
                 createParticle(x, y, "SPLIT!");
             } else if (cookieObj.type === 'green') {
                 for(let i=0; i<3; i++) spawnSpecialCookie('golden', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
-                createParticle(x, y, "FRAGMENTE!");
+                createParticle(x, y, "FRAGMENTS!");
             } else if (cookieObj.type === 'golden') {
                 const bonus = Math.max(10, state.cps * 60); 
                 addCookies(bonus);
@@ -906,8 +906,8 @@
 
         function updateUI() {
             cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            cpsDisplay.innerText = `pro Sekunde: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
-            clickPowerDisplay.innerText = `Klick Power: ${formatNumber(state.clickPower)}`;
+            cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
+            clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
             statTotalClicks.innerText = state.totalClicks;
             statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
@@ -931,17 +931,17 @@
             else frenzyBar.classList.remove('animate-pulse');
             
             const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
-            prestigeNeeded.innerText = `Noch: ${formatNumber(remaining)}`;
+            prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
             prestigeBar.style.width = prestigeProg + '%';
             prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 prestigeBtn.classList.remove('hidden');
-                prestigeNeeded.innerText = "Bereit für Prestige!";
+                prestigeNeeded.innerText = "Ready for Prestige!";
             } else prestigeBtn.classList.add('hidden');
             
-            currentBonusDisplay.innerText = `Aktueller Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
+            currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
             let list = state.activeTab === 'buildings' ? buildings : specials;
             list.forEach(item => {
@@ -982,7 +982,7 @@
                 try {
                     const data = JSON.parse(saved);
                     applySaveData(data);
-                } catch (e) { console.error("Laden fehlgeschlagen", e); }
+                } catch (e) { console.error("Load failed", e); }
             }
         }
 
