@@ -964,6 +964,10 @@
                     const countEl = document.getElementById(`count-${item.id}`);
                     if (countEl) countEl.innerText = item.count;
 
+                    // Fixed: Upgrade prices now visually update in the shop
+                    const priceEl = document.getElementById(`price-${item.id}`);
+                    if (priceEl) priceEl.innerText = formatNumber(price);
+
                     if (state.activeTab === 'buildings') {
                         const boostLabel = document.getElementById(`boost-${item.id}`);
                         const effMult = getUpgradeEfficiencyMult(item.count);
