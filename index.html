@@ -673,7 +673,9 @@
         }
 
         function getPrice(item) {
-            return Math.floor(item.basePrice * Math.pow(1.15, item.count));
+            // Check if it is the specific click upgrade to increase the price significantly
+            const scalingFactor = item.id === 'sp-clicker' ? 10.0 : 1.15;
+            return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count));
         }
 
         function calculateCPS() {
