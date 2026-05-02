@@ -302,13 +302,13 @@
             background: rgba(210, 105, 30, 0.1);
         }
 
-        /* Custom Modal for Reset */
-        #reset-modal {
+        /* Custom Modal for Reset, Startup, Performance */
+        #reset-modal, #performance-modal, #startup-modal {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
+            z-index: 3000; /* Higher than toasts */
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -320,6 +320,20 @@
             top: 20px;
             left: 20px;
             z-index: 500;
+        }
+
+        #fps-counter {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: bold;
+            color: #a1a1aa;
+            white-space: nowrap;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .settings-dropdown {
@@ -393,12 +407,16 @@
 
     <!-- Settings Menu Top Left -->
     <div id="settings-menu">
+        <div id="fps-counter">FPS: 60</div>
         <button onclick="toggleSettings()" class="bg-zinc-800/80 hover:bg-zinc-700 p-3 rounded-full border border-zinc-700 transition backdrop-blur-sm group">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <div id="settings-dropdown" class="settings-dropdown">
             <button onclick="switchTab('achievements'); toggleSettings();" class="settings-btn text-white hover:text-yellow-400">
                 <span>🏆</span> Achievements
+            </button>
+            <button onclick="toggleParticles()" class="settings-btn text-white hover:text-blue-400">
+                <span id="particle-toggle-icon">✨</span> <span id="particle-toggle-text">Disable Effects</span>
             </button>
             <div class="h-[1px] bg-zinc-700 my-1"></div>
             <button onclick="saveToFile()" class="settings-btn text-white hover:text-orange-400">
@@ -420,6 +438,18 @@
         <div id="multiplier-display" class="multiplier-tag">x1.0</div>
     </div>
 
+    <!-- Startup Modal -->
+    <div id="startup-modal" style="display: flex;">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-blue-500 max-w-md w-full text-center shadow-2xl">
+            <h2 class="text-3xl font-bold text-blue-500 mb-4">WELCOME! 🍪</h2>
+            <p class="text-zinc-400 mb-6">Would you like to enable cookie particles and click effects? You can always change this in the settings later.</p>
+            <div class="flex gap-4">
+                <button onclick="closeStartupModal(true)" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">DISABLE (Better Performance)</button>
+                <button onclick="closeStartupModal(false)" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition">ENABLE (Full Effects)</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Reset Modal -->
     <div id="reset-modal">
         <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-red-600 max-w-md w-full text-center shadow-2xl">
@@ -430,6 +460,18 @@
             <div class="flex gap-4">
                 <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">CANCEL</button>
                 <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">RESET ALL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Modal -->
+    <div id="performance-modal">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-yellow-500 max-w-md w-full text-center shadow-2xl">
+            <h2 class="text-3xl font-bold text-yellow-500 mb-4">LOW FPS! 🐢</h2>
+            <p class="text-zinc-400 mb-6">Your game is running slowly (< 40 FPS). Would you like to disable cookie particles and effects to improve performance?</p>
+            <div class="flex gap-4">
+                <button onclick="closePerformanceModal(false)" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">NO THANKS</button>
+                <button onclick="closePerformanceModal(true)" class="flex-1 py-3 bg-yellow-600 hover:bg-yellow-500 rounded-xl font-bold transition">DISABLE EFFECTS</button>
             </div>
         </div>
     </div>
@@ -536,13 +578,20 @@
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
-            achievements: [] // IDs of unlocked achievements
+            achievements: [], // IDs of unlocked achievements
+            showParticles: true,
+            performanceWarningShown: false
         };
 
         const PRESTIGE_THRESHOLD = 100000000000;
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
+        
+        // FPS Variables
+        let frameCount = 0;
+        let lastFpsUpdate = performance.now();
+        let fps = 60;
 
         // Achievements Definition
         const achievementsList = [
@@ -582,6 +631,54 @@
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
+
+        /**
+         * PERFORMANCE & PARTICLES & STARTUP
+         */
+        function closeStartupModal(disable) {
+            document.getElementById('startup-modal').style.display = 'none';
+            if (disable) {
+                state.showParticles = false;
+                updateParticleUI();
+            } else {
+                state.showParticles = true;
+                updateParticleUI();
+            }
+            saveGame();
+        }
+
+        function toggleParticles() {
+            state.showParticles = !state.showParticles;
+            updateParticleUI();
+            saveGame();
+        }
+
+        function updateParticleUI() {
+            const icon = document.getElementById('particle-toggle-icon');
+            const text = document.getElementById('particle-toggle-text');
+            if (state.showParticles) {
+                icon.innerText = "✨";
+                text.innerText = "Disable Effects";
+            } else {
+                icon.innerText = "🚫";
+                text.innerText = "Enable Effects";
+            }
+        }
+
+        function showPerformanceModal() {
+            if (state.performanceWarningShown) return;
+            document.getElementById('performance-modal').style.display = 'flex';
+        }
+
+        function closePerformanceModal(disableParticles) {
+            document.getElementById('performance-modal').style.display = 'none';
+            state.performanceWarningShown = true;
+            if (disableParticles) {
+                state.showParticles = false;
+                updateParticleUI();
+                saveGame();
+            }
+        }
 
         /**
          * ACHIEVEMENT SYSTEM
@@ -671,6 +768,7 @@
                 if (specials[index]) specials[index].count = savedSp.count;
             });
             calculateCPS();
+            updateParticleUI();
             saveGame(); // Sync with LocalStorage
         }
 
@@ -887,6 +985,7 @@
         }
 
         function createParticle(x, y, text) {
+            if (!state.showParticles) return;
             const p = document.createElement('div');
             p.className = 'particle text-orange-400';
             p.style.left = x + 'px';
@@ -897,6 +996,7 @@
         }
 
         function spawnFloatingCookie() {
+            if (!state.showParticles) return;
             const f = document.createElement('div');
             f.className = 'floating-cookie';
             const size = 20 + Math.random() * 30;
@@ -1261,8 +1361,28 @@
             updateUI();
         }
 
+        function updateFPS() {
+            frameCount++;
+            const now = performance.now();
+            const duration = now - lastFpsUpdate;
+            if (duration >= 1000) {
+                fps = Math.round((frameCount * 1000) / duration);
+                document.getElementById('fps-counter').innerText = `FPS: ${fps}`;
+                frameCount = 0;
+                lastFpsUpdate = now;
+                
+                // Performance Check (Only if Startup modal is gone)
+                if (document.getElementById('startup-modal').style.display === 'none') {
+                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) {
+                        showPerformanceModal();
+                    }
+                }
+            }
+        }
+
         function gameLoop() {
             runTick();
+            updateFPS();
             requestAnimationFrame(gameLoop);
         }
 
@@ -1294,6 +1414,7 @@
 
         loadGame();
         initShop();
+        updateParticleUI();
         updateUI();
         gameLoop();
     </script>
