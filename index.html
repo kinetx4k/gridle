@@ -19,9 +19,9 @@
         }
 
         /* Themes */
-        body.theme-midnight { background-color: #020617; }
-        body.theme-royal { background-color: #1e1b4b; }
-        body.theme-forest { background-color: #064e3b; }
+        body.theme-midnight { background-color: #020617 !important; }
+        body.theme-royal { background-color: #1e1b4b !important; }
+        body.theme-forest { background-color: #064e3b !important; }
 
         body.golden-frenzy {
             background-color: #433200;
@@ -46,9 +46,9 @@
             filter: drop-shadow(0 0 20px rgba(210, 105, 30, 0.4));
         }
 
-        /* Cosmetics for Cookie */
-        #main-cookie.cosmetic-gold { filter: drop-shadow(0 0 30px #ffd700) sepia(1) saturate(5); }
-        #main-cookie.cosmetic-neon { filter: drop-shadow(0 0 30px #00ff00) hue-rotate(90deg); }
+        /* Cosmetics for Cookie - Specificity fix */
+        #main-cookie.cosmetic-gold { filter: drop-shadow(0 0 40px #ffd700) sepia(0.5) saturate(3) !important; }
+        #main-cookie.cosmetic-neon { filter: drop-shadow(0 0 40px #00ff00) hue-rotate(90deg) brightness(1.2) !important; }
 
         #main-cookie:hover {
             transform: scale(1.05);
@@ -279,6 +279,18 @@
         .btn-equipped { background: #16a34a; color: white; }
         .btn-unequipped { background: #3f3f46; color: #a1a1aa; }
         .btn-unequipped:hover { background: #52525b; color: white; }
+
+        /* Custom Modal for Reset */
+        #reset-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
@@ -286,6 +298,20 @@
     <div id="frenzy-meter-container">
         <div id="frenzy-bar"></div>
         <div id="multiplier-display" class="multiplier-tag">x1.0</div>
+    </div>
+
+    <!-- Reset Modal -->
+    <div id="reset-modal">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-red-600 max-w-md w-full text-center">
+            <h2 class="text-3xl font-bold text-red-500 mb-4">DANGER! 🛑</h2>
+            <p class="text-zinc-400 mb-6">This will reset EVERYTHING. Level, Upgrades, Cookies and Cosmetics will be gone forever.</p>
+            <p class="text-white font-bold mb-2">Type "CONFIRM" to proceed:</p>
+            <input type="text" id="reset-confirm-input" class="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-center font-bold tracking-widest outline-none focus:border-red-500 transition mb-6" placeholder="...">
+            <div class="flex gap-4">
+                <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">CANCEL</button>
+                <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">RESET ALL</button>
+            </div>
+        </div>
     </div>
 
     <div id="prestige-container">
@@ -395,6 +421,9 @@
 
         const PRESTIGE_THRESHOLD = 100000000000;
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
+        
+        // Track keys for secret reset
+        let keysPressed = {};
 
         // Building Upgrades
         let buildings = [
@@ -411,7 +440,7 @@
         // Special Upgrades
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Double your base clicking power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
-            { id: 'sp-bird', type: 'bird', name: 'Auto-Collector Bird', description: 'A bird that picks up settled special cookies.', basePrice: 5000, count: 0, icon: '🐦' },
+            { id: 'sp-bird', type: 'bird', name: 'Auto-Collector Bird', description: 'A bird that picks up settled special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
             { id: 'th-midnight', type: 'theme', theme: 'midnight', name: 'Midnight Sky', description: 'Changes the background to deep blue.', basePrice: 100000, count: 0, icon: '🌑' },
             { id: 'th-royal', type: 'theme', theme: 'royal', name: 'Royal Chamber', description: 'Changes the background to royal purple.', basePrice: 1000000, count: 0, icon: '👑' },
             { id: 'cos-gold', type: 'cosmetic', cos: 'gold', name: 'Golden Shine', description: 'Makes your main cookie look shiny.', basePrice: 5000000, count: 0, icon: '✨' },
@@ -560,7 +589,10 @@
                 
                 const card = document.createElement('div');
                 card.className = 'upgrade-card p-4 rounded-xl flex items-center gap-4 cursor-pointer';
-                card.onclick = () => equipItem(item);
+                card.onclick = (e) => {
+                    e.stopPropagation();
+                    equipItem(item);
+                };
                 
                 card.innerHTML = `
                     <div class="text-3xl">${item.icon}</div>
@@ -660,15 +692,19 @@
         }
 
         function applyVisuals() {
-            // Themes
+            // Reset and apply theme classes
             document.body.classList.remove('theme-midnight', 'theme-royal', 'theme-forest');
-            if (state.currentTheme !== 'default') document.body.classList.add('theme-' + state.currentTheme);
+            if (state.currentTheme !== 'default') {
+                document.body.classList.add('theme-' + state.currentTheme);
+            }
             
-            // Cosmetics
+            // Reset and apply cosmetic classes to cookie
             mainCookie.classList.remove('cosmetic-gold', 'cosmetic-neon');
-            if (state.currentCosmetic !== 'default') mainCookie.classList.add('cosmetic-' + state.currentCosmetic);
+            if (state.currentCosmetic !== 'default') {
+                mainCookie.classList.add('cosmetic-' + state.currentCosmetic);
+            }
 
-            // Bird
+            // Bird visibility
             collectorBird.style.display = state.hasBird ? 'block' : 'none';
         }
 
@@ -843,8 +879,29 @@
             state.prestigeLevel++;
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
-            buildings = JSON.parse(JSON.stringify(baseUpgrades));
+            buildings = JSON.parse(JSON.stringify(buildings.slice(0, 8))); // Reset counts
+            buildings.forEach(b => b.count = 0);
+            specials.forEach(s => s.count = 0);
             initShop(); updateUI(); saveGame();
+        }
+
+        // Logic for Secret Reset Shortcut
+        function showResetModal() {
+            document.getElementById('reset-modal').style.display = 'flex';
+            document.getElementById('reset-confirm-input').focus();
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').style.display = 'none';
+            document.getElementById('reset-confirm-input').value = '';
+        }
+
+        function executeFullReset() {
+            const input = document.getElementById('reset-confirm-input').value;
+            if (input === 'CONFIRM') {
+                localStorage.removeItem('kinetx_cookie_save_v3');
+                location.reload();
+            }
         }
 
         function updateUI() {
@@ -986,7 +1043,16 @@
 
         mainCookie.addEventListener('mousedown', (e) => { clickCookie(e); });
         mainCookie.addEventListener('contextmenu', e => e.preventDefault());
+        
         window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keysPressed[key] = true;
+            
+            // Check for secret reset shortcut
+            if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) {
+                showResetModal();
+            }
+
             if (e.code === 'Space') {
                 e.preventDefault();
                 const rect = mainCookie.getBoundingClientRect();
@@ -994,7 +1060,12 @@
                 mainCookie.style.transform = 'scale(0.95)';
             }
         });
-        window.addEventListener('keyup', (e) => { if (e.code === 'Space') mainCookie.style.transform = ''; });
+        
+        window.addEventListener('keyup', (e) => { 
+            const key = e.key.toLowerCase();
+            keysPressed[key] = false;
+            if (e.code === 'Space') mainCookie.style.transform = ''; 
+        });
 
         loadGame();
         initShop();
