@@ -1763,11 +1763,15 @@
             
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
             const bonusPercent = milestoneCount * 5;
-            const totalCps = state.cps * state.multiplier * state.prestigeBonus;
+            
+            // DYNAMIC CPS CALCULATION (including Reactors based on current cookies)
+            const stabilizerCps = state.cookies * (0.01 * state.stabilizers);
+            const totalCps = (state.cps * state.multiplier * state.prestigeBonus) + stabilizerCps;
+            
             const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
 
             if (cpsDisplay) {
-                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span> <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span>`;
+                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span> <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span>${state.stabilizers > 0 ? ` <span class="text-green-500 font-bold ml-1">+${state.stabilizers}% Reactor</span>` : ''}`;
             }
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
