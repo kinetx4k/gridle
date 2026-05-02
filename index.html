@@ -474,13 +474,13 @@
         <!-- Slot Production -->
         <div id="pu-slot-production" class="powerup-slot">
             <span class="text-2xl">⚡</span>
-            <div id="pu-timer-production" class="powerup-timer hidden">120s</div>
+            <div id="pu-timer-production" class="powerup-timer hidden">45s</div>
             <div id="pu-cd-production" class="cooldown-overlay hidden">5:00</div>
         </div>
         <!-- Slot Golden -->
         <div id="pu-slot-golden" class="powerup-slot">
             <span class="text-2xl">🪙</span>
-            <div id="pu-timer-golden" class="powerup-timer hidden">120s</div>
+            <div id="pu-timer-golden" class="powerup-timer hidden">45s</div>
             <div id="pu-cd-golden" class="cooldown-overlay hidden">5:00</div>
         </div>
     </div>
@@ -668,7 +668,7 @@
             }
         };
 
-        const PRESTIGE_THRESHOLD = 100000000000;
+        const PRESTIGE_THRESHOLD = 100000000000; // 100 Billion
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
@@ -712,9 +712,9 @@
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
-            // NEW POWERUPS
-            { id: 'pu-production', type: 'powerup', powerupId: 'production', name: 'Frenzy Rush', description: 'x10 Production for 120s.', basePrice: 100000000, duration: 120, cooldown: 300, icon: '⚡' },
-            { id: 'pu-golden', type: 'powerup', powerupId: 'golden', name: 'Golden Storm', description: 'x10 Golden Cookie Spawns for 120s.', basePrice: 250000000, duration: 120, cooldown: 300, icon: '🪙' }
+            // UPDATED POWERUPS: 5x power, 45s duration
+            { id: 'pu-production', type: 'powerup', powerupId: 'production', name: 'Frenzy Rush', description: 'x5 Production for 45s.', basePrice: 100000000, duration: 45, cooldown: 300, icon: '⚡' },
+            { id: 'pu-golden', type: 'powerup', powerupId: 'golden', name: 'Golden Storm', description: 'x5 Golden Cookie Spawns for 45s.', basePrice: 250000000, duration: 45, cooldown: 300, icon: '🪙' }
         ];
 
         let activeSpecialCookies = [];
@@ -1090,9 +1090,9 @@
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
 
-            // Apply Powerup Multiplier
+            // UPDATED: Apply 5x Production Powerup
             if (state.powerups.production.active > 0) {
-                baseCps *= 10;
+                baseCps *= 5;
             }
 
             state.cps = baseCps;
@@ -1315,16 +1315,24 @@
         }
 
         function prestige() {
+            // UPDATED: Logic for 1% per 100b. Threshold is 100b.
             if (state.cookies < PRESTIGE_THRESHOLD) return;
             unlockAchievement('first_prestige');
+            
+            // Calculates how many 100b units have been earned
             const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            // Each 100b unit gives 1% (0.01) extra
             const extraBonus = newBonusPoints * 0.01; 
+            
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
+            
+            // Reset progression
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
             buildings.forEach(b => b.count = 0);
-            specials.forEach(s => { if(s.count) s.count = 0; });
+            specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
+            
             initShop(); updateUI(); saveGame();
         }
 
@@ -1522,8 +1530,8 @@
 
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
-            // Spawn Logic
-            const spawnMult = state.powerups.golden.active > 0 ? 10 : 1;
+            // UPDATED: Golden spawn spawn multiplier to 5x when active
+            const spawnMult = state.powerups.golden.active > 0 ? 5 : 1;
 
             if (state.multiplier >= 3.0) {
                 state.goldenCookieTimer += delta * spawnMult;
