@@ -831,6 +831,9 @@
             if (state.achievements.includes(id)) return;
             state.achievements.push(id);
             
+            // Update CPS for milestone boost immediately
+            if (id.startsWith('milestone_')) calculateCPS();
+
             // Check if it's dynamic or static
             let ach;
             if (id.startsWith('milestone_')) {
@@ -1028,7 +1031,7 @@
                         card.innerHTML = `
                             <div class="icon">${ach.icon}</div>
                             <div class="flex-1">
-                                <div class="font-bold text-sm text-yellow-400">${ach.name}</div>
+                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+5% Boost</span></div>
                                 <div class="text-[10px] text-zinc-500">${ach.description}</div>
                             </div>
                             <div class="text-yellow-400 text-xs">✓</div>
@@ -1195,6 +1198,11 @@
                 const mult = getUpgradeEfficiencyMult(up.count);
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
+
+            // NEW: Milestone boost (5% for each achievement currently unlocked in this run)
+            const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
+            const milestoneBoost = 1 + (milestoneCount * 0.05);
+            baseCps *= milestoneBoost;
 
             // Apply 5x Production Powerup
             if (state.powerups.production.active > 0) {
