@@ -1071,7 +1071,7 @@
                         card.innerHTML = `
                             <div class="icon">${ach.icon}</div>
                             <div class="flex-1">
-                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+5% Boost</span></div>
+                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+5% Bonus</span></div>
                                 <div class="text-[10px] text-zinc-500">${ach.description}</div>
                             </div>
                             <div class="text-yellow-400 text-xs">✓</div>
@@ -1131,7 +1131,7 @@
                         <div class="text-xs text-zinc-400">${item.description}</div>
                         <div class="flex items-center gap-2 mt-1">
                             <div class="text-[10px] text-zinc-500">${bonusText}</div>
-                            <div class="text-[10px] text-orange-500 font-bold hidden" id="boost-${item.id}">Boost: x1</div>
+                            <div class="text-[10px] text-orange-500 font-bold hidden" id="bonus-${item.id}">Bonus: x1</div>
                         </div>
                     </div>
                     <div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count || 0}</div>
@@ -1531,11 +1531,12 @@
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
             
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
-            const boostPercent = milestoneCount * 5;
+            const bonusPercent = milestoneCount * 5;
             const totalCps = state.cps * state.multiplier * state.prestigeBonus;
+            const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
 
             if (cpsDisplay) {
-                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${boostPercent}% Boost</span>`;
+                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span> <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span>`;
             }
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
@@ -1591,7 +1592,7 @@
                 if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!";
             } else if (prestigeBtn) prestigeBtn.classList.add('hidden');
             
-            if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
+            if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${currentPrestigeBonusText}%`;
             
             const hours = Math.floor(state.totalPlaytime / 3600);
             const minutes = Math.floor((state.totalPlaytime % 3600) / 60);
@@ -1622,13 +1623,13 @@
                         if (priceEl) priceEl.innerText = formatNumber(price);
 
                         if (state.activeTab === 'buildings') {
-                            const boostLabel = document.getElementById(`boost-${item.id}`);
+                            const bonusLabel = document.getElementById(`bonus-${item.id}`);
                             const effMult = getUpgradeEfficiencyMult(item.count);
                             const stars = getStarsForCount(item.count);
                             if (effMult > 1) {
-                                boostLabel.innerText = `${stars} Boost: x${effMult}`;
-                                boostLabel.classList.remove('hidden');
-                            } else if (boostLabel) boostLabel.classList.add('hidden');
+                                bonusLabel.innerText = `${stars} Bonus: x${effMult}`;
+                                bonusLabel.classList.remove('hidden');
+                            } else if (bonusLabel) bonusLabel.classList.add('hidden');
                         }
                     }
                 });
