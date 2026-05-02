@@ -49,17 +49,10 @@
             transform: scale(0.95);
         }
 
-        @keyframes wobble {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(2deg); }
-            50% { transform: rotate(0deg); }
-            75% { transform: rotate(-2deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        #main-cookie.shaking {
-            animation: wobble 0.1s infinite;
-            filter: drop-shadow(0 0 30px #ffd700);
+        /* Number display styling to prevent jumping/wiggling */
+        #cookie-count {
+            font-variant-numeric: tabular-nums;
+            display: inline-block;
         }
 
         .particle {
@@ -666,6 +659,7 @@
             }
         }
 
+        // Updated formatNumber to ensure a dot as decimal separator
         function formatNumber(num) {
             if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' Q';
             if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' T';
@@ -932,10 +926,9 @@
             
             if (state.multiplier >= 3.0) {
                 document.body.classList.add('golden-frenzy');
-                mainCookie.classList.add('shaking');
+                // Shaking effect logic removed for stability
             } else {
                 document.body.classList.remove('golden-frenzy');
-                mainCookie.classList.remove('shaking');
             }
             if (state.multiplier >= 5) frenzyBar.classList.add('animate-pulse');
             else frenzyBar.classList.remove('animate-pulse');
@@ -964,7 +957,7 @@
                     const countEl = document.getElementById(`count-${item.id}`);
                     if (countEl) countEl.innerText = item.count;
 
-                    // Fixed: Upgrade prices now visually update in the shop
+                    // Update prices visually in the shop
                     const priceEl = document.getElementById(`price-${item.id}`);
                     if (priceEl) priceEl.innerText = formatNumber(price);
 
