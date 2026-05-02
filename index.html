@@ -355,8 +355,8 @@
             background: rgba(210, 105, 30, 0.1);
         }
 
-        /* Custom Modal for Reset, Startup, Performance */
-        #reset-modal, #performance-modal, #startup-modal {
+        /* Custom Modal for Reset, Startup, Performance, Prestige */
+        #reset-modal, #performance-modal, #startup-modal, #prestige-confirm-modal {
             display: none;
             position: fixed;
             inset: 0;
@@ -645,6 +645,21 @@
         </div>
     </div>
 
+    <!-- Prestige Confirmation Modal -->
+    <div id="prestige-confirm-modal">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-purple-600 max-w-md w-full text-center shadow-2xl">
+            <h2 class="text-3xl font-bold text-purple-500 mb-4">ASCEND? 🌌</h2>
+            <p class="text-zinc-400 mb-6">You are about to sacrifice everything for permanent power. Your current cookies and buildings will be lost!</p>
+            <div class="bg-zinc-800 p-4 rounded-xl mb-6">
+                <p class="text-yellow-400 font-bold" id="prestige-gain-modal">+0% Production Bonus</p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closePrestigeModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">STAY HERE</button>
+                <button onclick="executePrestige()" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition">ASCEND NOW</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Performance Modal -->
     <div id="performance-modal">
         <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-yellow-500 max-w-md w-full text-center shadow-2xl">
@@ -658,9 +673,6 @@
     </div>
 
     <div id="prestige-container">
-        <div id="total-prestige-count" class="text-[11px] text-purple-400 font-bold mb-2 border-b border-zinc-700 pb-1">
-            Total Prestige: 0
-        </div>
         <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
             Left: 1.00 B
         </div>
@@ -671,7 +683,7 @@
         <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
             <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
         </div>
-        <button id="prestige-btn" onclick="prestige()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
+        <button id="prestige-btn" onclick="showPrestigeModal()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
             PRESTIGE NOW!
         </button>
         <div class="flex items-center gap-2 mt-1">
@@ -1085,7 +1097,6 @@
         const prestigeBtn = document.getElementById('prestige-btn');
         const currentBonusDisplay = document.getElementById('current-bonus-display');
         const prestigeNeeded = document.getElementById('prestige-needed');
-        const totalPrestigeDisplay = document.getElementById('total-prestige-count');
 
         function initShop() {
             shopItems.innerHTML = '';
@@ -1504,9 +1515,20 @@
             }
         }
 
-        async function prestige() {
+        function showPrestigeModal() {
+            const potentialBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            document.getElementById('prestige-gain-modal').innerText = `+${potentialBonusPoints}% Production Bonus`;
+            document.getElementById('prestige-confirm-modal').style.display = 'flex';
+        }
+
+        function closePrestigeModal() {
+            document.getElementById('prestige-confirm-modal').style.display = 'none';
+        }
+
+        async function executePrestige() {
             if (state.cookies < PRESTIGE_THRESHOLD || state.isPrestiging) return;
             
+            closePrestigeModal();
             state.isPrestiging = true;
             unlockAchievement('first_prestige');
             
@@ -1592,8 +1614,6 @@
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             
-            if (totalPrestigeDisplay) totalPrestigeDisplay.innerText = `Total Prestige: ${state.totalPrestigeEarned}`;
-
             // Thresholds updated for 10x multiplier
             if (state.clickHeat >= 95) {
                 state.multiplier = 10.0;
