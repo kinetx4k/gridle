@@ -621,10 +621,7 @@
         </div>
         <div class="flex justify-between text-[10px] mb-1">
             <span>PRESTIGE PROGRESS</span>
-            <div class="flex items-center gap-1">
-                <span id="prestige-percent">0%</span>
-                <span id="prestige-gain" class="text-yellow-400 font-bold hidden"></span>
-            </div>
+            <span id="prestige-percent">0%</span>
         </div>
         <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
             <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
@@ -632,7 +629,10 @@
         <button id="prestige-btn" onclick="prestige()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
             PRESTIGE NOW!
         </button>
-        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Current Bonus: +0%</div>
+        <div class="flex items-center gap-2 mt-1">
+            <div id="current-bonus-display" class="text-[9px] text-zinc-400">Current Bonus: +0%</div>
+            <span id="prestige-gain" class="text-yellow-400 font-bold text-[9px] hidden"></span>
+        </div>
     </div>
 
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
