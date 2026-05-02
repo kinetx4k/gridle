@@ -14,14 +14,14 @@
             color: #ffffff;
             overflow: hidden;
             user-select: none;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.1s linear; /* Smooth color transition */
             position: relative;
         }
 
         body.golden-frenzy {
-            background-color: #433200;
+            /* We keep the class for the background image pattern, but color is handled dynamically */
             background-image: 
-                radial-gradient(circle, #b8860b44 0%, #1a1a1a 100%),
+                radial-gradient(circle, #b8860b22 0%, transparent 100%),
                 url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='90' fill='%23ffd700' fill-opacity='0.1' /%3E%3Ccircle cx='60' cy='60' r='10' fill='%23d4af37' fill-opacity='0.1' /%3E%3Ccircle cx='140' cy='140' r='10' fill='%23d4af37' fill-opacity='0.1' /%3E%3C/svg%3E");
             animation: frenzy-bg-slide 10s linear infinite;
         }
@@ -1604,15 +1604,26 @@
             }
             else if (state.clickHeat >= 25) state.multiplier = 1.5;
             else state.multiplier = 1.0;
+
+            /**
+             * DYNAMIC BACKGROUND COLOR LOGIC
+             * Interpolates between #1a1a1a (base) and #433200 (intense)
+             */
+            const heatRatio = state.clickHeat / 100;
+            const r = Math.round(26 + (67 - 26) * heatRatio);
+            const g = Math.round(26 + (50 - 26) * heatRatio);
+            const b = Math.round(26 + (0 - 26) * heatRatio);
+            document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
             
             if (frenzyBar) frenzyBar.style.width = state.clickHeat + '%';
             if (multiplierDisplay) multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
             
-            if (state.multiplier >= 3.0) {
+            if (state.clickHeat >= 30) {
                 document.body.classList.add('golden-frenzy');
             } else {
                 document.body.classList.remove('golden-frenzy');
             }
+
             if (state.multiplier >= 5 && frenzyBar) frenzyBar.classList.add('animate-pulse');
             else if (frenzyBar) frenzyBar.classList.remove('animate-pulse');
             
