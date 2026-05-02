@@ -392,6 +392,70 @@
             opacity: 1;
             grayscale: 0;
         }
+
+        /* Powerup Hotbar */
+        #powerup-hotbar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 400;
+        }
+
+        .powerup-slot {
+            width: 60px;
+            height: 60px;
+            background: #27272a;
+            border: 2px solid #3f3f46;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            opacity: 0.2; /* Default hidden until active or cooling */
+        }
+
+        .powerup-slot.active {
+            opacity: 1;
+            border-color: #d2691e;
+            box-shadow: 0 0 15px rgba(210, 105, 30, 0.6);
+        }
+
+        .powerup-slot.on-cooldown {
+            opacity: 0.5;
+            grayscale: 1;
+        }
+
+        .powerup-timer {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #d2691e;
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cooldown-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #ef4444;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
@@ -402,6 +466,22 @@
         <div class="text-content">
             <div class="toast-title">Achievement Get!</div>
             <div class="toast-name" id="toast-name">New Progress</div>
+        </div>
+    </div>
+
+    <!-- Powerup Hotbar -->
+    <div id="powerup-hotbar">
+        <!-- Slot Production -->
+        <div id="pu-slot-production" class="powerup-slot">
+            <span class="text-2xl">⚡</span>
+            <div id="pu-timer-production" class="powerup-timer hidden">120s</div>
+            <div id="pu-cd-production" class="cooldown-overlay hidden">5:00</div>
+        </div>
+        <!-- Slot Golden -->
+        <div id="pu-slot-golden" class="powerup-slot">
+            <span class="text-2xl">🪙</span>
+            <div id="pu-timer-golden" class="powerup-timer hidden">120s</div>
+            <div id="pu-cd-golden" class="cooldown-overlay hidden">5:00</div>
         </div>
     </div>
 
@@ -580,7 +660,12 @@
             hasBird: false,
             achievements: [], // IDs of unlocked achievements
             showParticles: true,
-            performanceWarningShown: false
+            performanceWarningShown: false,
+            // Powerup Timers
+            powerups: {
+                production: { active: 0, cd: 0 },
+                golden: { active: 0, cd: 0 }
+            }
         };
 
         const PRESTIGE_THRESHOLD = 100000000000;
@@ -623,10 +708,13 @@
             { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Special Upgrades
+        // Special Upgrades & Powerups
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
-            { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' }
+            { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
+            // NEW POWERUPS
+            { id: 'pu-production', type: 'powerup', powerupId: 'production', name: 'Frenzy Rush', description: 'x10 Production for 120s.', basePrice: 100000000, duration: 120, cooldown: 300, icon: '⚡' },
+            { id: 'pu-golden', type: 'powerup', powerupId: 'golden', name: 'Golden Storm', description: 'x10 Golden Cookie Spawns for 120s.', basePrice: 250000000, duration: 120, cooldown: 300, icon: '🪙' }
         ];
 
         let activeSpecialCookies = [];
@@ -878,6 +966,9 @@
                 let bonusText = "";
                 if (item.type === 'click') {
                     bonusText = `Power x${item.factor}`;
+                } else if (item.type === 'powerup') {
+                    const onCd = state.powerups[item.powerupId].cd > 0;
+                    bonusText = onCd ? "On Cooldown" : "Ready to activate";
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
@@ -897,7 +988,7 @@
                             <div class="text-[10px] text-orange-500 font-bold hidden" id="boost-${item.id}">Boost: x1</div>
                         </div>
                     </div>
-                    <div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count}</div>
+                    <div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count || 0}</div>
                 `;
                 shopItems.appendChild(card);
             }
@@ -957,6 +1048,21 @@
         function buySpecial(index) {
             const sp = specials[index];
             const currentPrice = getPrice(sp);
+            
+            // Handle Powerups
+            if (sp.type === 'powerup') {
+                if (state.cookies >= currentPrice && state.powerups[sp.powerupId].cd <= 0) {
+                    state.cookies -= currentPrice;
+                    state.powerups[sp.powerupId].active = sp.duration;
+                    state.powerups[sp.powerupId].cd = sp.cooldown;
+                    calculateCPS();
+                    updateUI();
+                    initShop();
+                }
+                return;
+            }
+
+            // Normal Specials
             if (sp.type !== 'click' && sp.count > 0) return;
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
@@ -973,15 +1079,23 @@
         }
 
         function getPrice(item) {
+            if (item.type === 'powerup') return item.basePrice;
             const scalingFactor = item.id === 'sp-clicker' ? 10.0 : 1.15;
-            return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count));
+            return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count || 0));
         }
 
         function calculateCPS() {
-            state.cps = buildings.reduce((sum, up) => {
+            let baseCps = buildings.reduce((sum, up) => {
                 const mult = getUpgradeEfficiencyMult(up.count);
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
+
+            // Apply Powerup Multiplier
+            if (state.powerups.production.active > 0) {
+                baseCps *= 10;
+            }
+
+            state.cps = baseCps;
         }
 
         function createParticle(x, y, text) {
@@ -1210,7 +1324,7 @@
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
             buildings.forEach(b => b.count = 0);
-            specials.forEach(s => s.count = 0);
+            specials.forEach(s => { if(s.count) s.count = 0; });
             initShop(); updateUI(); saveGame();
         }
 
@@ -1275,17 +1389,23 @@
             
             currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
+            // Powerup Visuals
+            updatePowerupHotbar();
+
             if (state.activeTab !== 'achievements') {
                 let list = state.activeTab === 'buildings' ? buildings : specials;
                 list.forEach(item => {
                     const card = document.getElementById(`upgrade-${item.id}`);
                     if (card) {
                         const price = getPrice(item);
-                        if (state.cookies >= price) card.classList.remove('disabled');
+                        const isPowerup = item.type === 'powerup';
+                        const onCd = isPowerup ? state.powerups[item.powerupId].cd > 0 : false;
+
+                        if (state.cookies >= price && !onCd) card.classList.remove('disabled');
                         else card.classList.add('disabled');
                         
                         const countEl = document.getElementById(`count-${item.id}`);
-                        if (countEl) countEl.innerText = item.count;
+                        if (countEl) countEl.innerText = item.count || 0;
 
                         const priceEl = document.getElementById(`price-${item.id}`);
                         if (priceEl) priceEl.innerText = formatNumber(price);
@@ -1304,11 +1424,63 @@
             }
         }
 
+        function updatePowerupHotbar() {
+            // Production
+            const pSlot = document.getElementById('pu-slot-production');
+            const pTimer = document.getElementById('pu-timer-production');
+            const pCd = document.getElementById('pu-cd-production');
+            const pData = state.powerups.production;
+
+            if (pData.active > 0) {
+                pSlot.className = 'powerup-slot active';
+                pTimer.classList.remove('hidden');
+                pTimer.innerText = Math.ceil(pData.active) + 's';
+                pCd.classList.add('hidden');
+            } else if (pData.cd > 0) {
+                pSlot.className = 'powerup-slot on-cooldown';
+                pTimer.classList.add('hidden');
+                pCd.classList.remove('hidden');
+                pCd.innerText = formatTime(pData.cd);
+            } else {
+                pSlot.className = 'powerup-slot';
+                pTimer.classList.add('hidden');
+                pCd.classList.add('hidden');
+            }
+
+            // Golden
+            const gSlot = document.getElementById('pu-slot-golden');
+            const gTimer = document.getElementById('pu-timer-golden');
+            const gCd = document.getElementById('pu-cd-golden');
+            const gData = state.powerups.golden;
+
+            if (gData.active > 0) {
+                gSlot.className = 'powerup-slot active';
+                gTimer.classList.remove('hidden');
+                gTimer.innerText = Math.ceil(gData.active) + 's';
+                gCd.classList.add('hidden');
+            } else if (gData.cd > 0) {
+                gSlot.className = 'powerup-slot on-cooldown';
+                gTimer.classList.add('hidden');
+                gCd.classList.remove('hidden');
+                gCd.innerText = formatTime(gData.cd);
+            } else {
+                gSlot.className = 'powerup-slot';
+                gTimer.classList.add('hidden');
+                gCd.classList.add('hidden');
+            }
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
         function saveGame() {
             const saveData = { 
                 state: state, 
                 buildingCounts: buildings.map(u => ({ id: u.id, count: u.count })),
-                specialCounts: specials.map(s => ({ id: s.id, count: s.count }))
+                specialCounts: specials.map(s => ({ id: s.id, count: s.count || 0 }))
             };
             localStorage.setItem('kinetx_cookie_save_v4', JSON.stringify(saveData));
         }
@@ -1328,20 +1500,42 @@
             const delta = (now - state.lastTick) / 1000;
             if (delta < 0.001) return;
             state.lastTick = now;
+            
+            // Heat and CPS
             state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
+            
+            // Handle Powerup Timers
+            Object.keys(state.powerups).forEach(key => {
+                const pu = state.powerups[key];
+                if (pu.active > 0) {
+                    const oldActive = pu.active;
+                    pu.active = Math.max(0, pu.active - delta);
+                    // Recalculate CPS if production powerup ends
+                    if (key === 'production' && oldActive > 0 && pu.active === 0) calculateCPS();
+                }
+                if (pu.cd > 0) {
+                    pu.cd = Math.max(0, pu.cd - delta);
+                    // Refresh shop if cooldown ends to enable button
+                    if (pu.cd === 0) initShop();
+                }
+            });
+
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
+            // Spawn Logic
+            const spawnMult = state.powerups.golden.active > 0 ? 10 : 1;
+
             if (state.multiplier >= 3.0) {
-                state.goldenCookieTimer += delta;
+                state.goldenCookieTimer += delta * spawnMult;
                 if (state.goldenCookieTimer >= 5) {
                     spawnSpecialCookie('golden');
                     state.goldenCookieTimer = 0;
                 }
             } else state.goldenCookieTimer = 0;
             
-            state.randomGoldenSpawnTimer += delta;
+            state.randomGoldenSpawnTimer += delta * spawnMult;
             if (state.randomGoldenSpawnTimer >= 1.0) {
-                if (Math.random() < 0.002) spawnSpecialCookie('golden');
+                if (Math.random() < 0.002 * spawnMult) spawnSpecialCookie('golden');
                 state.randomGoldenSpawnTimer = 0;
             }
             
