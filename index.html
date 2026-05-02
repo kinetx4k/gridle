@@ -179,10 +179,10 @@
             position: fixed;
             bottom: 20px;
             left: 20px;
-            width: 200px;
+            width: 220px;
             background: rgba(0,0,0,0.6);
             border: 1px solid #444;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             z-index: 100;
         }
@@ -198,6 +198,9 @@
 
     <!-- Prestige Progress Area -->
     <div id="prestige-container">
+        <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
+            Noch: 100.0 B
+        </div>
         <div class="flex justify-between text-[10px] mb-1">
             <span>PRESTIGE PROGRESS</span>
             <span id="prestige-percent">0%</span>
@@ -278,7 +281,7 @@
             goldenCookieTimer: 0
         };
 
-        const PRESTIGE_THRESHOLD = 1000000000000; // 1 Trillion
+        const PRESTIGE_THRESHOLD = 100000000000; // 100 Billion (milliarden)
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
 
         let baseUpgrades = [
@@ -357,6 +360,7 @@
         const prestigePercent = document.getElementById('prestige-percent');
         const prestigeBtn = document.getElementById('prestige-btn');
         const currentBonusDisplay = document.getElementById('current-bonus-display');
+        const prestigeNeeded = document.getElementById('prestige-needed');
 
         /**
          * Initializes shop based on unlocked upgrades
@@ -601,12 +605,17 @@
                 frenzyBar.classList.remove('animate-pulse');
             }
 
+            // Prestige UI
+            const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
+            prestigeNeeded.innerText = `Noch: ${formatNumber(remaining)}`;
+
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
             prestigeBar.style.width = prestigeProg + '%';
             prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 prestigeBtn.classList.remove('hidden');
+                prestigeNeeded.innerText = "Balken voll!";
             } else {
                 prestigeBtn.classList.add('hidden');
             }
