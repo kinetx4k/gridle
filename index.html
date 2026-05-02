@@ -613,6 +613,7 @@
         <div class="frenzy-marker" style="left: 25%;"></div> <!-- x1.5 start -->
         <div class="frenzy-marker" style="left: 60%;"></div> <!-- x3.0 start -->
         <div class="frenzy-marker" style="left: 85%;"></div> <!-- x5.0 start -->
+        <div class="frenzy-marker" style="left: 95%;"></div> <!-- x10.0 start -->
         
         <div id="frenzy-bar"></div>
         <div id="multiplier-display" class="multiplier-tag">x1.0</div>
@@ -802,6 +803,7 @@
             { id: 'first_prestige', name: 'The New You', description: 'Perform your first Prestige.', icon: '🌌' },
             { id: 'multiplier_3', name: 'Getting Hot', description: 'Reach a 3x multiplier.', icon: '⚡' },
             { id: 'multiplier_5', name: 'Absolute Fire', description: 'Reach a 5x multiplier.', icon: '♨️' },
+            { id: 'multiplier_10', name: 'Supernova', description: 'Reach a massive 10x multiplier!', icon: '💥' },
             { id: 'bird_buy', name: 'Bird Watcher', description: 'Buy the Collector Bird.', icon: '🐦' }
         ];
 
@@ -1592,8 +1594,12 @@
             
             if (totalPrestigeDisplay) totalPrestigeDisplay.innerText = `Total Prestige: ${state.totalPrestigeEarned}`;
 
-            // Thresholds adjusted: 5x starts earlier (at 85 instead of 100)
-            if (state.clickHeat >= 85) {
+            // Thresholds updated for 10x multiplier
+            if (state.clickHeat >= 95) {
+                state.multiplier = 10.0;
+                unlockAchievement('multiplier_10');
+            }
+            else if (state.clickHeat >= 85) {
                 state.multiplier = 5.0;
                 unlockAchievement('multiplier_5');
             }
@@ -1612,17 +1618,17 @@
             let r, g, b;
 
             if (heatRatio < 0.5) {
-                // Transition: Grey (26, 26, 26) to Yellow (100, 80, 10)
+                // Transition: Grey (26, 26, 26) to Yellow (180, 160, 20)
                 const localRatio = heatRatio / 0.5;
-                r = Math.round(26 + (100 - 26) * localRatio);
-                g = Math.round(26 + (80 - 26) * localRatio);
-                b = Math.round(26 + (10 - 26) * localRatio);
+                r = Math.round(26 + (180 - 26) * localRatio);
+                g = Math.round(26 + (160 - 26) * localRatio);
+                b = Math.round(26 + (20 - 26) * localRatio);
             } else {
-                // Transition: Yellow (100, 80, 10) to Intense Red (120, 20, 10)
+                // Transition: Yellow (180, 160, 20) to Intense Red (150, 0, 0)
                 const localRatio = (heatRatio - 0.5) / 0.5;
-                r = Math.round(100 + (120 - 100) * localRatio);
-                g = Math.round(80 + (20 - 80) * localRatio);
-                b = Math.round(10 + (10 - 10) * localRatio);
+                r = Math.round(180 + (150 - 180) * localRatio);
+                g = Math.round(160 + (0 - 160) * localRatio);
+                b = Math.round(20 + (0 - 20) * localRatio);
             }
             
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
