@@ -1438,6 +1438,11 @@
             
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
+            
+            // NEW: Reset Bird on Prestige
+            state.hasBird = false;
+            if (collectorBird) collectorBird.style.display = 'none';
+
             buildings.forEach(b => b.count = 0);
             specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
             
