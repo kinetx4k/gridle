@@ -458,9 +458,8 @@
         
         let keysPressed = {};
 
-        // Buildings - Starting set (Stronger Grip moved here)
+        // Buildings - Starting set
         let buildings = [
-            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪', baseCps: 0 },
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
             { id: 'farm', name: 'Farm', description: 'Grows cookie plants from seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
@@ -474,8 +473,9 @@
             { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Special Upgrades
+        // Special Upgrades (Stronger Grip moved back here)
         let specials = [
+            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' }
         ];
 
@@ -698,11 +698,6 @@
                 state.cookies -= currentPrice;
                 up.count++;
                 
-                // Handle click power upgrades in buildings tab
-                if (up.type === 'click') {
-                    state.clickPower *= up.factor;
-                }
-
                 if (index === state.unlockedUpgrades - 1 && up.count >= 5) {
                     state.unlockedUpgrades++;
                     if (state.unlockedUpgrades > buildings.length) generateNextUpgrade();
@@ -736,7 +731,6 @@
 
         function calculateCPS() {
             state.cps = buildings.reduce((sum, up) => {
-                if (up.type === 'click') return sum;
                 const mult = getUpgradeEfficiencyMult(up.count);
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
