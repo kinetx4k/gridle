@@ -12,7 +12,8 @@
             --secondary-bg: #1a2a44;
             --border-color: #2c3e50;
             --highlight-color: #3498db;
-            --danger-color: #e74c3c;
+            --guess-bar-bg: #2d384d;
+            --empty-slot-bg: #162235;
         }
 
         * {
@@ -51,9 +52,7 @@
             gap: 5px;
         }
 
-        .logo span {
-            color: var(--primary-green);
-        }
+        .logo span { color: var(--primary-green); }
 
         .header-icons {
             display: flex;
@@ -62,7 +61,7 @@
             font-size: 20px;
         }
 
-        /* --- Game Container --- */
+        /* --- Game Area --- */
         .game-container {
             width: 100%;
             max-width: 500px;
@@ -70,20 +69,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             flex-grow: 1;
         }
 
+        /* Date/Mode Nav */
         .nav-controls {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: var(--secondary-bg);
-            padding: 5px 15px;
-            border-radius: 20px;
+            width: 100%;
+            justify-content: center;
         }
 
-        .country-silhouette {
+        .selector-box {
+            background: var(--secondary-bg);
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-grow: 0.8;
+            justify-content: center;
+        }
+
+        .nav-arrow {
+            background: #2d384d;
+            color: #5d6d7e;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Silhouette */
+        .silhouette-box {
             width: 250px;
             height: 250px;
             background-color: white;
@@ -93,11 +114,10 @@
             -webkit-mask-size: contain;
             -webkit-mask-repeat: no-repeat;
             -webkit-mask-position: center;
-            margin: 20px 0;
-            transition: transform 0.3s ease;
+            margin: 10px 0;
         }
 
-        /* --- Input Area --- */
+        /* Input Area */
         .input-group {
             width: 100%;
             display: flex;
@@ -105,27 +125,30 @@
             position: relative;
         }
 
-        input {
+        #guess-input {
             flex-grow: 1;
             padding: 12px;
-            border-radius: 5px;
-            border: 2px solid var(--border-color);
-            background: transparent;
+            border-radius: 10px;
+            border: 2px solid var(--primary-green);
+            background: rgba(255,255,255,0.05);
             color: white;
             outline: none;
+            font-size: 16px;
         }
 
         .btn-guess {
-            background-color: var(--primary-green);
-            color: white;
+            background-color: #f8f9fa;
+            color: #2c3e50;
             border: none;
             padding: 0 20px;
-            border-radius: 5px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* --- Autocomplete --- */
         #autocomplete-list {
             position: absolute;
             bottom: 100%;
@@ -137,173 +160,94 @@
             overflow-y: auto;
             z-index: 10;
             display: none;
+            border-radius: 8px 8px 0 0;
         }
 
-        .autocomplete-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #2c3e50;
-        }
+        .autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #2c3e50; }
+        .autocomplete-item:hover, .autocomplete-item.active { background: var(--highlight-color); }
 
-        .autocomplete-item:hover, .autocomplete-item.active {
-            background: var(--highlight-color);
-        }
-
-        /* --- Guesses List --- */
+        /* --- Guesses (The Pills) --- */
         .guesses-container {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-
-        .guess-row {
-            height: 40px;
-            background: var(--secondary-bg);
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            font-size: 14px;
-            justify-content: space-between;
-        }
-
-        .guess-data {
-            display: flex;
             gap: 10px;
+        }
+
+        .guess-data-row {
+            display: flex;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .pill {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            height: 38px;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .pill-name { flex: 2.5; }
+        .pill-dist { flex: 1.5; }
+        .pill-dir { flex: 0.8; background: #3498db; color: white; border: none; }
+        .pill-prox { flex: 1; }
+
+        /* --- Counter & Slots --- */
+        .status-bar {
+            width: 100%;
+            height: 38px;
+            background: var(--guess-bar-bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 13px;
+            color: #bdc3c7;
+            letter-spacing: 1px;
+        }
+
+        .empty-slot {
+            width: 100%;
+            height: 14px;
+            background: var(--empty-slot-bg);
+            border-radius: 10px;
+            opacity: 0.6;
         }
 
         /* --- Modals --- */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100; justify-content: center; align-items: center;
         }
 
         .modal-content {
             background: var(--secondary-bg);
-            width: 90%;
-            max-width: 450px;
-            padding: 25px;
-            border-radius: 10px;
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
+            width: 90%; max-width: 450px;
+            padding: 25px; border-radius: 15px;
+            position: relative; max-height: 85vh; overflow-y: auto;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
-            cursor: pointer;
-        }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; }
 
-        /* --- Stats Visuals --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            text-align: center;
-            margin: 20px 0;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .stat-box { text-align: center; }
+        .stat-box .v { font-size: 22px; font-weight: bold; }
+        .stat-box .l { font-size: 10px; color: #999; text-transform: uppercase; }
 
-        .stat-box .value { font-size: 24px; font-weight: bold; }
-        .stat-box .label { font-size: 12px; color: #aaa; }
-
-        .distribution-bar {
-            background: #444;
-            height: 20px;
-            margin: 5px 0;
-            border-radius: 3px;
-            position: relative;
-        }
-
-        .bar-fill {
-            background: var(--primary-green);
-            height: 100%;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 5px;
-            font-size: 12px;
-        }
-
-        /* --- Calendar --- */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-top: 15px;
-        }
-
-        .cal-day {
-            padding: 10px 5px;
-            background: #2c3e50;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-
-        .cal-day:hover { background: var(--highlight-color); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .cal-day { padding: 8px; background: #2c3e50; text-align: center; cursor: pointer; border-radius: 5px; font-size: 12px; }
         .cal-day.today { border: 2px solid var(--primary-green); }
 
-        /* --- Settings --- */
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 3px; bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider { background-color: var(--primary-green); }
-        input:checked + .slider:before { transform: translateX(26px); }
-
-        .footer {
-            margin-top: auto;
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-        }
+        .footer { margin-top: auto; padding: 25px; text-align: center; font-size: 13px; color: #7f8c8d; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -313,393 +257,282 @@
         <div class="logo">🌍 WOR<span>L</span>DLE</div>
         <div class="header-icons">
             <span onclick="toggleModal('modal-stats')">📊</span>
-            <span onclick="toggleModal('modal-settings')">⚙️</span>
+            <span onclick="toggleModal('modal-settings')">≡</span>
         </div>
     </header>
 
     <div class="game-container">
         <div class="nav-controls">
-            <button id="prev-day" onclick="changeDay(-1)">◀</button>
-            <span id="current-date-display">May 2, 2026</span>
-            <button id="next-day" onclick="changeDay(1)">▶</button>
+            <button class="nav-arrow" onclick="changeDay(-1)">◀</button>
+            <div class="selector-box">🎉 Country ▾</div>
+            <button class="nav-arrow" onclick="changeDay(1)">▶</button>
         </div>
 
-        <div id="silhouette" class="country-silhouette"></div>
+        <div id="silhouette" class="silhouette-box"></div>
 
         <div class="input-group">
             <input type="text" id="guess-input" placeholder="Country, territory..." autocomplete="off">
-            <button class="btn-guess" onclick="makeGuess()">GUESS</button>
+            <button class="btn-guess" onclick="makeGuess()">🌐 Guess</button>
             <div id="autocomplete-list"></div>
         </div>
 
-        <div id="guess-counter" style="margin-top: 10px; font-weight: bold;">GUESS 1/6</div>
-
         <div class="guesses-container" id="guesses-list">
-            <!-- Rows will be injected here -->
+            <!-- Dynamic rows will appear here -->
+        </div>
+
+        <div id="status-bar-container" style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
+            <div class="status-bar" id="guess-counter-bar">GUESS 1 / 6</div>
+            <div class="empty-slot"></div>
+            <div class="empty-slot"></div>
+            <div class="empty-slot"></div>
+            <div class="empty-slot"></div>
+            <div class="empty-slot"></div>
         </div>
     </div>
 
     <div class="footer">
-        WORLDLE - Guess the Country | Daily Geography Game<br>
-        Inspired by Wordle
+        WORLDLE - Guess the Country | Daily Geography Game
     </div>
 
-    <!-- Help Modal -->
+    <!-- Modals (Help, Stats, Settings) -->
     <div id="modal-help" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="toggleModal('modal-help')">&times;</span>
             <h2>How to play</h2>
-            <p>Guess the WORLDLE in 6 guesses.</p>
-            <p>Each guess must be a valid country or territory.</p>
-            <hr style="margin: 15px 0; border: 0.5px solid #444;">
-            <p>Examples:</p>
-            <div class="guess-row" style="margin-top:10px">
-                <span>Austria</span>
-                <div class="guess-data"><span>0km</span><span>🎉</span><span>100%</span></div>
+            <p style="margin: 10px 0;">Guess the WORLDLE in 6 guesses.</p>
+            <hr style="border: 0.5px solid #444; margin: 15px 0;">
+            <p>Example:</p>
+            <div class="guess-data-row" style="margin-top: 10px;">
+                <div class="pill pill-name">AUSTRIA</div>
+                <div class="pill pill-dist">0km</div>
+                <div class="pill pill-dir" style="background:#27ae60">🎉</div>
+                <div class="pill pill-prox">100%</div>
             </div>
-            <p style="font-size: 12px; margin-top:5px">Target is 0km away from Austria (Success!).</p>
+            <p style="font-size: 12px; margin-top:10px; color: #999;">Correct! The target was Austria.</p>
         </div>
     </div>
 
-    <!-- Stats Modal -->
     <div id="modal-stats" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="toggleModal('modal-stats')">&times;</span>
             <h2>Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-box"><div class="value" id="stat-played">0</div><div class="label">Played</div></div>
-                <div class="stat-box"><div class="value" id="stat-win">0%</div><div class="label">Win %</div></div>
-                <div class="stat-box"><div class="value" id="stat-streak">0</div><div class="label">Streak</div></div>
-                <div class="stat-box"><div class="value" id="stat-max">0</div><div class="label">Max Streak</div></div>
+            <div class="stats-grid" id="stats-view">
+                <div class="stat-box"><div class="v" id="s-p">0</div><div class="l">Played</div></div>
+                <div class="stat-box"><div class="v" id="s-w">0%</div><div class="l">Win %</div></div>
+                <div class="stat-box"><div class="v" id="s-s">0</div><div class="l">Streak</div></div>
+                <div class="stat-box"><div class="v" id="s-m">0</div><div class="l">Max</div></div>
             </div>
-            <h3>Guess Distribution</h3>
-            <div id="guess-dist">
-                <!-- Bar chart items -->
-            </div>
-            <h3 style="margin-top: 20px;">Archive Calendar</h3>
-            <div class="calendar-grid" id="calendar">
-                <!-- Days generated by JS -->
-            </div>
+            <h3>Archive</h3>
+            <div class="calendar-grid" id="calendar"></div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div id="modal-settings" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="toggleModal('modal-settings')">&times;</span>
             <h2>Settings</h2>
-            <div class="settings-row">
-                <div>
-                    <div><strong>Practice Mode</strong></div>
-                    <div style="font-size:12px; color:#aaa">Infinite guesses, random countries</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="practice-toggle" onchange="togglePractice()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="settings-row">
-                <div><strong>Distance Unit</strong></div>
-                <div style="font-size:14px">KM</div>
+            <div style="padding: 20px 0; display:flex; justify-content:space-between; align-items:center;">
+                <span>Practice Mode (Infinite)</span>
+                <input type="checkbox" id="practice-check" onchange="togglePractice()" style="width:20px; height:20px;">
             </div>
         </div>
     </div>
 
     <script>
-        /**
-         * WORLDLE CORE ENGINE
-         * Long & Complex Implementation for maximum robustness.
-         */
-
-        // --- Data ---
+        // --- Game Data ---
         const countries = [
-            { name: "Austria", iso: "AT", lat: 47.5162, lon: 14.5501, svg: "https://upload.wikimedia.org/wikipedia/commons/4/41/Austria_location_map.svg" },
-            { name: "Nigeria", iso: "NG", lat: 9.082, lon: 8.675, svg: "https://upload.wikimedia.org/wikipedia/commons/2/23/Nigeria_location_map.svg" },
-            { name: "Germany", iso: "DE", lat: 51.165, lon: 10.451, svg: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Germany_location_map.svg" },
-            { name: "USA", iso: "US", lat: 37.090, lon: -95.712, svg: "https://upload.wikimedia.org/wikipedia/commons/a/a5/USA_location_map.svg" },
-            { name: "Japan", iso: "JP", lat: 36.204, lon: 138.252, svg: "https://upload.wikimedia.org/wikipedia/commons/2/24/Japan_location_map.svg" },
-            { name: "Brazil", iso: "BR", lat: -14.235, lon: -51.925, svg: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Brazil_location_map.svg" },
-            { name: "Australia", iso: "AU", lat: -25.274, lon: 133.775, svg: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Australia_location_map.svg" },
-            { name: "France", iso: "FR", lat: 46.227, lon: 2.213, svg: "https://upload.wikimedia.org/wikipedia/commons/c/c5/France_location_map.svg" },
-            { name: "Canada", iso: "CA", lat: 56.1304, lon: -106.3468, svg: "https://upload.wikimedia.org/wikipedia/commons/6/67/Canada_location_map.svg" },
-            { name: "Italy", iso: "IT", lat: 41.8719, lon: 12.5674, svg: "https://upload.wikimedia.org/wikipedia/commons/3/32/Italy_location_map.svg" }
+            { name: "Austria", lat: 47.516, lon: 14.550, svg: "https://upload.wikimedia.org/wikipedia/commons/4/41/Austria_location_map.svg" },
+            { name: "Nigeria", lat: 9.082, lon: 8.675, svg: "https://upload.wikimedia.org/wikipedia/commons/2/23/Nigeria_location_map.svg" },
+            { name: "Botswana", lat: -22.328, lon: 24.684, svg: "https://upload.wikimedia.org/wikipedia/commons/7/71/Botswana_location_map.svg" },
+            { name: "Germany", lat: 51.165, lon: 10.451, svg: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Germany_location_map.svg" },
+            { name: "Japan", lat: 36.204, lon: 138.252, svg: "https://upload.wikimedia.org/wikipedia/commons/2/24/Japan_location_map.svg" },
+            { name: "Brazil", lat: -14.235, lon: -51.925, svg: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Brazil_location_map.svg" },
+            { name: "Canada", lat: 56.130, lon: -106.346, svg: "https://upload.wikimedia.org/wikipedia/commons/6/67/Canada_location_map.svg" }
         ];
 
-        // --- State Management ---
-        let gameState = {
-            currentDate: new Date(),
-            targetCountry: null,
+        let state = {
+            date: new Date(),
+            target: null,
             guesses: [],
             isGameOver: false,
             isPractice: false,
-            maxGuesses: 6,
-            stats: JSON.parse(localStorage.getItem('worldle_stats')) || {
-                played: 0,
-                wins: 0,
-                streak: 0,
-                maxStreak: 0,
-                distribution: [0,0,0,0,0,0]
-            }
+            stats: JSON.parse(localStorage.getItem('w_stats')) || { p: 0, w: 0, s: 0, m: 0, d: [0,0,0,0,0,0] }
         };
 
-        // --- Core Functions ---
+        // --- Logic ---
 
-        function initGame() {
-            // Set time to midnight UTC for "Same for everyone" logic
-            const dayStart = new Date(gameState.currentDate);
-            dayStart.setUTCHours(0,0,0,0);
+        function init() {
+            const dayIdx = Math.floor(state.date.getTime() / 86400000) % countries.length;
+            state.target = state.isPractice ? countries[Math.floor(Math.random() * countries.length)] : countries[dayIdx];
             
-            // Determine target using deterministic seed based on days since epoch
-            if (gameState.isPractice) {
-                gameState.targetCountry = countries[Math.floor(Math.random() * countries.length)];
-                document.getElementById('current-date-display').innerText = "PRACTICE MODE";
-                gameState.maxGuesses = Infinity;
-            } else {
-                const daysSinceEpoch = Math.floor(dayStart.getTime() / 86400000);
-                const dailyIndex = daysSinceEpoch % countries.length;
-                gameState.targetCountry = countries[dailyIndex];
-                
-                document.getElementById('current-date-display').innerText = gameState.currentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-                gameState.maxGuesses = 6;
-            }
-
-            // Update UI elements
-            const silhouette = document.getElementById('silhouette');
-            silhouette.style.webkitMaskImage = `url('${gameState.targetCountry.svg}')`;
-            silhouette.style.maskImage = `url('${gameState.targetCountry.svg}')`;
+            document.getElementById('silhouette').style.webkitMaskImage = `url('${state.target.svg}')`;
+            document.getElementById('silhouette').style.maskImage = `url('${state.target.svg}')`;
             
-            // Clear previous game data
+            state.guesses = [];
+            state.isGameOver = false;
             document.getElementById('guesses-list').innerHTML = '';
-            gameState.guesses = [];
-            gameState.isGameOver = false;
-            
-            updateGuessCounter();
+            refreshUI();
             renderCalendar();
-            renderStats();
         }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth radius in KM
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return Math.round(R * c);
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+            return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         }
 
-        function getDirectionEmoji(lat1, lon1, lat2, lon2) {
+        function getDirEmoji(lat1, lon1, lat2, lon2) {
             if (lat1 === lat2 && lon1 === lon2) return "🎉";
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
-            const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
-                      Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
-            let brng = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-            
-            const arrows = ["⬆️", "↗️", "➡️", "↘️", "⬇️", "↙️", "⬅️", "↖️", "⬆️"];
-            return arrows[Math.round(brng / 45)];
+            const y = Math.sin((lon2-lon1)*Math.PI/180) * Math.cos(lat2*Math.PI/180);
+            const x = Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180) - Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos((lon2-lon1)*Math.PI/180);
+            const brng = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+            return ["⬆️","↗️","➡️","↘️","⬇️","↙️","⬅️","↖️","⬆️"][Math.round(brng/45)];
         }
 
         function makeGuess() {
-            if (gameState.isGameOver) return;
-            
+            if (state.isGameOver) return;
             const input = document.getElementById('guess-input');
-            const guessName = input.value.trim();
-            const country = countries.find(c => c.name.toLowerCase() === guessName.toLowerCase());
+            const country = countries.find(c => c.name.toLowerCase() === input.value.trim().toLowerCase());
+            
+            if (!country || state.guesses.some(g => g.name === country.name)) return;
 
-            if (!country) {
-                alert("Unknown country!");
-                return;
-            }
+            const d = calculateDistance(country.lat, country.lon, state.target.lat, state.target.lon);
+            const dir = getDirEmoji(country.lat, country.lon, state.target.lat, state.target.lon);
+            const prox = Math.max(0, 100 - Math.round((d / 20000) * 100));
 
-            if (gameState.guesses.some(g => g.name === country.name)) {
-                alert("Already guessed!");
-                return;
-            }
-
-            const dist = calculateDistance(country.lat, country.lon, gameState.targetCountry.lat, gameState.targetCountry.lon);
-            const dir = getDirectionEmoji(country.lat, country.lon, gameState.targetCountry.lat, gameState.targetCountry.lon);
-            const proximity = Math.max(0, 100 - Math.round((dist / 20000) * 100));
-
-            const guessResult = { name: country.name, distance: dist, direction: dir, proximity: proximity };
-            gameState.guesses.push(guessResult);
-            addGuessRow(guessResult);
+            const g = { name: country.name, dist: d, dir: dir, prox: prox };
+            state.guesses.push(g);
+            renderGuess(g);
             input.value = '';
             
-            if (country.name === gameState.targetCountry.name) {
-                endGame(true);
-            } else if (!gameState.isPractice && gameState.guesses.length >= gameState.maxGuesses) {
-                endGame(false);
+            if (country.name === state.target.name) end(true);
+            else if (!state.isPractice && state.guesses.length >= 6) end(false);
+            
+            refreshUI();
+        }
+
+        function renderGuess(g) {
+            const row = document.createElement('div');
+            row.className = 'guess-data-row';
+            row.innerHTML = `
+                <div class="pill pill-name">${g.name.toUpperCase()}</div>
+                <div class="pill pill-dist">${g.dist.toLocaleString()}km</div>
+                <div class="pill pill-dir">${g.dir}</div>
+                <div class="pill pill-prox">${g.prox}%</div>
+            `;
+            document.getElementById('guesses-list').appendChild(row);
+        }
+
+        function refreshUI() {
+            const count = state.isPractice ? "∞" : "6";
+            const current = state.guesses.length + (state.isGameOver ? 0 : 1);
+            document.getElementById('guess-counter-bar').innerText = `GUESS ${current} / ${count}`;
+            
+            // Render empty slots
+            const container = document.getElementById('status-bar-container');
+            const existingSlots = container.querySelectorAll('.empty-slot');
+            existingSlots.forEach(s => s.remove());
+            
+            if (!state.isPractice) {
+                const remaining = 6 - state.guesses.length - (state.isGameOver ? 0 : 1);
+                for(let i=0; i<remaining; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'empty-slot';
+                    container.appendChild(slot);
+                }
             }
             
-            updateGuessCounter();
+            // Stats UI
+            document.getElementById('s-p').innerText = state.stats.p;
+            document.getElementById('s-w').innerText = (state.stats.p ? Math.round(state.stats.w/state.stats.p*100) : 0) + "%";
+            document.getElementById('s-s').innerText = state.stats.s;
+            document.getElementById('s-m').innerText = state.stats.m;
         }
 
-        function addGuessRow(guess) {
-            const list = document.getElementById('guesses-list');
-            const row = document.createElement('div');
-            row.className = 'guess-row';
-            row.innerHTML = `
-                <span>${guess.name.toUpperCase()}</span>
-                <div class="guess-data">
-                    <span>${guess.distance}km</span>
-                    <span>${guess.direction}</span>
-                    <span>${guess.proximity}%</span>
-                </div>
-            `;
-            list.appendChild(row);
-        }
-
-        function updateGuessCounter() {
-            const count = gameState.isPractice ? "∞" : gameState.maxGuesses;
-            const current = gameState.guesses.length + (gameState.isGameOver ? 0 : 1);
-            document.getElementById('guess-counter').innerText = `GUESS ${current}/${count}`;
-        }
-
-        function endGame(win) {
-            gameState.isGameOver = true;
-            if (!gameState.isPractice) {
-                gameState.stats.played++;
+        function end(win) {
+            state.isGameOver = true;
+            if (!state.isPractice) {
+                state.stats.p++;
                 if (win) {
-                    gameState.stats.wins++;
-                    gameState.stats.streak++;
-                    gameState.stats.maxStreak = Math.max(gameState.stats.streak, gameState.stats.maxStreak);
-                    if (gameState.guesses.length <= 6) {
-                        gameState.stats.distribution[gameState.guesses.length - 1]++;
-                    }
-                } else {
-                    gameState.stats.streak = 0;
-                }
-                localStorage.setItem('worldle_stats', JSON.stringify(gameState.stats));
+                    state.stats.w++; state.stats.s++;
+                    state.stats.m = Math.max(state.stats.s, state.stats.m);
+                    state.stats.d[state.guesses.length-1]++;
+                } else state.stats.s = 0;
+                localStorage.setItem('w_stats', JSON.stringify(state.stats));
             }
-            alert(win ? "CONGRATULATIONS! 🏆" : `GAME OVER. Target was ${gameState.targetCountry.name}`);
+            setTimeout(() => alert(win ? "Correct! 🏆" : "Game Over! It was " + state.target.name), 200);
         }
 
-        // --- UI Interactions ---
-
+        // --- UI Utils ---
         function toggleModal(id) {
             const m = document.getElementById(id);
             m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function togglePractice() {
-            gameState.isPractice = document.getElementById('practice-toggle').checked;
-            initGame();
+            state.isPractice = document.getElementById('practice-check').checked;
+            init();
         }
 
-        function changeDay(offset) {
-            if (gameState.isPractice) return;
-            gameState.currentDate.setDate(gameState.currentDate.getDate() + offset);
-            initGame();
-        }
-
-        function renderStats() {
-            document.getElementById('stat-played').innerText = gameState.stats.played;
-            const winRate = gameState.stats.played === 0 ? 0 : Math.round((gameState.stats.wins / gameState.stats.played) * 100);
-            document.getElementById('stat-win').innerText = winRate + "%";
-            document.getElementById('stat-streak').innerText = gameState.stats.streak;
-            document.getElementById('stat-max').innerText = gameState.stats.maxStreak;
-
-            const distContainer = document.getElementById('guess-dist');
-            distContainer.innerHTML = '';
-            const maxVal = Math.max(...gameState.stats.distribution, 1);
-            gameState.stats.distribution.forEach((val, i) => {
-                const width = (val / maxVal) * 100;
-                distContainer.innerHTML += `
-                    <div style="display:flex; align-items:center; gap:10px">
-                        <span style="width:10px">${i+1}</span>
-                        <div class="distribution-bar" style="flex-grow:1">
-                            <div class="bar-fill" style="width:${Math.max(5, width)}%">${val}</div>
-                        </div>
-                    </div>
-                `;
-            });
+        function changeDay(n) {
+            if (state.isPractice) return;
+            state.date.setDate(state.date.getDate() + n);
+            init();
         }
 
         function renderCalendar() {
             const cal = document.getElementById('calendar');
             cal.innerHTML = '';
-            const today = new Date();
-            for(let i = -13; i <= 0; i++) {
-                const d = new Date(today);
-                d.setDate(d.getDate() + i);
-                const dayNum = d.getDate();
-                
+            const t = new Date();
+            for(let i=-13; i<=0; i++) {
+                const d = new Date(t); d.setDate(d.getDate()+i);
                 const el = document.createElement('div');
-                el.className = `cal-day ${i === 0 ? 'today' : ''}`;
-                el.innerText = dayNum;
-                el.onclick = () => {
-                    gameState.currentDate = d;
-                    gameState.isPractice = false;
-                    document.getElementById('practice-toggle').checked = false;
-                    toggleModal('modal-stats');
-                    initGame();
-                };
+                el.className = `cal-day ${i===0?'today':''}`;
+                el.innerText = d.getDate();
+                el.onclick = () => { state.date = d; state.isPractice = false; toggleModal('modal-stats'); init(); };
                 cal.appendChild(el);
             }
         }
 
-        // --- Autocomplete & Input Logic ---
-        const inputField = document.getElementById('guess-input');
-        inputField.addEventListener('input', () => {
-            const val = inputField.value.toLowerCase();
+        // --- Controls (WASD & Space) ---
+        const input = document.getElementById('guess-input');
+        input.addEventListener('input', () => {
             const list = document.getElementById('autocomplete-list');
+            const val = input.value.toLowerCase();
             list.innerHTML = '';
-            if (!val) { list.style.display = 'none'; return; }
-            
+            if (!val) { list.style.display='none'; return; }
             const filtered = countries.filter(c => c.name.toLowerCase().includes(val));
-            filtered.forEach((c, idx) => {
+            filtered.forEach((c, i) => {
                 const item = document.createElement('div');
-                item.className = 'autocomplete-item' + (idx === 0 ? ' active' : '');
+                item.className = 'autocomplete-item' + (i===0?' active':'');
                 item.innerText = c.name;
-                item.onclick = () => {
-                    inputField.value = c.name;
-                    list.style.display = 'none';
-                    makeGuess();
-                };
+                item.onclick = () => { input.value = c.name; list.style.display='none'; makeGuess(); };
                 list.appendChild(item);
             });
             list.style.display = filtered.length ? 'block' : 'none';
         });
 
-        // --- Keyboard Controls (WASD & Space) ---
         document.addEventListener('keydown', (e) => {
             const list = document.getElementById('autocomplete-list');
             const items = list.querySelectorAll('.autocomplete-item');
             let active = list.querySelector('.active');
-            let activeIdx = Array.from(items).indexOf(active);
+            let idx = Array.from(items).indexOf(active);
 
-            // W / S for selection
             if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
                 e.preventDefault();
-                if (activeIdx > 0) {
-                    if (active) active.classList.remove('active');
-                    items[activeIdx - 1].classList.add('active');
-                    items[activeIdx - 1].scrollIntoView({ block: 'nearest' });
-                }
+                if (idx > 0) { active.classList.remove('active'); items[idx-1].classList.add('active'); }
             } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
                 e.preventDefault();
-                if (activeIdx < items.length - 1) {
-                    if (active) active.classList.remove('active');
-                    items[activeIdx + 1].classList.add('active');
-                    items[activeIdx + 1].scrollIntoView({ block: 'nearest' });
-                }
-            } 
-            // Space or Enter to select
-            else if (e.key === ' ' || e.key === 'Enter') {
-                if (active && list.style.display !== 'none') {
-                    e.preventDefault();
-                    active.click();
-                } else if (document.activeElement !== inputField) {
-                    e.preventDefault();
-                    inputField.focus();
-                }
+                if (idx < items.length-1) { active.classList.remove('active'); items[idx+1].classList.add('active'); }
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                if (active && list.style.display !== 'none') { e.preventDefault(); active.click(); }
+                else if (document.activeElement !== input) { e.preventDefault(); input.focus(); }
             }
         });
 
-        // Initialize on Load
-        window.onload = initGame;
+        init();
     </script>
 </body>
 </html>
