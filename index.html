@@ -18,11 +18,6 @@
             position: relative;
         }
 
-        /* Themes */
-        body.theme-midnight { background-color: #020617 !important; }
-        body.theme-royal { background-color: #1e1b4b !important; }
-        body.theme-forest { background-color: #064e3b !important; }
-
         body.golden-frenzy {
             background-color: #433200;
             background-image: 
@@ -45,10 +40,6 @@
             cursor: pointer;
             filter: drop-shadow(0 0 20px rgba(210, 105, 30, 0.4));
         }
-
-        /* Cosmetics for Cookie */
-        #main-cookie.cosmetic-gold { filter: drop-shadow(0 0 40px #ffd700) sepia(0.5) saturate(3) !important; }
-        #main-cookie.cosmetic-neon { filter: drop-shadow(0 0 40px #00ff00) hue-rotate(90deg) brightness(1.2) !important; }
 
         #main-cookie:hover {
             transform: scale(1.05);
@@ -268,18 +259,6 @@
             background: rgba(210, 105, 30, 0.1);
         }
 
-        /* Inventory Buttons */
-        .equip-btn {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        .btn-equipped { background: #16a34a; color: white; }
-        .btn-unequipped { background: #3f3f46; color: #a1a1aa; }
-        .btn-unequipped:hover { background: #52525b; color: white; }
-
         /* Custom Modal for Reset */
         #reset-modal {
             display: none;
@@ -291,9 +270,67 @@
             justify-content: center;
             padding: 20px;
         }
+
+        /* Settings Menu */
+        #settings-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 500;
+        }
+
+        .settings-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 12px;
+            padding: 8px;
+            width: 200px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .settings-btn {
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-btn:hover {
+            background: #3f3f46;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
+
+    <!-- Einstellungsmenü Oben Links -->
+    <div id="settings-menu">
+        <button onclick="toggleSettings()" class="bg-zinc-800/80 hover:bg-zinc-700 p-3 rounded-full border border-zinc-700 transition backdrop-blur-sm group">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <div id="settings-dropdown" class="settings-dropdown">
+            <button onclick="saveToFile()" class="settings-btn text-white hover:text-orange-400">
+                <span>💾</span> Speichern (.json)
+            </button>
+            <button onclick="triggerFileLoad()" class="settings-btn text-white hover:text-green-400">
+                <span>📂</span> Laden (.json)
+            </button>
+            <div class="h-[1px] bg-zinc-700 my-1"></div>
+            <button onclick="showResetModal()" class="settings-btn text-red-400 hover:bg-red-500/10">
+                <span>⚠️</span> Vollständiger Reset
+            </button>
+        </div>
+        <input type="file" id="file-loader" class="hidden" accept=".json" onchange="loadFromFile(event)">
+    </div>
 
     <div id="frenzy-meter-container">
         <div id="frenzy-bar"></div>
@@ -302,44 +339,43 @@
 
     <!-- Reset Modal -->
     <div id="reset-modal">
-        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-red-600 max-w-md w-full text-center">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-red-600 max-w-md w-full text-center shadow-2xl">
             <h2 class="text-3xl font-bold text-red-500 mb-4">DANGER! 🛑</h2>
-            <p class="text-zinc-400 mb-6">This will reset EVERYTHING. Level, Upgrades, Cookies and Cosmetics will be gone forever.</p>
-            <p class="text-white font-bold mb-2">Type "CONFIRM" to proceed:</p>
+            <p class="text-zinc-400 mb-6">Dies wird ALLES zurücksetzen. Gebäude, Upgrades, Cookies und Fortschritt gehen verloren.</p>
+            <p class="text-white font-bold mb-2">Tippe "CONFIRM" zum Bestätigen:</p>
             <input type="text" id="reset-confirm-input" class="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-center font-bold tracking-widest outline-none focus:border-red-500 transition mb-6" placeholder="...">
             <div class="flex gap-4">
-                <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">CANCEL</button>
-                <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">RESET ALL</button>
+                <button onclick="closeResetModal()" class="flex-1 py-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">ABBRECHEN</button>
+                <button onclick="executeFullReset()" class="flex-1 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">ALLES LÖSCHEN</button>
             </div>
         </div>
     </div>
 
     <div id="prestige-container">
         <div id="prestige-needed" class="text-[10px] text-orange-400 font-bold mb-1">
-            Left: 100.0 B
+            Noch: 100.000 B
         </div>
         <div class="flex justify-between text-[10px] mb-1">
-            <span>PRESTIGE PROGRESS</span>
+            <span>PRESTIGE FORTSCHRITT</span>
             <span id="prestige-percent">0%</span>
         </div>
         <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
             <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
         </div>
         <button id="prestige-btn" onclick="prestige()" class="hidden mt-2 w-full bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold py-1 rounded transition">
-            PRESTIGE NOW!
+            PRESTIGE JETZT!
         </button>
-        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Current Bonus: +0%</div>
+        <div id="current-bonus-display" class="text-[9px] text-zinc-400 mt-1">Aktueller Bonus: +0%</div>
     </div>
 
     <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
-        <!-- The Bird -->
+        <!-- Der Vogel -->
         <div id="collector-bird">
             <svg viewBox="0 0 100 100">
                 <path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#3b82f6" />
                 <circle cx="70" cy="45" r="5" fill="white" />
                 <circle cx="72" cy="45" r="2" fill="black" />
                 <path d="M80 50 L90 45 L90 55 Z" fill="#fbbf24" />
-                <!-- Wings -->
                 <path d="M50 50 L30 30" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
                 <path d="M50 50 L30 70" stroke="#1d4ed8" stroke-width="5" stroke-linecap="round" />
             </svg>
@@ -347,8 +383,8 @@
 
         <div class="text-center mb-8 z-10">
             <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.000 Cookies</h1>
-            <p id="cps-display" class="text-xl text-orange-400">per second: 0</p>
-            <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Click Power: 1</p>
+            <p id="cps-display" class="text-xl text-orange-400">pro Sekunde: 0</p>
+            <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Klick Power: 1</p>
         </div>
 
         <div class="cookie-container z-10">
@@ -371,31 +407,33 @@
     <div id="shop-container" class="w-full md:w-96 bg-zinc-900 border-l border-zinc-800 flex flex-col">
         <div class="p-4 stats-panel border-b border-zinc-800">
             <h2 class="text-xl font-bold mb-2 flex items-center gap-2">
-                <span>🛒</span> Market
+                <span>🛒</span> Markt
             </h2>
             <div class="flex justify-between text-[11px] text-zinc-500">
-                <span>Total Clicks: <span id="stat-total-clicks">0</span></span>
-                <span>All-time: <span id="stat-all-time">0.000</span></span>
+                <span>Klicks: <span id="stat-total-clicks">0</span></span>
+                <span>Gesamt: <span id="stat-all-time">0.000</span></span>
             </div>
         </div>
 
         <!-- Tab Selector -->
         <div class="flex bg-zinc-950">
-            <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Buildings</button>
-            <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Specials</button>
-            <button onclick="switchTab('cosmetics')" id="tab-cosmetics" class="tab-btn">Cosmetics</button>
+            <button onclick="switchTab('buildings')" id="tab-buildings" class="tab-btn active">Gebäude</button>
+            <button onclick="switchTab('special')" id="tab-special" class="tab-btn">Spezial</button>
         </div>
 
         <div id="shop-items" class="flex-1 overflow-y-auto scroller p-4 space-y-3">
-            <!-- Items injected by JS -->
+            <!-- Gebäude werden hier generiert -->
         </div>
 
         <div class="p-4 bg-zinc-800 text-center text-xs text-zinc-500">
-            Developed by <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
+            Entwickelt von <a href="#" class="text-orange-400 hover:underline font-bold">kinetx</a>
         </div>
     </div>
 
     <script>
+        /**
+         * SPIELZUSTAND
+         */
         let state = {
             cookies: 0.0,
             totalCookiesEarned: 0.0,
@@ -412,11 +450,7 @@
             blueCookieSpawnTimer: 0,
             randomGoldenSpawnTimer: 0,
             activeTab: 'buildings',
-            hasBird: false,
-            currentTheme: 'default',
-            currentCosmetic: 'default',
-            ownedThemes: ['default'],
-            ownedCosmetics: ['default']
+            hasBird: false
         };
 
         const PRESTIGE_THRESHOLD = 100000000000;
@@ -424,40 +458,101 @@
         
         let keysPressed = {};
 
-        // Base Buildings - Starting set expanded
+        // Gebäude - Start-Set
         let buildings = [
-            { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
-            { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake more cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
-            { id: 'farm', name: 'Farm', description: 'Grows cookie plants from cookie seeds.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
-            { id: 'mine', name: 'Mine', description: 'Mines out cookie dough and chocolate chips.', basePrice: 12000, baseCps: 47, count: 0, icon: '⛏️' },
-            { id: 'factory', name: 'Factory', description: 'Mass produces cookies.', basePrice: 130000, baseCps: 260, count: 0, icon: '🏭' },
-            { id: 'bank', name: 'Bank', description: 'Generates cookies from interest.', basePrice: 1400000, baseCps: 1400, count: 0, icon: '🏦' },
-            { id: 'temple', name: 'Temple', description: 'Full of cookie gods.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
-            { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' },
-            { id: 'ship', name: 'Shipment', description: 'Brings in fresh cookies from the cookie planet.', basePrice: 5100000000, baseCps: 260000, count: 0, icon: '🚀' },
-            { id: 'alchemy', name: 'Alchemy Lab', description: 'Turns gold into cookies.', basePrice: 75000000000, baseCps: 1600000, count: 0, icon: '⚗️' },
-            { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
+            { id: 'cursor', name: 'Klicker', description: 'Klickt alle 10 Sekunden automatisch.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
+            { id: 'grandma', name: 'Oma', description: 'Eine nette Oma, die Kekse backt.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
+            { id: 'farm', name: 'Farm', description: 'Baut Keks-Pflanzen aus Samen an.', basePrice: 1100, baseCps: 8, count: 0, icon: '🌾' },
+            { id: 'mine', name: 'Mine', description: 'Baut Keksteig und Schokostückchen ab.', basePrice: 12000, baseCps: 47, count: 0, icon: '⛏️' },
+            { id: 'factory', name: 'Fabrik', description: 'Produziert Kekse in Massen.', basePrice: 130000, baseCps: 260, count: 0, icon: '🏭' },
+            { id: 'bank', name: 'Bank', description: 'Erwirtschaftet Kekse durch Zinsen.', basePrice: 1400000, baseCps: 1400, count: 0, icon: '🏦' },
+            { id: 'temple', name: 'Tempel', description: 'Voller Keks-Götter.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
+            { id: 'wizard', name: 'Zauberturm', description: 'Beschwört Kekse mit Magie.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' },
+            { id: 'ship', name: 'Raumschiff', description: 'Bringt Kekse vom Keksplaneten.', basePrice: 5100000000, baseCps: 260000, count: 0, icon: '🚀' },
+            { id: 'alchemy', name: 'Labor', description: 'Verwandelt Gold in Kekse.', basePrice: 75000000000, baseCps: 1600000, count: 0, icon: '⚗️' },
+            { id: 'portal', name: 'Portal', description: 'Öffnet eine Tür zum Keks-Universum.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Special Upgrades
+        // Spezial-Upgrades
         let specials = [
-            { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Double your base clicking power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
-            { id: 'sp-bird', type: 'bird', name: 'Auto-Collector Bird', description: 'A bird that picks up settled special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
-            { id: 'th-midnight', type: 'theme', theme: 'midnight', name: 'Midnight Sky', description: 'Changes the background to deep blue.', basePrice: 100000, count: 0, icon: '🌑' },
-            { id: 'th-royal', type: 'theme', theme: 'royal', name: 'Royal Chamber', description: 'Changes the background to royal purple.', basePrice: 1000000, count: 0, icon: '👑' },
-            { id: 'th-forest', type: 'theme', theme: 'forest', name: 'Deep Forest', description: 'A calming green scenery.', basePrice: 5000000, count: 0, icon: '🌳' },
-            { id: 'cos-gold', type: 'cosmetic', cos: 'gold', name: 'Golden Shine', description: 'Makes your main cookie look shiny.', basePrice: 5000000, count: 0, icon: '✨' },
-            { id: 'cos-neon', type: 'cosmetic', cos: 'neon', name: 'Neon Glow', description: 'A futuristic green glow for your cookie.', basePrice: 25000000, count: 0, icon: '🧪' }
+            { id: 'sp-clicker', type: 'click', name: 'Fester Griff', description: 'Verdoppelt die Basis-Klickkraft.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
+            { id: 'sp-bird', type: 'bird', name: 'Sammler-Vogel', description: 'Ein Vogel, der spezielle Kekse einsammelt.', basePrice: 1000000000, count: 0, icon: '🐦' }
         ];
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
 
+        /**
+         * EINSTELLUNGEN LOGIK
+         */
+        function toggleSettings() {
+            const dropdown = document.getElementById('settings-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Klick außerhalb schließt Menü
+        window.onclick = function(event) {
+            if (!event.target.closest('#settings-menu')) {
+                document.getElementById('settings-dropdown').style.display = 'none';
+            }
+        };
+
+        function saveToFile() {
+            const saveData = { 
+                state: state, 
+                buildingCounts: buildings.map(u => ({ id: u.id, count: u.count })),
+                specialCounts: specials.map(s => ({ id: s.id, count: s.count }))
+            };
+            const blob = new Blob([JSON.stringify(saveData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cookie_clicker_save_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerFileLoad() {
+            document.getElementById('file-loader').click();
+        }
+
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    applySaveData(data);
+                    location.reload(); // Neuladen um alles sauber zu initialisieren
+                } catch (err) {
+                    console.error("Laden fehlgeschlagen", err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function applySaveData(data) {
+            if (!data.state) return;
+            state = { ...state, ...data.state };
+            data.buildingCounts.forEach((savedUp, index) => {
+                while (index >= buildings.length) generateNextUpgrade();
+                if (buildings[index]) buildings[index].count = savedUp.count;
+            });
+            data.specialCounts.forEach((savedSp, index) => {
+                if (specials[index]) specials[index].count = savedSp.count;
+            });
+            calculateCPS();
+            saveGame(); // In LocalStorage spiegeln
+        }
+
+        /**
+         * UI & SPIEL LOGIK
+         */
         function switchTab(tab) {
             state.activeTab = tab;
             document.getElementById('tab-buildings').classList.toggle('active', tab === 'buildings');
             document.getElementById('tab-special').classList.toggle('active', tab === 'special');
-            document.getElementById('tab-cosmetics').classList.toggle('active', tab === 'cosmetics');
             initShop();
         }
 
@@ -483,10 +578,8 @@
 
         function generateNextUpgrade() {
             const last = buildings[buildings.length - 1];
-            
-            // Varied Name Pool
-            const prefixPool = ['Quantum', 'Cosmic', 'Hyper', 'Galactic', 'Infinite', 'Divine', 'Chrono', 'Void', 'Nebula', 'Omega'];
-            const entityPool = ['Synthesizer', 'Engine', 'Network', 'Dyson Sphere', 'Empire', 'God', 'Fractal', 'Singularity', 'Pulse', 'Core'];
+            const prefixPool = ['Quanten', 'Kosmisch', 'Hyper', 'Galaktisch', 'Unendlich', 'Göttlich', 'Chrono', 'Leeren', 'Nebula', 'Omega'];
+            const entityPool = ['Synthesizer', 'Motor', 'Netzwerk', 'Dyson Sphäre', 'Imperium', 'Gott', 'Fraktal', 'Singularität', 'Puls', 'Kern'];
             const iconPool = ['🧬', '🪐', '⚡', '🤖', '🔱', '🧿', '💎', '🛸', '💥', '✨'];
 
             const randPrefix = prefixPool[Math.floor(Math.random() * prefixPool.length)];
@@ -498,7 +591,7 @@
             buildings.push({
                 id: 'gen-' + buildings.length,
                 name: name,
-                description: `A legendary ${name} from a different dimension.`,
+                description: `Ein legendärer ${name} aus einer anderen Dimension.`,
                 basePrice: last.basePrice * 15.5,
                 baseCps: last.baseCps * 8.2,
                 count: 0,
@@ -525,11 +618,6 @@
         function initShop() {
             shopItems.innerHTML = '';
             
-            if (state.activeTab === 'cosmetics') {
-                renderCosmeticsTab();
-                return;
-            }
-
             let list = state.activeTab === 'buildings' ? buildings : specials;
             let unlockLimit = state.activeTab === 'buildings' ? state.unlockedUpgrades : list.length;
 
@@ -539,15 +627,15 @@
                 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
-                card.className = 'upgrade-card p-4 rounded-xl flex items-center gap-4 cursor-pointer disabled';
+                card.className = 'upgrade-card p-4 rounded-xl flex items-center gap-4 cursor-pointer disabled shadow-sm';
                 card.onclick = () => state.activeTab === 'buildings' ? buyBuilding(i) : buySpecial(i);
                 
                 let bonusText = "";
                 if (state.activeTab === 'buildings') {
-                    bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
+                    bonusText = `Jedes +${formatNumber(item.baseCps)} CPS`;
                 } else {
                     if (item.type === 'click') bonusText = `Power x${item.factor}`;
-                    else bonusText = "One-time purchase";
+                    else bonusText = "Einmaliger Kauf";
                 }
                 
                 card.innerHTML = `
@@ -569,58 +657,6 @@
             }
         }
 
-        function renderCosmeticsTab() {
-            shopItems.innerHTML = '';
-            const items = [
-                { id: 'th-default', type: 'theme', theme: 'default', name: 'Default Theme', icon: '🌑' },
-                { id: 'cos-default', type: 'cosmetic', cos: 'default', name: 'Default Cookie', icon: '🍪' }
-            ];
-
-            specials.forEach(s => {
-                if (s.type === 'theme' && state.ownedThemes.includes(s.theme)) {
-                    items.push(s);
-                } else if (s.type === 'cosmetic' && state.ownedCosmetics.includes(s.cos)) {
-                    items.push(s);
-                }
-            });
-
-            items.forEach(item => {
-                const isEquipped = (item.type === 'theme' && state.currentTheme === item.theme) || 
-                                   (item.type === 'cosmetic' && state.currentCosmetic === item.cos);
-                
-                const card = document.createElement('div');
-                card.className = 'upgrade-card p-4 rounded-xl flex items-center gap-4 cursor-pointer';
-                card.onclick = (e) => {
-                    e.stopPropagation();
-                    equipItem(item);
-                };
-                
-                card.innerHTML = `
-                    <div class="text-3xl">${item.icon}</div>
-                    <div class="flex-1">
-                        <div class="font-bold">${item.name}</div>
-                        <div class="text-[10px] text-zinc-500 capitalize">${item.type}</div>
-                    </div>
-                    <button class="equip-btn ${isEquipped ? 'btn-equipped' : 'btn-unequipped'}">
-                        ${isEquipped ? 'Equipped' : 'Equip'}
-                    </button>
-                `;
-                shopItems.appendChild(card);
-            });
-        }
-
-        function equipItem(item) {
-            if (item.type === 'theme') {
-                state.currentTheme = item.theme;
-            } else if (item.type === 'cosmetic') {
-                state.currentCosmetic = item.cos;
-            }
-            applyVisuals();
-            renderCosmeticsTab();
-            saveGame();
-        }
-
-        // Updated formatNumber to limit decimals to max 3
         function formatNumber(num) {
             if (num >= 1e15) return (num / 1e15).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' Q';
             if (num >= 1e12) return (num / 1e12).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' T';
@@ -652,14 +688,9 @@
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 up.count++;
-                
-                // When we buy 5 of the current "highest" tier, unlock the next
                 if (index === state.unlockedUpgrades - 1 && up.count >= 5) {
                     state.unlockedUpgrades++;
-                    // If we reach the end of the initial list, generate one
-                    if (state.unlockedUpgrades > buildings.length) {
-                        generateNextUpgrade();
-                    }
+                    if (state.unlockedUpgrades > buildings.length) generateNextUpgrade();
                     initShop();
                 }
                 calculateCPS();
@@ -671,44 +702,16 @@
         function buySpecial(index) {
             const sp = specials[index];
             const currentPrice = getPrice(sp);
-
             if (sp.type !== 'click' && sp.count > 0) return;
-
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 sp.count++;
-
                 if (sp.type === 'click') state.clickPower *= sp.factor;
                 if (sp.type === 'bird') state.hasBird = true;
-                if (sp.type === 'theme') {
-                    if (!state.ownedThemes.includes(sp.theme)) state.ownedThemes.push(sp.theme);
-                    state.currentTheme = sp.theme;
-                    applyVisuals();
-                }
-                if (sp.type === 'cosmetic') {
-                    if (!state.ownedCosmetics.includes(sp.cos)) state.ownedCosmetics.push(sp.cos);
-                    state.currentCosmetic = sp.cos;
-                    applyVisuals();
-                }
-
                 initShop();
                 updateUI();
                 saveGame();
             }
-        }
-
-        function applyVisuals() {
-            document.body.classList.remove('theme-midnight', 'theme-royal', 'theme-forest');
-            if (state.currentTheme !== 'default') {
-                document.body.classList.add('theme-' + state.currentTheme);
-            }
-            
-            mainCookie.classList.remove('cosmetic-gold', 'cosmetic-neon');
-            if (state.currentCosmetic !== 'default') {
-                mainCookie.classList.add('cosmetic-' + state.currentCosmetic);
-            }
-
-            collectorBird.style.display = state.hasBird ? 'block' : 'none';
         }
 
         function getPrice(item) {
@@ -795,13 +798,12 @@
         function triggerCookie(cookieObj, clickX, clickY) {
             const x = clickX || cookieObj.x + 30;
             const y = clickY || cookieObj.y + 30;
-
             if (cookieObj.type === 'blue') {
                 for(let i=0; i<3; i++) spawnSpecialCookie('green', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
                 createParticle(x, y, "SPLIT!");
             } else if (cookieObj.type === 'green') {
                 for(let i=0; i<3; i++) spawnSpecialCookie('golden', cookieObj.x, cookieObj.y, (Math.random()-0.5)*10, -5 - Math.random()*5);
-                createParticle(x, y, "FRAGMENTS!");
+                createParticle(x, y, "FRAGMENTE!");
             } else if (cookieObj.type === 'golden') {
                 const bonus = Math.max(10, state.cps * 60); 
                 addCookies(bonus);
@@ -849,6 +851,7 @@
             });
 
             if (state.hasBird) {
+                collectorBird.style.display = 'block';
                 const target = activeSpecialCookies.find(c => c.state === 'settled');
                 if (target) {
                     const birdX = parseFloat(collectorBird.style.left) || 0;
@@ -856,7 +859,6 @@
                     const dx = target.x - birdX;
                     const dy = target.y - birdY;
                     const dist = Math.sqrt(dx*dx + dy*dy);
-                    
                     if (dist < 30) triggerCookie(target);
                     else {
                         collectorBird.style.left = (birdX + dx * 0.05) + 'px';
@@ -897,15 +899,15 @@
         function executeFullReset() {
             const input = document.getElementById('reset-confirm-input').value;
             if (input === 'CONFIRM') {
-                localStorage.removeItem('kinetx_cookie_save_v3');
+                localStorage.removeItem('kinetx_cookie_save_v4');
                 location.reload();
             }
         }
 
         function updateUI() {
             cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
-            clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
+            cpsDisplay.innerText = `pro Sekunde: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
+            clickPowerDisplay.innerText = `Klick Power: ${formatNumber(state.clickPower)}`;
             statTotalClicks.innerText = state.totalClicks;
             statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
@@ -929,44 +931,40 @@
             else frenzyBar.classList.remove('animate-pulse');
             
             const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
-            prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
+            prestigeNeeded.innerText = `Noch: ${formatNumber(remaining)}`;
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
             prestigeBar.style.width = prestigeProg + '%';
             prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 prestigeBtn.classList.remove('hidden');
-                prestigeNeeded.innerText = "Ready to Prestige!";
+                prestigeNeeded.innerText = "Bereit für Prestige!";
             } else prestigeBtn.classList.add('hidden');
             
-            currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
+            currentBonusDisplay.innerText = `Aktueller Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
-            if (state.activeTab === 'cosmetics') {
-                renderCosmeticsTab();
-            } else {
-                let list = state.activeTab === 'buildings' ? buildings : specials;
-                list.forEach(item => {
-                    const card = document.getElementById(`upgrade-${item.id}`);
-                    if (card) {
-                        const price = getPrice(item);
-                        if (state.cookies >= price) card.classList.remove('disabled');
-                        else card.classList.add('disabled');
-                        
-                        const countEl = document.getElementById(`count-${item.id}`);
-                        if (countEl) countEl.innerText = item.count;
+            let list = state.activeTab === 'buildings' ? buildings : specials;
+            list.forEach(item => {
+                const card = document.getElementById(`upgrade-${item.id}`);
+                if (card) {
+                    const price = getPrice(item);
+                    if (state.cookies >= price) card.classList.remove('disabled');
+                    else card.classList.add('disabled');
+                    
+                    const countEl = document.getElementById(`count-${item.id}`);
+                    if (countEl) countEl.innerText = item.count;
 
-                        if (state.activeTab === 'buildings') {
-                            const boostLabel = document.getElementById(`boost-${item.id}`);
-                            const effMult = getUpgradeEfficiencyMult(item.count);
-                            const stars = getStarsForCount(item.count);
-                            if (effMult > 1) {
-                                boostLabel.innerText = `${stars} Boost: x${effMult}`;
-                                boostLabel.classList.remove('hidden');
-                            } else boostLabel.classList.add('hidden');
-                        }
+                    if (state.activeTab === 'buildings') {
+                        const boostLabel = document.getElementById(`boost-${item.id}`);
+                        const effMult = getUpgradeEfficiencyMult(item.count);
+                        const stars = getStarsForCount(item.count);
+                        if (effMult > 1) {
+                            boostLabel.innerText = `${stars} Boost: x${effMult}`;
+                            boostLabel.classList.remove('hidden');
+                        } else boostLabel.classList.add('hidden');
                     }
-                });
-            }
+                }
+            });
         }
 
         function saveGame() {
@@ -983,22 +981,8 @@
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
-                    state = { ...state, ...data.state };
-                    state.clickHeat = 0; state.multiplier = 1.0;
-                    
-                    data.buildingCounts.forEach((savedUp, index) => {
-                        while (index >= buildings.length) generateNextUpgrade();
-                        if (buildings[index]) buildings[index].count = savedUp.count;
-                    });
-                    data.specialCounts.forEach((savedSp, index) => {
-                        if (specials[index]) specials[index].count = savedSp.count;
-                    });
-
-                    calculateCPS();
-                    applyVisuals();
-                    initShop();
-                    updateUI();
-                } catch (e) { console.error("Error loading save", e); }
+                    applySaveData(data);
+                } catch (e) { console.error("Laden fehlgeschlagen", e); }
             }
         }
 
