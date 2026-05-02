@@ -853,6 +853,9 @@
             totalPlaytime: 0, // Playtime in seconds
             isPrestiging: false,
             stabilizers: 0,
+            heatResist: 0, // Heat decay reduction
+            quantumChipLevel: 0, // Extra flat multiplier
+            nanoOvenLevel: 0, // Price discount level
             // Powerup Timers
             powerups: {
                 production: { active: 0, cd: 0 },
@@ -861,6 +864,7 @@
         };
 
         const PRESTIGE_THRESHOLD = 1000000000; // 1 Billion
+        const PRESTIGE_MAX_BONUS_PER_RUN = 100; // 100% max bonus increase per run
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
@@ -951,6 +955,9 @@
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
             { id: 'sp-stabilizer', type: 'stabilizer', name: 'Stabilizer Reactor', description: 'Generates 1% of current cookies per second per reactor.', basePrice: 5000000000, count: 0, icon: '☢️' },
+            { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
+            { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
+            { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
             { id: 'pu-production', type: 'powerup', powerupId: 'production', name: 'Frenzy Rush', description: 'x5 Production for 45s.', basePrice: 100000000, duration: 45, cooldown: 300, icon: '⚡' },
             { id: 'pu-golden', type: 'powerup', powerupId: 'golden', name: 'Golden Storm', description: 'x5 Golden Cookie Spawns for 45s.', basePrice: 250000000, duration: 45, cooldown: 300, icon: '🪙' }
         ];
@@ -1092,7 +1099,8 @@
                 if (buildings[index]) buildings[index].count = savedUp.count;
             });
             data.specialCounts.forEach((savedSp, index) => {
-                if (specials[index]) specials[index].count = savedSp.count;
+                const sp = specials.find(s => s.id === savedSp.id);
+                if (sp) sp.count = savedSp.count;
             });
             
             // Re-spawn reactors based on state
@@ -1250,6 +1258,12 @@
                     bonusText = onCd ? "On Cooldown" : "Ready to activate";
                 } else if (item.type === 'stabilizer') {
                     bonusText = `Current: ${item.count} (+${item.count}%)`;
+                } else if (item.type === 'heat-resist') {
+                    bonusText = `Resist: ${(state.heatResist * 100).toFixed(0)}%`;
+                } else if (item.type === 'quantum-chip') {
+                    bonusText = `Mult: +${(state.quantumChipLevel * 10).toFixed(0)}%`;
+                } else if (item.type === 'nano-oven') {
+                    bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
@@ -1295,7 +1309,7 @@
             
             unlockAchievement('first_click');
             
-            // Slightly easier to gain heat (+4.0 instead of +3.5)
+            // Heat gain with slight variation
             state.clickHeat = Math.min(100, state.clickHeat + 4.0);
             createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
             spawnFloatingCookie();
@@ -1344,28 +1358,30 @@
                 return;
             }
 
-            if (sp.type === 'stabilizer') {
-                if (state.cookies >= currentPrice) {
-                    state.cookies -= currentPrice;
-                    sp.count++;
-                    state.stabilizers++;
-                    spawnReactorVisual();
-                    initShop();
-                    updateUI();
-                    saveGame();
-                }
-                return;
-            }
-
-            if (sp.type !== 'click' && sp.count > 0) return;
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 sp.count++;
+
                 if (sp.type === 'click') state.clickPower *= sp.factor;
                 if (sp.type === 'bird') {
                     state.hasBird = true;
                     unlockAchievement('bird_buy');
                 }
+                if (sp.type === 'stabilizer') {
+                    state.stabilizers++;
+                    spawnReactorVisual();
+                }
+                if (sp.type === 'heat-resist') {
+                    state.heatResist += sp.factor;
+                }
+                if (sp.type === 'quantum-chip') {
+                    state.quantumChipLevel++;
+                    calculateCPS();
+                }
+                if (sp.type === 'nano-oven') {
+                    state.nanoOvenLevel++;
+                }
+                
                 initShop();
                 updateUI();
                 saveGame();
@@ -1385,7 +1401,6 @@
             laser.className = 'laser-beam';
             document.body.appendChild(laser);
             
-            // Initial positioning logic (lasers need to be updated in a loop or once)
             updateLaserPositions();
         }
 
@@ -1424,9 +1439,25 @@
 
         function getPrice(item) {
             if (item.type === 'powerup') return item.basePrice;
-            // Higher scaling for the powerful Stabilizer
-            const scalingFactor = item.type === 'stabilizer' ? 2.5 : (item.id === 'sp-clicker' ? 5.0 : 1.15);
-            return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count || 0));
+            
+            // Basic scaling
+            let scaling = 1.15;
+            if (item.type === 'stabilizer') scaling = 2.5;
+            if (item.id === 'sp-clicker') scaling = 5.0;
+            if (item.type === 'quantum-chip') scaling = 3.0;
+            if (item.type === 'nano-oven') scaling = 4.0;
+            if (item.type === 'heat-resist') scaling = 2.0;
+
+            let price = Math.floor(item.basePrice * Math.pow(scaling, item.count || 0));
+            
+            // Apply Nano Oven discount to buildings
+            const isBuilding = buildings.some(b => b.id === item.id);
+            if (isBuilding) {
+                const discount = 1 - (state.nanoOvenLevel * 0.01);
+                price = Math.floor(price * discount);
+            }
+
+            return price;
         }
 
         function calculateCPS() {
@@ -1438,6 +1469,10 @@
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
             const milestoneBoost = 1 + (milestoneCount * 0.05);
             baseCps *= milestoneBoost;
+
+            // Quantum Chip Boost (flat % per level)
+            const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
+            baseCps *= quantumBoost;
 
             if (state.powerups.production.active > 0) {
                 baseCps *= 5;
@@ -1658,8 +1693,11 @@
         }
 
         function showPrestigeModal() {
-            const potentialBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
-            document.getElementById('prestige-gain-modal').innerText = `+${potentialBonusPoints}% Production Bonus`;
+            let potentialPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            // Apply Run Cap: 100% (100 points) max bonus increase
+            if (potentialPoints > PRESTIGE_MAX_BONUS_PER_RUN) potentialPoints = PRESTIGE_MAX_BONUS_PER_RUN;
+            
+            document.getElementById('prestige-gain-modal').innerText = `+${potentialPoints}% Production Bonus`;
             document.getElementById('prestige-confirm-modal').style.display = 'flex';
         }
 
@@ -1674,8 +1712,11 @@
             state.isPrestiging = true;
             unlockAchievement('first_prestige');
             
-            const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
-            const extraBonus = newBonusPoints * 0.01; 
+            let newPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            // Cap it at 100% per run
+            if (newPoints > PRESTIGE_MAX_BONUS_PER_RUN) newPoints = PRESTIGE_MAX_BONUS_PER_RUN;
+            
+            const extraBonus = newPoints * 0.01; 
             
             document.body.classList.add('black-hole-active');
             const wrapper = document.getElementById('main-content-wrapper');
@@ -1695,6 +1736,9 @@
             state.unlockedUpgrades = 1; 
             state.clickHeat = 0;
             state.stabilizers = 0;
+            state.heatResist = 0;
+            state.quantumChipLevel = 0;
+            state.nanoOvenLevel = 0;
             
             state.hasBird = false;
             if (collectorBird) collectorBird.style.display = 'none';
@@ -1865,11 +1909,13 @@
             if (prestigePercent) prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
             // Potential bonus display update
-            const potentialBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            let potentialPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            if (potentialPoints > PRESTIGE_MAX_BONUS_PER_RUN) potentialPoints = PRESTIGE_MAX_BONUS_PER_RUN;
+
             const prestigeGainEl = document.getElementById('prestige-gain');
             if (prestigeGainEl) {
-                if (potentialBonusPoints > 0) {
-                    prestigeGainEl.innerText = `+${potentialBonusPoints}%`;
+                if (potentialPoints > 0) {
+                    prestigeGainEl.innerText = `+${potentialPoints}% (MAX 100)`;
                     prestigeGainEl.classList.remove('hidden');
                 } else {
                     prestigeGainEl.classList.add('hidden');
@@ -2015,8 +2061,10 @@
 
             state.totalPlaytime += delta;
 
-            // Slightly slower decay (from 25 to 22) to make maintaining 10x easier
-            state.clickHeat = Math.max(0, state.clickHeat - (22 * delta));
+            // Decay speed influenced by Heat Shielding
+            const baseDecay = 22;
+            const decayPenalty = baseDecay * (1 - Math.min(0.9, state.heatResist));
+            state.clickHeat = Math.max(0, state.clickHeat - (decayPenalty * delta));
             
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
