@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0.0 Cookies - Cookie Clicker</title>
+    <title>0.000 Cookies - Cookie Clicker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;700&display=swap');
@@ -46,7 +46,7 @@
             filter: drop-shadow(0 0 20px rgba(210, 105, 30, 0.4));
         }
 
-        /* Cosmetics for Cookie - Specificity fix */
+        /* Cosmetics for Cookie */
         #main-cookie.cosmetic-gold { filter: drop-shadow(0 0 40px #ffd700) sepia(0.5) saturate(3) !important; }
         #main-cookie.cosmetic-neon { filter: drop-shadow(0 0 40px #00ff00) hue-rotate(90deg) brightness(1.2) !important; }
 
@@ -346,7 +346,7 @@
         </div>
 
         <div class="text-center mb-8 z-10">
-            <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.0 Cookies</h1>
+            <h1 id="cookie-count" class="text-5xl font-bold mb-2">0.000 Cookies</h1>
             <p id="cps-display" class="text-xl text-orange-400">per second: 0</p>
             <p id="click-power-display" class="text-xs text-zinc-500 mt-1">Click Power: 1</p>
         </div>
@@ -375,7 +375,7 @@
             </h2>
             <div class="flex justify-between text-[11px] text-zinc-500">
                 <span>Total Clicks: <span id="stat-total-clicks">0</span></span>
-                <span>All-time: <span id="stat-all-time">0.0</span></span>
+                <span>All-time: <span id="stat-all-time">0.000</span></span>
             </div>
         </div>
 
@@ -422,10 +422,9 @@
         const PRESTIGE_THRESHOLD = 100000000000;
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
-        // Track keys for secret reset
         let keysPressed = {};
 
-        // Building Upgrades
+        // Base Buildings - Starting set expanded
         let buildings = [
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
             { id: 'grandma', name: 'Grandma', description: 'A nice grandmother to bake more cookies.', basePrice: 100, baseCps: 1, count: 0, icon: '👵' },
@@ -434,7 +433,10 @@
             { id: 'factory', name: 'Factory', description: 'Mass produces cookies.', basePrice: 130000, baseCps: 260, count: 0, icon: '🏭' },
             { id: 'bank', name: 'Bank', description: 'Generates cookies from interest.', basePrice: 1400000, baseCps: 1400, count: 0, icon: '🏦' },
             { id: 'temple', name: 'Temple', description: 'Full of cookie gods.', basePrice: 20000000, baseCps: 7800, count: 0, icon: '🏛️' },
-            { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' }
+            { id: 'wizard', name: 'Wizard Tower', description: 'Summons cookies with magic.', basePrice: 330000000, baseCps: 44000, count: 0, icon: '🧙' },
+            { id: 'ship', name: 'Shipment', description: 'Brings in fresh cookies from the cookie planet.', basePrice: 5100000000, baseCps: 260000, count: 0, icon: '🚀' },
+            { id: 'alchemy', name: 'Alchemy Lab', description: 'Turns gold into cookies.', basePrice: 75000000000, baseCps: 1600000, count: 0, icon: '⚗️' },
+            { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
         // Special Upgrades
@@ -443,6 +445,7 @@
             { id: 'sp-bird', type: 'bird', name: 'Auto-Collector Bird', description: 'A bird that picks up settled special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
             { id: 'th-midnight', type: 'theme', theme: 'midnight', name: 'Midnight Sky', description: 'Changes the background to deep blue.', basePrice: 100000, count: 0, icon: '🌑' },
             { id: 'th-royal', type: 'theme', theme: 'royal', name: 'Royal Chamber', description: 'Changes the background to royal purple.', basePrice: 1000000, count: 0, icon: '👑' },
+            { id: 'th-forest', type: 'theme', theme: 'forest', name: 'Deep Forest', description: 'A calming green scenery.', basePrice: 5000000, count: 0, icon: '🌳' },
             { id: 'cos-gold', type: 'cosmetic', cos: 'gold', name: 'Golden Shine', description: 'Makes your main cookie look shiny.', basePrice: 5000000, count: 0, icon: '✨' },
             { id: 'cos-neon', type: 'cosmetic', cos: 'neon', name: 'Neon Glow', description: 'A futuristic green glow for your cookie.', basePrice: 25000000, count: 0, icon: '🧪' }
         ];
@@ -480,19 +483,26 @@
 
         function generateNextUpgrade() {
             const last = buildings[buildings.length - 1];
-            const icons = ['🚀', '🌌', '⚡', '🤖', '👑', '🔮', '💎', '🪐', '🧬', '🛸'];
-            const names = ['Ship', 'Galaxy', 'Energy', 'Bot', 'Empire', 'Portal', 'Gem', 'Planet', 'Clone', 'Alien'];
-            const nextIndex = buildings.length - 8; 
-            const icon = icons[nextIndex % icons.length];
-            const name = names[nextIndex % names.length] + ' ' + (Math.floor(nextIndex / names.length) + 2);
+            
+            // Varied Name Pool
+            const prefixPool = ['Quantum', 'Cosmic', 'Hyper', 'Galactic', 'Infinite', 'Divine', 'Chrono', 'Void', 'Nebula', 'Omega'];
+            const entityPool = ['Synthesizer', 'Engine', 'Network', 'Dyson Sphere', 'Empire', 'God', 'Fractal', 'Singularity', 'Pulse', 'Core'];
+            const iconPool = ['🧬', '🪐', '⚡', '🤖', '🔱', '🧿', '💎', '🛸', '💥', '✨'];
+
+            const randPrefix = prefixPool[Math.floor(Math.random() * prefixPool.length)];
+            const randEntity = entityPool[Math.floor(Math.random() * entityPool.length)];
+            const randIcon = iconPool[Math.floor(Math.random() * iconPool.length)];
+            
+            const name = `${randPrefix} ${randEntity}`;
+            
             buildings.push({
-                id: 'infinite-' + buildings.length,
+                id: 'gen-' + buildings.length,
                 name: name,
-                description: `A futuristic ${name} for even more cookies.`,
-                basePrice: last.basePrice * 12,
-                baseCps: last.baseCps * 6,
+                description: `A legendary ${name} from a different dimension.`,
+                basePrice: last.basePrice * 15.5,
+                baseCps: last.baseCps * 8.2,
                 count: 0,
-                icon: icon
+                icon: randIcon
             });
         }
 
@@ -560,16 +570,12 @@
         }
 
         function renderCosmeticsTab() {
-            // Clear current list to prevent "infinite" duplication during UI updates
             shopItems.innerHTML = '';
-
-            // Include default options
             const items = [
                 { id: 'th-default', type: 'theme', theme: 'default', name: 'Default Theme', icon: '🌑' },
                 { id: 'cos-default', type: 'cosmetic', cos: 'default', name: 'Default Cookie', icon: '🍪' }
             ];
 
-            // Add only owned items, exactly once
             specials.forEach(s => {
                 if (s.type === 'theme' && state.ownedThemes.includes(s.theme)) {
                     items.push(s);
@@ -577,11 +583,6 @@
                     items.push(s);
                 }
             });
-
-            if (items.length === 0) {
-                shopItems.innerHTML = '<div class="text-center text-zinc-500 text-sm p-10">No items owned yet. Buy some in the Specials tab!</div>';
-                return;
-            }
 
             items.forEach(item => {
                 const isEquipped = (item.type === 'theme' && state.currentTheme === item.theme) || 
@@ -619,13 +620,14 @@
             saveGame();
         }
 
+        // Updated formatNumber to limit decimals to max 3
         function formatNumber(num) {
-            if (num >= 1e15) return (num / 1e15).toFixed(3) + ' Q';
-            if (num >= 1e12) return (num / 1e12).toFixed(3) + ' T';
-            if (num >= 1e9) return (num / 1e9).toFixed(3) + ' B';
-            if (num >= 1000000) return (num / 1000000).toFixed(3) + ' M';
-            if (num >= 1000) return (num / 1000).toFixed(2) + ' k';
-            return num.toFixed(1);
+            if (num >= 1e15) return (num / 1e15).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' Q';
+            if (num >= 1e12) return (num / 1e12).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' T';
+            if (num >= 1e9) return (num / 1e9).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' B';
+            if (num >= 1000000) return (num / 1000000).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' M';
+            if (num >= 1000) return (num / 1000).toLocaleString(undefined, { maximumFractionDigits: 3 }) + ' k';
+            return num.toLocaleString(undefined, { maximumFractionDigits: 3 });
         }
 
         function clickCookie(e) {
@@ -633,7 +635,7 @@
             addCookies(amount);
             state.totalClicks++;
             state.clickHeat = Math.min(100, state.clickHeat + 5);
-            createParticle(e.clientX, e.clientY, `+${amount.toFixed(1)}`);
+            createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
             spawnFloatingCookie();
             updateUI();
             saveGame();
@@ -650,9 +652,14 @@
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 up.count++;
+                
+                // When we buy 5 of the current "highest" tier, unlock the next
                 if (index === state.unlockedUpgrades - 1 && up.count >= 5) {
                     state.unlockedUpgrades++;
-                    if (state.unlockedUpgrades > buildings.length) generateNextUpgrade();
+                    // If we reach the end of the initial list, generate one
+                    if (state.unlockedUpgrades > buildings.length) {
+                        generateNextUpgrade();
+                    }
                     initShop();
                 }
                 calculateCPS();
@@ -665,7 +672,6 @@
             const sp = specials[index];
             const currentPrice = getPrice(sp);
 
-            // One-time check for themes/skins/birds
             if (sp.type !== 'click' && sp.count > 0) return;
 
             if (state.cookies >= currentPrice) {
@@ -692,24 +698,20 @@
         }
 
         function applyVisuals() {
-            // Reset and apply theme classes
             document.body.classList.remove('theme-midnight', 'theme-royal', 'theme-forest');
             if (state.currentTheme !== 'default') {
                 document.body.classList.add('theme-' + state.currentTheme);
             }
             
-            // Reset and apply cosmetic classes to cookie
             mainCookie.classList.remove('cosmetic-gold', 'cosmetic-neon');
             if (state.currentCosmetic !== 'default') {
                 mainCookie.classList.add('cosmetic-' + state.currentCosmetic);
             }
 
-            // Bird visibility
             collectorBird.style.display = state.hasBird ? 'block' : 'none';
         }
 
         function getPrice(item) {
-            // Check if it is the specific click upgrade to increase the price significantly
             const scalingFactor = item.id === 'sp-clicker' ? 10.0 : 1.15;
             return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count));
         }
@@ -846,7 +848,6 @@
                 c.element.style.transform = `translate(${c.x}px, ${c.y}px)`;
             });
 
-            // Bird AI
             if (state.hasBird) {
                 const target = activeSpecialCookies.find(c => c.state === 'settled');
                 if (target) {
@@ -863,7 +864,6 @@
                         collectorBird.style.transform = dx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
                     }
                 } else {
-                    // Idle movement
                     const time = Date.now() / 1000;
                     collectorBird.style.left = (200 + Math.sin(time) * 100) + 'px';
                     collectorBird.style.top = (200 + Math.cos(time * 0.5) * 50) + 'px';
@@ -879,13 +879,11 @@
             state.prestigeLevel++;
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
-            buildings = JSON.parse(JSON.stringify(buildings.slice(0, 8))); // Reset counts
             buildings.forEach(b => b.count = 0);
             specials.forEach(s => s.count = 0);
             initShop(); updateUI(); saveGame();
         }
 
-        // Logic for Secret Reset Shortcut
         function showResetModal() {
             document.getElementById('reset-modal').style.display = 'flex';
             document.getElementById('reset-confirm-input').focus();
@@ -943,7 +941,6 @@
             
             currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
-            // Re-render current tab items - fixed to clear DOM correctly
             if (state.activeTab === 'cosmetics') {
                 renderCosmeticsTab();
             } else {
@@ -978,11 +975,11 @@
                 buildingCounts: buildings.map(u => ({ id: u.id, count: u.count })),
                 specialCounts: specials.map(s => ({ id: s.id, count: s.count }))
             };
-            localStorage.setItem('kinetx_cookie_save_v3', JSON.stringify(saveData));
+            localStorage.setItem('kinetx_cookie_save_v4', JSON.stringify(saveData));
         }
 
         function loadGame() {
-            const saved = localStorage.getItem('kinetx_cookie_save_v3');
+            const saved = localStorage.getItem('kinetx_cookie_save_v4');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
@@ -1047,12 +1044,9 @@
         window.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
             keysPressed[key] = true;
-            
-            // Check for secret reset shortcut
             if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) {
                 showResetModal();
             }
-
             if (e.code === 'Space') {
                 e.preventDefault();
                 const rect = mainCookie.getBoundingClientRect();
