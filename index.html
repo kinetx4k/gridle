@@ -320,6 +320,53 @@
             display: none;
         }
 
+        /* Drone Styles */
+        #golden-drone {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+            z-index: 185;
+            display: none;
+            animation: drone-float 3s ease-in-out infinite;
+        }
+
+        @keyframes drone-float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        .drone-cooldown-ring {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .drone-cooldown-fill {
+            height: 100%;
+            width: 0%;
+            background: #ffd700;
+            transition: width 0.1s linear;
+        }
+
+        .drone-forming-cookie {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+            filter: grayscale(1);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
         #prestige-container {
             position: fixed;
             bottom: 20px;
@@ -695,6 +742,28 @@
 
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
+            
+            <!-- Drone Entity -->
+            <div id="golden-drone">
+                <div class="drone-cooldown-ring">
+                    <div id="drone-fill" class="drone-cooldown-fill"></div>
+                </div>
+                <svg viewBox="0 0 100 100" width="60" height="60">
+                    <rect x="20" y="45" width="60" height="15" fill="#444" rx="4" />
+                    <circle cx="30" cy="45" r="10" fill="#666" stroke="#222" stroke-width="2" />
+                    <circle cx="70" cy="45" r="10" fill="#666" stroke="#222" stroke-width="2" />
+                    <path d="M20 45 L40 45 M60 45 L80 45" stroke="white" stroke-width="2" />
+                    <circle cx="50" cy="52" r="12" fill="#ffd700" fill-opacity="0.3" />
+                </svg>
+                <div id="drone-cookie" class="drone-forming-cookie">
+                    <svg viewBox="0 0 200 200" width="20" height="20">
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                        <circle cx="60" cy="60" r="10" fill="#4b3621" />
+                        <circle cx="140" cy="140" r="10" fill="#4b3621" />
+                    </svg>
+                </div>
+            </div>
+
             <div id="collector-bird">
                 <svg viewBox="0 0 100 100">
                     <path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#3b82f6" />
@@ -789,6 +858,8 @@
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
+            hasGoldDrone: false,
+            goldDroneTimer: 0,
             achievements: [],
             showParticles: true,
             performanceWarningShown: false,
@@ -797,7 +868,7 @@
             heatResist: 0,
             quantumChipLevel: 0,
             nanoOvenLevel: 0,
-            numberFormat: 'short', // Added format setting
+            numberFormat: 'short',
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -885,6 +956,7 @@
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
+            { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -894,6 +966,7 @@
 
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
+        const goldenDrone = document.getElementById('golden-drone');
 
         function setNumberFormat(format) {
             state.numberFormat = format;
@@ -1176,6 +1249,11 @@
             for (let i = 0; i < unlockLimit; i++) {
                 const item = list[i];
                 if (!item) continue;
+
+                // Hidden Logic for unique one-time bird
+                if (item.id === 'sp-bird' && state.hasBird) continue;
+                // Hidden Logic for one-time gold drone
+                if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
                 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1220,7 +1298,6 @@
         }
 
         function formatNumber(num) {
-            // Updated Format Logic
             if (state.numberFormat === 'full') {
                 return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
@@ -1303,6 +1380,9 @@
                 if (sp.type === 'bird') {
                     state.hasBird = true;
                     unlockAchievement('bird_buy');
+                }
+                if (sp.type === 'gold-drone') {
+                    state.hasGoldDrone = true;
                 }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
@@ -1476,6 +1556,50 @@
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
 
+            for (let i = 0; i < activeSpecialCookies.length; i++) {
+                for (let j = i + 1; j < activeSpecialCookies.length; j++) {
+                    const c1 = activeSpecialCookies[i];
+                    const c2 = activeSpecialCookies[j];
+
+                    if (c1.state === 'flying' || c2.state === 'flying') continue;
+
+                    const dx = c2.x - c1.x;
+                    const dy = c2.y - c1.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const minDistance = c1.radius + c2.radius;
+
+                    if (distance < minDistance && distance > 0.1) {
+                        const overlap = minDistance - distance;
+                        const nx = dx / distance; 
+                        const ny = dy / distance; 
+
+                        const moveX = nx * overlap * 0.5;
+                        const moveY = ny * overlap * 0.5;
+
+                        if (c1.state === 'falling') {
+                            c1.x -= moveX;
+                            c1.y -= moveY;
+                        }
+                        if (c2.state === 'falling') {
+                            c2.x += moveX;
+                            c2.y += moveY;
+                        }
+
+                        const relativeVelocityX = c1.vx - c2.vx;
+                        const relativeVelocityY = c1.vy - c2.vy;
+                        const dotProduct = relativeVelocityX * nx + relativeVelocityY * ny;
+
+                        if (dotProduct > 0) {
+                            const impulse = 2 * dotProduct / 2; 
+                            c1.vx -= impulse * nx;
+                            c1.vy -= impulse * ny;
+                            c2.vx += impulse * nx;
+                            c2.vy += impulse * ny;
+                        }
+                    }
+                }
+            }
+
             activeSpecialCookies.forEach(c => {
                 if (c.state === 'falling') {
                     c.vy += c.gravity; c.x += c.vx; c.y += c.vy;
@@ -1525,6 +1649,14 @@
                     }
                 }
             }
+
+            // Drone Position Update
+            if (state.hasGoldDrone && goldenDrone) {
+                goldenDrone.style.display = 'block';
+                const time = Date.now() / 1000;
+                goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`;
+                goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
+            }
         }
 
         function showPrestigeModal() {
@@ -1573,7 +1705,9 @@
             state.nanoOvenLevel = 0;
             
             state.hasBird = false;
+            state.hasGoldDrone = false;
             if (collectorBird) collectorBird.style.display = 'none';
+            if (goldenDrone) goldenDrone.style.display = 'none';
 
             [...activeSpecialCookies].forEach(c => removeCookie(c.id));
 
@@ -1748,6 +1882,18 @@
 
             updatePowerupHotbar();
 
+            // Drone Visual Update
+            if (state.hasGoldDrone) {
+                const droneFill = document.getElementById('drone-fill');
+                const droneCookie = document.getElementById('drone-cookie');
+                const progress = (state.goldDroneTimer / 15) * 100;
+                if (droneFill) droneFill.style.width = progress + '%';
+                if (droneCookie) {
+                    droneCookie.style.opacity = (0.2 + (state.goldDroneTimer / 15) * 0.8);
+                    droneCookie.style.transform = `translateX(-50%) scale(${0.5 + (state.goldDroneTimer / 15) * 0.5})`;
+                }
+            }
+
             if (state.activeTab !== 'achievements') {
                 let list = state.activeTab === 'buildings' ? buildings : specials;
                 list.forEach(item => {
@@ -1889,6 +2035,24 @@
 
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
+            // Golden Drone Tick
+            if (state.hasGoldDrone) {
+                state.goldDroneTimer += delta;
+                if (state.goldDroneTimer >= 15) {
+                    // Spawn a random special cookie
+                    const pool = ['golden', 'blue', 'green', 'red'];
+                    const weights = [0.6, 0.2, 0.15, 0.05];
+                    let r = Math.random();
+                    let chosen = 'golden';
+                    for (let i = 0; i < weights.length; i++) {
+                        if (r < weights[i]) { chosen = pool[i]; break; }
+                        r -= weights[i];
+                    }
+                    spawnSpecialCookie(chosen);
+                    state.goldDroneTimer = 0;
+                }
+            }
+
             const spawnMult = state.powerups.golden.active > 0 ? 5 : 1;
 
             if (state.multiplier >= 3.0) {
@@ -1934,7 +2098,7 @@
                 
                 const startup = document.getElementById('startup-modal');
                 if (startup && startup.style.display === 'none') {
-                    if (fps < 57 && state.showParticles && !state.performanceWarningShown) {
+                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) {
                         showPerformanceModal();
                     }
                 }
