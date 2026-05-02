@@ -1225,7 +1225,8 @@
 
         function getPrice(item) {
             if (item.type === 'powerup') return item.basePrice;
-            const scalingFactor = item.id === 'sp-clicker' ? 10.0 : 1.15;
+            // Changed from 10.0 to 5.0 to make it hard but accessible
+            const scalingFactor = item.id === 'sp-clicker' ? 5.0 : 1.15;
             return Math.floor(item.basePrice * Math.pow(scalingFactor, item.count || 0));
         }
 
