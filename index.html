@@ -694,18 +694,6 @@
             { id: 'blue_click', name: 'Sky High', description: 'Click your first Blue Cookie.', icon: '🧊' },
             { id: 'green_click', name: 'Nature Lover', description: 'Click your first Green Cookie.', icon: '🌿' },
             { id: 'red_click', name: 'The Chosen One', description: 'Click your first Red Cookie.', icon: '🔥' },
-            { id: 'millionaire', name: 'Millionaire', description: 'Reach 1,000,000 cookies. That is the population of a small country!', icon: '💰' },
-            { id: 'multi_millionaire', name: 'Multi-Millionaire', description: 'Reach 10,000,000 cookies. Enough to fill a football stadium 100 times.', icon: '💸' },
-            { id: 'hundred_millionaire', name: 'Cookie Tycoon', description: 'Reach 100,000,000 cookies. You could buy a private island made of dough.', icon: '🏗️' },
-            { id: 'billionaire', name: 'Cookie Billionaire', description: 'Reach 1,000,000,000 cookies. Fun fact: 1 billion seconds is about 31 years!', icon: '🏛️' },
-            { id: 'ten_billionaire', name: 'Imperial Baker', description: 'Reach 10,000,000,000 cookies. You now own more cookies than there are people on Earth.', icon: '🌎' },
-            { id: 'hundred_billionaire', name: 'Global Supply', description: 'Reach 100,000,000,000 cookies. Your cookies are a registered currency now.', icon: '💹' },
-            { id: 'trillionaire', name: 'Galactic Baker', description: 'Reach 1,000,000,000,000 cookies. There are roughly this many cells in your body.', icon: '🧬' },
-            { id: 'ten_trillionaire', name: 'Stellar Chef', description: 'Reach 10,000,000,000,000 cookies. Your bakery is visible from Mars.', icon: '🪐' },
-            { id: 'hundred_trillionaire', name: 'Nebula Kneader', description: 'Reach 100,000,000,000,000 cookies. That is a lot of sugar.', icon: '🌌' },
-            { id: 'quadrillionaire', name: 'Universal Constant', description: 'Reach 1,000,000,000,000,000 cookies. You are officially a law of physics.', icon: '⚛️' },
-            { id: 'quintillionaire', name: 'Sand Master', description: 'Reach 1,000,000,000,000,000,000 cookies. This is roughly the number of grains of sand on Earth.', icon: '🏖️' },
-            { id: 'sextillionaire', name: 'Star Counter', description: 'Reach 1,000,000,000,000,000,000,000 cookies. You have as many cookies as there are stars in the observable universe.', icon: '✨' },
             { id: 'first_prestige', name: 'The New You', description: 'Perform your first Prestige.', icon: '🌌' },
             { id: 'multiplier_3', name: 'Getting Hot', description: 'Reach a 3x multiplier.', icon: '⚡' },
             { id: 'multiplier_5', name: 'Absolute Fire', description: 'Reach a 5x multiplier.', icon: '♨️' },
@@ -713,22 +701,52 @@
         ];
 
         /**
+         * DYNAMIC MILESTONE HELPER
+         */
+        const milestoneFacts = {
+            6: "Population of a small country.",
+            7: "Enough to fill 100 football stadiums.",
+            8: "About one cookie for every person in Germany.",
+            9: "1 billion seconds is roughly 31 years!",
+            10: "More cookies than there are people on planet Earth.",
+            11: "Approximately the number of stars in the Milky Way.",
+            12: "Roughly the number of cells in a human body.",
+            13: "Number of bacteria living on your skin.",
+            14: "Number of synapses in a human brain.",
+            15: "Seconds since the end of the last Ice Age.",
+            18: "Grains of sand on all the beaches of Earth.",
+            21: "Total stars in the observable universe. Infinite sweetness!",
+            24: "Number of molecules in a single drop of water."
+        };
+
+        function getMilestoneInfo(exponent) {
+            const value = Math.pow(10, exponent);
+            const formatted = formatNumber(value);
+            return {
+                id: `milestone_${exponent}`,
+                name: `${formatted} Club`,
+                description: milestoneFacts[exponent] || `You reached the massive goal of ${formatted} cookies!`,
+                icon: '🏆',
+                value: value
+            };
+        }
+
+        /**
          * ACHIEVEMENT CHECK LOGIC
          */
         function checkMilestoneAchievements() {
             const total = state.totalCookiesEarned;
-            if (total >= 1000000) unlockAchievement('millionaire');
-            if (total >= 10000000) unlockAchievement('multi_millionaire');
-            if (total >= 100000000) unlockAchievement('hundred_millionaire');
-            if (total >= 1000000000) unlockAchievement('billionaire');
-            if (total >= 10000000000) unlockAchievement('ten_billionaire');
-            if (total >= 100000000000) unlockAchievement('hundred_billionaire');
-            if (total >= 1000000000000) unlockAchievement('trillionaire');
-            if (total >= 10000000000000) unlockAchievement('ten_trillionaire');
-            if (total >= 100000000000000) unlockAchievement('hundred_trillionaire');
-            if (total >= 1000000000000000) unlockAchievement('quadrillionaire');
-            if (total >= 1000000000000000000) unlockAchievement('quintillionaire');
-            if (total >= 1000000000000000000000) unlockAchievement('sextillionaire');
+            
+            // Check powers of 10 starting from 1 Million (10^6)
+            for (let e = 6; e <= 33; e++) {
+                const threshold = Math.pow(10, e);
+                if (total >= threshold) {
+                    unlockAchievement(`milestone_${e}`);
+                } else {
+                    // Stop once we find a milestone we haven't reached
+                    break;
+                }
+            }
         }
 
         // Buildings - Starting set
@@ -811,7 +829,15 @@
         function unlockAchievement(id) {
             if (state.achievements.includes(id)) return;
             state.achievements.push(id);
-            const ach = achievementsList.find(a => a.id === id);
+            
+            // Check if it's dynamic or static
+            let ach;
+            if (id.startsWith('milestone_')) {
+                ach = getMilestoneInfo(parseInt(id.split('_')[1]));
+            } else {
+                ach = achievementsList.find(a => a.id === id);
+            }
+
             if (ach) {
                 showAchievementNotification(ach);
                 saveGame();
@@ -973,6 +999,7 @@
             shopItems.innerHTML = '';
             
             if (state.activeTab === 'achievements') {
+                // 1. Show all static achievements from list
                 achievementsList.forEach(ach => {
                     const isUnlocked = state.achievements.includes(ach.id);
                     const card = document.createElement('div');
@@ -987,6 +1014,43 @@
                     `;
                     shopItems.appendChild(card);
                 });
+
+                // 2. Calculate and show ALL unlocked milestones
+                let maxE = 0;
+                for (let e = 6; e <= 33; e++) {
+                    const id = `milestone_${e}`;
+                    if (state.achievements.includes(id)) {
+                        maxE = e;
+                        const ach = getMilestoneInfo(e);
+                        const card = document.createElement('div');
+                        card.className = `achievement-card unlocked`;
+                        card.innerHTML = `
+                            <div class="icon">${ach.icon}</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm text-yellow-400">${ach.name}</div>
+                                <div class="text-[10px] text-zinc-500">${ach.description}</div>
+                            </div>
+                            <div class="text-yellow-400 text-xs">✓</div>
+                        `;
+                        shopItems.appendChild(card);
+                    }
+                }
+
+                // 3. Show NEXT goal milestone (Dynamic Growth)
+                const nextE = Math.max(6, maxE + 1);
+                const nextAch = getMilestoneInfo(nextE);
+                const card = document.createElement('div');
+                card.className = `achievement-card opacity-60 border-dashed border-zinc-700`;
+                card.innerHTML = `
+                    <div class="icon grayscale opacity-20">${nextAch.icon}</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-sm text-zinc-500">Goal: ${nextAch.name}</div>
+                        <div class="text-[10px] text-zinc-600">Locked Challenge</div>
+                    </div>
+                    <div class="text-zinc-700 text-xs">🔒</div>
+                `;
+                shopItems.appendChild(card);
+
                 return;
             }
 
@@ -1064,7 +1128,7 @@
             state.cookies += amount;
             state.totalCookiesEarned += amount;
             
-            // Checks Milestone Achievements whenever cookies are added
+            // Dynamic Achievement check
             checkMilestoneAchievements();
         }
 
