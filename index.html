@@ -238,6 +238,17 @@
             line-height: 24px;
             color: white;
             text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            z-index: 30;
+        }
+
+        /* Marker lines for thresholds */
+        .frenzy-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            z-index: 20;
         }
 
         /* Special Cookie Physics Elements */
@@ -599,6 +610,11 @@
     </div>
 
     <div id="frenzy-meter-container">
+        <!-- Lines for multiplier starts -->
+        <div class="frenzy-marker" style="left: 25%;"></div> <!-- x1.5 start -->
+        <div class="frenzy-marker" style="left: 60%;"></div> <!-- x3.0 start -->
+        <div class="frenzy-marker" style="left: 85%;"></div> <!-- x5.0 start -->
+        
         <div id="frenzy-bar"></div>
         <div id="multiplier-display" class="multiplier-tag">x1.0</div>
     </div>
@@ -1577,7 +1593,8 @@
             
             if (totalPrestigeDisplay) totalPrestigeDisplay.innerText = `Total Prestige: ${state.totalPrestigeEarned}`;
 
-            if (state.clickHeat >= 100) {
+            // Thresholds adjusted: 5x starts earlier (at 85 instead of 100)
+            if (state.clickHeat >= 85) {
                 state.multiplier = 5.0;
                 unlockAchievement('multiplier_5');
             }
