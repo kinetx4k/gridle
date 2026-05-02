@@ -667,7 +667,7 @@
             achievements: [], // IDs of unlocked achievements
             showParticles: true,
             performanceWarningShown: false,
-            totalPlaytime: 0, // NEW: Playtime in seconds
+            totalPlaytime: 0, // Playtime in seconds
             // Powerup Timers
             powerups: {
                 production: { active: 0, cd: 0 },
@@ -685,20 +685,51 @@
         let lastFpsUpdate = performance.now();
         let fps = 60;
 
-        // Achievements Definition
+        /**
+         * ACHIEVEMENTS DEFINITION (EXTENDED)
+         */
         const achievementsList = [
             { id: 'first_click', name: 'Cookie Rookie', description: 'Click your first cookie.', icon: '🍪' },
             { id: 'golden_click', name: 'Golden Touch', description: 'Click your first Golden Cookie.', icon: '🪙' },
             { id: 'blue_click', name: 'Sky High', description: 'Click your first Blue Cookie.', icon: '🧊' },
             { id: 'green_click', name: 'Nature Lover', description: 'Click your first Green Cookie.', icon: '🌿' },
             { id: 'red_click', name: 'The Chosen One', description: 'Click your first Red Cookie.', icon: '🔥' },
-            { id: 'millionaire', name: 'Millionaire', description: 'Reach 1,000,000 cookies.', icon: '💰' },
-            { id: 'billionaire', name: 'Billionaire', description: 'Reach 1,000,000,000 cookies.', icon: '🏛️' },
+            { id: 'millionaire', name: 'Millionaire', description: 'Reach 1,000,000 cookies. That is the population of a small country!', icon: '💰' },
+            { id: 'multi_millionaire', name: 'Multi-Millionaire', description: 'Reach 10,000,000 cookies. Enough to fill a football stadium 100 times.', icon: '💸' },
+            { id: 'hundred_millionaire', name: 'Cookie Tycoon', description: 'Reach 100,000,000 cookies. You could buy a private island made of dough.', icon: '🏗️' },
+            { id: 'billionaire', name: 'Cookie Billionaire', description: 'Reach 1,000,000,000 cookies. Fun fact: 1 billion seconds is about 31 years!', icon: '🏛️' },
+            { id: 'ten_billionaire', name: 'Imperial Baker', description: 'Reach 10,000,000,000 cookies. You now own more cookies than there are people on Earth.', icon: '🌎' },
+            { id: 'hundred_billionaire', name: 'Global Supply', description: 'Reach 100,000,000,000 cookies. Your cookies are a registered currency now.', icon: '💹' },
+            { id: 'trillionaire', name: 'Galactic Baker', description: 'Reach 1,000,000,000,000 cookies. There are roughly this many cells in your body.', icon: '🧬' },
+            { id: 'ten_trillionaire', name: 'Stellar Chef', description: 'Reach 10,000,000,000,000 cookies. Your bakery is visible from Mars.', icon: '🪐' },
+            { id: 'hundred_trillionaire', name: 'Nebula Kneader', description: 'Reach 100,000,000,000,000 cookies. That is a lot of sugar.', icon: '🌌' },
+            { id: 'quadrillionaire', name: 'Universal Constant', description: 'Reach 1,000,000,000,000,000 cookies. You are officially a law of physics.', icon: '⚛️' },
+            { id: 'quintillionaire', name: 'Sand Master', description: 'Reach 1,000,000,000,000,000,000 cookies. This is roughly the number of grains of sand on Earth.', icon: '🏖️' },
+            { id: 'sextillionaire', name: 'Star Counter', description: 'Reach 1,000,000,000,000,000,000,000 cookies. You have as many cookies as there are stars in the observable universe.', icon: '✨' },
             { id: 'first_prestige', name: 'The New You', description: 'Perform your first Prestige.', icon: '🌌' },
             { id: 'multiplier_3', name: 'Getting Hot', description: 'Reach a 3x multiplier.', icon: '⚡' },
             { id: 'multiplier_5', name: 'Absolute Fire', description: 'Reach a 5x multiplier.', icon: '♨️' },
             { id: 'bird_buy', name: 'Bird Watcher', description: 'Buy the Collector Bird.', icon: '🐦' }
         ];
+
+        /**
+         * ACHIEVEMENT CHECK LOGIC
+         */
+        function checkMilestoneAchievements() {
+            const total = state.totalCookiesEarned;
+            if (total >= 1000000) unlockAchievement('millionaire');
+            if (total >= 10000000) unlockAchievement('multi_millionaire');
+            if (total >= 100000000) unlockAchievement('hundred_millionaire');
+            if (total >= 1000000000) unlockAchievement('billionaire');
+            if (total >= 10000000000) unlockAchievement('ten_billionaire');
+            if (total >= 100000000000) unlockAchievement('hundred_billionaire');
+            if (total >= 1000000000000) unlockAchievement('trillionaire');
+            if (total >= 10000000000000) unlockAchievement('ten_trillionaire');
+            if (total >= 100000000000000) unlockAchievement('hundred_trillionaire');
+            if (total >= 1000000000000000) unlockAchievement('quadrillionaire');
+            if (total >= 1000000000000000000) unlockAchievement('quintillionaire');
+            if (total >= 1000000000000000000000) unlockAchievement('sextillionaire');
+        }
 
         // Buildings - Starting set
         let buildings = [
@@ -719,7 +750,6 @@
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
-            // UPDATED POWERUPS: Cooldown explicitly set to 300s (5 min)
             { id: 'pu-production', type: 'powerup', powerupId: 'production', name: 'Frenzy Rush', description: 'x5 Production for 45s.', basePrice: 100000000, duration: 45, cooldown: 300, icon: '⚡' },
             { id: 'pu-golden', type: 'powerup', powerupId: 'golden', name: 'Golden Storm', description: 'x5 Golden Cookie Spawns for 45s.', basePrice: 250000000, duration: 45, cooldown: 300, icon: '🪙' }
         ];
@@ -792,6 +822,8 @@
             const toast = document.getElementById('achievement-toast');
             const iconEl = document.getElementById('toast-icon');
             const nameEl = document.getElementById('toast-name');
+
+            if (!toast || !iconEl || !nameEl) return;
 
             iconEl.innerText = ach.icon;
             nameEl.innerText = ach.name;
@@ -1002,6 +1034,9 @@
         }
 
         function formatNumber(num) {
+            if (num >= 1e24) return (num / 1e24).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Y';
+            if (num >= 1e21) return (num / 1e21).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Z';
+            if (num >= 1e18) return (num / 1e18).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' E';
             if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Q';
             if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' T';
             if (num >= 1e9) return (num / 1e9).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' B';
@@ -1029,9 +1064,8 @@
             state.cookies += amount;
             state.totalCookiesEarned += amount;
             
-            // Achievements: Money
-            if (state.totalCookiesEarned >= 1000000) unlockAchievement('millionaire');
-            if (state.totalCookiesEarned >= 1000000000) unlockAchievement('billionaire');
+            // Checks Milestone Achievements whenever cookies are added
+            checkMilestoneAchievements();
         }
 
         function buyBuilding(index) {
@@ -1097,7 +1131,7 @@
                 return sum + (up.count * (up.baseCps || 0) * mult);
             }, 0);
 
-            // UPDATED: Apply 5x Production Powerup
+            // Apply 5x Production Powerup
             if (state.powerups.production.active > 0) {
                 baseCps *= 5;
             }
@@ -1141,7 +1175,6 @@
             const cookieArea = document.getElementById('cookie-area');
             const areaRect = cookieArea.getBoundingClientRect();
             
-            // Fixed Spawning: Use provided coordinates or calculate random within screen bounds properly
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
             
@@ -1187,7 +1220,6 @@
             const x = clickX || cookieObj.x + 30;
             const y = clickY || cookieObj.y + 30;
             
-            // Use the absolute current coordinates of the destroyed cookie as spawn point for fragments
             if (cookieObj.type === 'red') {
                 unlockAchievement('red_click');
                 for(let i=0; i<3; i++) spawnSpecialCookie('blue', x - 30, y - 30, (Math.random()-0.5)*15, -6 - Math.random()*6);
@@ -1222,13 +1254,11 @@
             const shopContainer = document.getElementById('shop-container');
             const shopLeftBound = shopContainer.getBoundingClientRect().left;
 
-            // Collision Detection Loop (Complex Elastic Collision Implementation)
             for (let i = 0; i < activeSpecialCookies.length; i++) {
                 for (let j = i + 1; j < activeSpecialCookies.length; j++) {
                     const c1 = activeSpecialCookies[i];
                     const c2 = activeSpecialCookies[j];
 
-                    // Only collide if not flying away
                     if (c1.state === 'flying' || c2.state === 'flying') continue;
 
                     const dx = c2.x - c1.x;
@@ -1237,12 +1267,10 @@
                     const minDistance = c1.radius + c2.radius;
 
                     if (distance < minDistance && distance > 0.1) {
-                        // Collision response - simple position correction
                         const overlap = minDistance - distance;
-                        const nx = dx / distance; // Normal X
-                        const ny = dy / distance; // Normal Y
+                        const nx = dx / distance; 
+                        const ny = dy / distance; 
 
-                        // Move cookies apart based on overlap
                         const moveX = nx * overlap * 0.5;
                         const moveY = ny * overlap * 0.5;
 
@@ -1255,13 +1283,12 @@
                             c2.y += moveY;
                         }
 
-                        // Velocity exchange (Elastic)
                         const relativeVelocityX = c1.vx - c2.vx;
                         const relativeVelocityY = c1.vy - c2.vy;
                         const dotProduct = relativeVelocityX * nx + relativeVelocityY * ny;
 
                         if (dotProduct > 0) {
-                            const impulse = 2 * dotProduct / 2; // Assuming equal mass
+                            const impulse = 2 * dotProduct / 2; 
                             c1.vx -= impulse * nx;
                             c1.vy -= impulse * ny;
                             c2.vx += impulse * nx;
@@ -1278,19 +1305,18 @@
                         c.y = ground; c.vy *= -c.bounce; c.vx *= 0.8;
                         if (Math.abs(c.vy) < 1) {
                             c.state = 'settled'; 
-                            c.timer = 5.0; // Updated from 3.0 to 5.0 seconds
+                            c.timer = 5.0; 
                         }
                     }
-                    // Screen Boundaries
                     if (c.x < 0) { c.x = 0; c.vx *= -1; }
                     if (c.x > shopLeftBound - 60) { c.x = shopLeftBound - 60; c.vx *= -1; }
                 } else if (c.state === 'settled') {
                     c.timer -= 0.016; 
                     if (c.timer <= 0) {
                         c.state = 'flying';
-                        c.wingsEl.classList.add('wings-visible');
+                        if (c.wingsEl) c.wingsEl.classList.add('wings-visible');
                         c.flyVx = (Math.random() > 0.5 ? 1.5 : -1.5) * (Math.random() * 2 + 1);
-                    } else c.countdownEl.innerText = c.timer.toFixed(1);
+                    } else if (c.countdownEl) c.countdownEl.innerText = c.timer.toFixed(1);
                 } else if (c.state === 'flying') {
                     c.y -= 1.8; c.x += c.flyVx;
                     if (c.y < -100 || c.x < -100 || c.x > window.innerWidth + 100) removeCookie(c.id);
@@ -1299,42 +1325,40 @@
             });
 
             if (state.hasBird) {
-                collectorBird.style.display = 'block';
-                const target = activeSpecialCookies.find(c => c.state === 'settled');
-                if (target) {
-                    const birdX = parseFloat(collectorBird.style.left) || 0;
-                    const birdY = parseFloat(collectorBird.style.top) || 0;
-                    const dx = target.x - birdX;
-                    const dy = target.y - birdY;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 30) triggerCookie(target);
-                    else {
-                        collectorBird.style.left = (birdX + dx * 0.05) + 'px';
-                        collectorBird.style.top = (birdY + dy * 0.05) + 'px';
-                        collectorBird.style.transform = dx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+                if (collectorBird) {
+                    collectorBird.style.display = 'block';
+                    const target = activeSpecialCookies.find(c => c.state === 'settled');
+                    if (target) {
+                        const birdX = parseFloat(collectorBird.style.left) || 0;
+                        const birdY = parseFloat(collectorBird.style.top) || 0;
+                        const dx = target.x - birdX;
+                        const dy = target.y - birdY;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 30) triggerCookie(target);
+                        else {
+                            collectorBird.style.left = (birdX + dx * 0.05) + 'px';
+                            collectorBird.style.top = (birdY + dy * 0.05) + 'px';
+                            collectorBird.style.transform = dx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+                        }
+                    } else {
+                        const time = Date.now() / 1000;
+                        collectorBird.style.left = (200 + Math.sin(time) * 100) + 'px';
+                        collectorBird.style.top = (200 + Math.cos(time * 0.5) * 50) + 'px';
                     }
-                } else {
-                    const time = Date.now() / 1000;
-                    collectorBird.style.left = (200 + Math.sin(time) * 100) + 'px';
-                    collectorBird.style.top = (200 + Math.cos(time * 0.5) * 50) + 'px';
                 }
             }
         }
 
         function prestige() {
-            // UPDATED: Logic for 1% per 100b. Threshold is 100b.
             if (state.cookies < PRESTIGE_THRESHOLD) return;
             unlockAchievement('first_prestige');
             
-            // Calculates how many 100b units have been earned
             const newBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
-            // Each 100b unit gives 1% (0.01) extra
             const extraBonus = newBonusPoints * 0.01; 
             
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
             
-            // Reset progression
             state.cookies = 0; state.cps = 0; state.clickPower = 1;
             state.unlockedUpgrades = 1; state.clickHeat = 0;
             buildings.forEach(b => b.count = 0);
@@ -1362,11 +1386,11 @@
         }
 
         function updateUI() {
-            cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
-            clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
-            statTotalClicks.innerText = state.totalClicks;
-            statAllTime.innerText = formatNumber(state.totalCookiesEarned);
+            if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
+            if (cpsDisplay) cpsDisplay.innerText = `per second: ${formatNumber(state.cps * state.multiplier * state.prestigeBonus)}`;
+            if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
+            if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
+            if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             
             if (state.clickHeat >= 100) {
@@ -1380,31 +1404,30 @@
             else if (state.clickHeat >= 25) state.multiplier = 1.5;
             else state.multiplier = 1.0;
             
-            frenzyBar.style.width = state.clickHeat + '%';
-            multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
+            if (frenzyBar) frenzyBar.style.width = state.clickHeat + '%';
+            if (multiplierDisplay) multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
             
             if (state.multiplier >= 3.0) {
                 document.body.classList.add('golden-frenzy');
             } else {
                 document.body.classList.remove('golden-frenzy');
             }
-            if (state.multiplier >= 5) frenzyBar.classList.add('animate-pulse');
-            else frenzyBar.classList.remove('animate-pulse');
+            if (state.multiplier >= 5 && frenzyBar) frenzyBar.classList.add('animate-pulse');
+            else if (frenzyBar) frenzyBar.classList.remove('animate-pulse');
             
             const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
-            prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
+            if (prestigeNeeded) prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
-            prestigeBar.style.width = prestigeProg + '%';
-            prestigePercent.innerText = Math.floor(prestigeProg) + '%';
+            if (prestigeBar) prestigeBar.style.width = prestigeProg + '%';
+            if (prestigePercent) prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
             if (state.cookies >= PRESTIGE_THRESHOLD) {
-                prestigeBtn.classList.remove('hidden');
-                prestigeNeeded.innerText = "Ready for Prestige!";
-            } else prestigeBtn.classList.add('hidden');
+                if (prestigeBtn) prestigeBtn.classList.remove('hidden');
+                if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!";
+            } else if (prestigeBtn) prestigeBtn.classList.add('hidden');
             
-            currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
+            if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
             
-            // NEW: Update Playtime Display
             const hours = Math.floor(state.totalPlaytime / 3600);
             const minutes = Math.floor((state.totalPlaytime % 3600) / 60);
             const seconds = Math.floor(state.totalPlaytime % 60);
@@ -1413,7 +1436,6 @@
                 playtimeEl.innerText = `${hours}h ${minutes}m ${seconds}s`;
             }
 
-            // Powerup Visuals
             updatePowerupHotbar();
 
             if (state.activeTab !== 'achievements') {
@@ -1441,7 +1463,7 @@
                             if (effMult > 1) {
                                 boostLabel.innerText = `${stars} Boost: x${effMult}`;
                                 boostLabel.classList.remove('hidden');
-                            } else boostLabel.classList.add('hidden');
+                            } else if (boostLabel) boostLabel.classList.add('hidden');
                         }
                     }
                 });
@@ -1449,48 +1471,50 @@
         }
 
         function updatePowerupHotbar() {
-            // Production
             const pSlot = document.getElementById('pu-slot-production');
             const pTimer = document.getElementById('pu-timer-production');
             const pCd = document.getElementById('pu-cd-production');
             const pData = state.powerups.production;
 
-            if (pData.active > 0) {
-                pSlot.className = 'powerup-slot active';
-                pTimer.classList.remove('hidden');
-                pTimer.innerText = Math.ceil(pData.active) + 's';
-                pCd.classList.add('hidden');
-            } else if (pData.cd > 0) {
-                pSlot.className = 'powerup-slot on-cooldown';
-                pTimer.classList.add('hidden');
-                pCd.classList.remove('hidden');
-                pCd.innerText = formatPowerupTime(pData.cd);
-            } else {
-                pSlot.className = 'powerup-slot';
-                pTimer.classList.add('hidden');
-                pCd.classList.add('hidden');
+            if (pSlot && pTimer && pCd) {
+                if (pData.active > 0) {
+                    pSlot.className = 'powerup-slot active';
+                    pTimer.classList.remove('hidden');
+                    pTimer.innerText = Math.ceil(pData.active) + 's';
+                    pCd.classList.add('hidden');
+                } else if (pData.cd > 0) {
+                    pSlot.className = 'powerup-slot on-cooldown';
+                    pTimer.classList.add('hidden');
+                    pCd.classList.remove('hidden');
+                    pCd.innerText = formatPowerupTime(pData.cd);
+                } else {
+                    pSlot.className = 'powerup-slot';
+                    pTimer.classList.add('hidden');
+                    pCd.classList.add('hidden');
+                }
             }
 
-            // Golden
             const gSlot = document.getElementById('pu-slot-golden');
             const gTimer = document.getElementById('pu-timer-golden');
             const gCd = document.getElementById('pu-cd-golden');
             const gData = state.powerups.golden;
 
-            if (gData.active > 0) {
-                gSlot.className = 'powerup-slot active';
-                gTimer.classList.remove('hidden');
-                gTimer.innerText = Math.ceil(gData.active) + 's';
-                gCd.classList.add('hidden');
-            } else if (gData.cd > 0) {
-                gSlot.className = 'powerup-slot on-cooldown';
-                gTimer.classList.add('hidden');
-                gCd.classList.remove('hidden');
-                gCd.innerText = formatPowerupTime(gData.cd);
-            } else {
-                gSlot.className = 'powerup-slot';
-                gTimer.classList.add('hidden');
-                gCd.classList.add('hidden');
+            if (gSlot && gTimer && gCd) {
+                if (gData.active > 0) {
+                    gSlot.className = 'powerup-slot active';
+                    gTimer.classList.remove('hidden');
+                    gTimer.innerText = Math.ceil(gData.active) + 's';
+                    gCd.classList.add('hidden');
+                } else if (gData.cd > 0) {
+                    gSlot.className = 'powerup-slot on-cooldown';
+                    gTimer.classList.add('hidden');
+                    gCd.classList.remove('hidden');
+                    gCd.innerText = formatPowerupTime(gData.cd);
+                } else {
+                    gSlot.className = 'powerup-slot';
+                    gTimer.classList.add('hidden');
+                    gCd.classList.add('hidden');
+                }
             }
         }
 
@@ -1525,31 +1549,25 @@
             if (delta < 0.001) return;
             state.lastTick = now;
             
-            // NEW: Increment Total Playtime
             state.totalPlaytime += delta;
 
-            // Heat and CPS
             state.clickHeat = Math.max(0, state.clickHeat - (15 * delta));
             
-            // Handle Powerup Timers
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
                 if (pu.active > 0) {
                     const oldActive = pu.active;
                     pu.active = Math.max(0, pu.active - delta);
-                    // Recalculate CPS if production powerup ends
                     if (key === 'production' && oldActive > 0 && pu.active === 0) calculateCPS();
                 }
                 if (pu.cd > 0) {
                     pu.cd = Math.max(0, pu.cd - delta);
-                    // Refresh shop if cooldown ends to enable button
                     if (pu.cd === 0) initShop();
                 }
             });
 
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
-            // UPDATED: Golden spawn spawn multiplier to 5x when active
             const spawnMult = state.powerups.golden.active > 0 ? 5 : 1;
 
             if (state.multiplier >= 3.0) {
@@ -1593,7 +1611,6 @@
                 frameCount = 0;
                 lastFpsUpdate = now;
                 
-                // Performance Check (Only if Startup modal is gone)
                 const startup = document.getElementById('startup-modal');
                 if (startup && startup.style.display === 'none') {
                     if (fps < 40 && state.showParticles && !state.performanceWarningShown) {
@@ -1609,7 +1626,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        setInterval(() => { /* Fixed logic inside gameLoop/requestAnimationFrame */ }, 1000);
         setInterval(saveGame, 30000);
 
         mainCookie.addEventListener('mousedown', (e) => { clickCookie(e); });
