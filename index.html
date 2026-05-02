@@ -621,7 +621,10 @@
         </div>
         <div class="flex justify-between text-[10px] mb-1">
             <span>PRESTIGE PROGRESS</span>
-            <span id="prestige-percent">0%</span>
+            <div class="flex items-center gap-1">
+                <span id="prestige-percent">0%</span>
+                <span id="prestige-gain" class="text-yellow-400 font-bold hidden"></span>
+            </div>
         </div>
         <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
             <div id="prestige-bar" class="bg-purple-500 h-full w-0"></div>
@@ -1571,6 +1574,18 @@
             if (prestigeBar) prestigeBar.style.width = prestigeProg + '%';
             if (prestigePercent) prestigePercent.innerText = Math.floor(prestigeProg) + '%';
             
+            // Potential bonus display update
+            const potentialBonusPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            const prestigeGainEl = document.getElementById('prestige-gain');
+            if (prestigeGainEl) {
+                if (potentialBonusPoints > 0) {
+                    prestigeGainEl.innerText = `+${potentialBonusPoints}%`;
+                    prestigeGainEl.classList.remove('hidden');
+                } else {
+                    prestigeGainEl.classList.add('hidden');
+                }
+            }
+
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 if (prestigeBtn) prestigeBtn.classList.remove('hidden');
                 if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!";
