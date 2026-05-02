@@ -473,7 +473,7 @@
             { id: 'portal', name: 'Portal', description: 'Opens a door to the Cookieverse.', basePrice: 1000000000000, baseCps: 10000000, count: 0, icon: '🌀' }
         ];
 
-        // Special Upgrades (Stronger Grip moved back here)
+        // Special Upgrades
         let specials = [
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' }
@@ -667,12 +667,12 @@
         }
 
         function formatNumber(num) {
-            if (num >= 1e15) return (num / 1e15).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' Q';
-            if (num >= 1e12) return (num / 1e12).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' T';
-            if (num >= 1e9) return (num / 1e9).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' B';
-            if (num >= 1000000) return (num / 1000000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' M';
-            if (num >= 1000) return (num / 1000).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' k';
-            return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+            if (num >= 1e15) return (num / 1e15).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' Q';
+            if (num >= 1e12) return (num / 1e12).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' T';
+            if (num >= 1e9) return (num / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' B';
+            if (num >= 1000000) return (num / 1000000).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' M';
+            if (num >= 1000) return (num / 1000).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' k';
+            return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
         }
 
         function clickCookie(e) {
