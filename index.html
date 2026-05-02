@@ -270,6 +270,7 @@
         };
 
         const PRESTIGE_THRESHOLD = 1000000000000; // 1 Trillion
+        const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
 
         let baseUpgrades = [
             { id: 'cursor', name: 'Cursor', description: 'Autoclicks once every 10 seconds.', basePrice: 15, baseCps: 0.1, count: 0, icon: '🖱️' },
@@ -283,6 +284,17 @@
         ];
 
         let upgrades = JSON.parse(JSON.stringify(baseUpgrades));
+
+        /**
+         * Helper to get efficiency multiplier for an upgrade
+         */
+        function getUpgradeEfficiencyMult(count) {
+            let mult = 1;
+            MILESTONES.forEach(m => {
+                if (count >= m) mult *= 2;
+            });
+            return mult;
+        }
 
         /**
          * Generates new upgrades for infinite mode
@@ -344,7 +356,10 @@
                             <span class="text-orange-400 font-bold" id="price-${upgrade.id}">${formatNumber(upgrade.basePrice)}</span>
                         </div>
                         <div class="text-xs text-zinc-400">${upgrade.description}</div>
-                        <div class="text-xs mt-1 text-zinc-500">Each gives +${formatNumber(upgrade.baseCps)} CPS</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="text-[10px] text-zinc-500">Each +${formatNumber(upgrade.baseCps)} CPS</div>
+                            <div class="text-[10px] text-orange-500 font-bold hidden" id="boost-${upgrade.id}">Boost: x1</div>
+                        </div>
                     </div>
                     <div class="text-2xl font-bold opacity-20" id="count-${upgrade.id}">0</div>
                 `;
@@ -414,8 +429,14 @@
             return Math.floor(upgrade.basePrice * Math.pow(1.15, upgrade.count));
         }
 
+        /**
+         * Calculate CPS with milestone boosts
+         */
         function calculateCPS() {
-            state.cps = upgrades.reduce((sum, up) => sum + (up.count * up.baseCps), 0);
+            state.cps = upgrades.reduce((sum, up) => {
+                const mult = getUpgradeEfficiencyMult(up.count);
+                return sum + (up.count * up.baseCps * mult);
+            }, 0);
         }
 
         /**
@@ -574,11 +595,21 @@
                 const card = document.getElementById(`upgrade-${up.id}`);
                 const priceLabel = document.getElementById(`price-${up.id}`);
                 const countLabel = document.getElementById(`count-${up.id}`);
+                const boostLabel = document.getElementById(`boost-${up.id}`);
                 
                 if (card && priceLabel && countLabel) {
                     const currentPrice = getPrice(up);
                     priceLabel.innerText = formatNumber(currentPrice);
                     countLabel.innerText = up.count;
+
+                    // Milestone Boost Logic
+                    const effMult = getUpgradeEfficiencyMult(up.count);
+                    if (effMult > 1) {
+                        boostLabel.innerText = `Boost: x${effMult}`;
+                        boostLabel.classList.remove('hidden');
+                    } else {
+                        boostLabel.classList.add('hidden');
+                    }
 
                     if (state.cookies >= currentPrice) {
                         card.classList.remove('disabled');
