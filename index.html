@@ -15,12 +15,21 @@
             overflow: hidden;
             user-select: none;
             transition: background-color 0.5s ease;
+            position: relative;
         }
 
-        /* Golden Frenzy Effect */
+        /* Golden Frenzy Effect with animated cookie background */
         body.golden-frenzy {
             background-color: #433200;
-            background-image: radial-gradient(circle, #b8860b22 0%, #1a1a1a 100%);
+            background-image: 
+                radial-gradient(circle, #b8860b44 0%, #1a1a1a 100%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='100' cy='100' r='90' fill='%23ffd700' fill-opacity='0.1' /%3E%3Ccircle cx='60' cy='60' r='10' fill='%23d4af37' fill-opacity='0.1' /%3E%3Ccircle cx='140' cy='140' r='10' fill='%23d4af37' fill-opacity='0.1' /%3E%3C/svg%3E");
+            animation: frenzy-bg-slide 10s linear infinite;
+        }
+
+        @keyframes frenzy-bg-slide {
+            from { background-position: 0 0; }
+            to { background-position: 300px 300px; }
         }
 
         .cookie-container {
