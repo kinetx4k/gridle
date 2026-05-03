@@ -52,31 +52,6 @@
             transition: all 0.3s ease;
         }
 
-        /* --- Auto Hand --- */
-        #robotic-hand {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            z-index: 100;
-            pointer-events: none;
-            display: none;
-            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
-        }
-
-        .hand-clicking {
-            animation: tap 0.2s infinite ease-in-out;
-        }
-
-        @keyframes tap {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(0.9); }
-        }
-
-        .hand-cooling {
-            filter: grayscale(1) brightness(0.5);
-            opacity: 0.5;
-        }
-
         #prestige-overlay {
             position: fixed;
             inset: 0;
@@ -789,16 +764,6 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Robotic Hand Entity -->
-            <div id="robotic-hand">
-                <svg viewBox="0 0 100 100">
-                    <path d="M30 60 C30 40, 40 30, 50 30 C60 30, 70 40, 70 60 L70 90 L30 90 Z" fill="#607d8b" />
-                    <circle cx="50" cy="30" r="10" fill="#00bcd4" />
-                    <rect x="45" y="40" width="10" height="40" fill="#455a64" rx="2" />
-                    <path d="M40 30 L60 30" stroke="white" stroke-width="2" />
-                </svg>
-            </div>
-
             <!-- Cookie Trio Visuals -->
             <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
                 <svg class="absolute inset-0 w-full h-full">
@@ -969,9 +934,6 @@
             numberFormat: 'short',
             hasCookieTrio: false, // Triple income/clicks
             hasCookieQuintet: false, // Quintuple income/clicks
-            hasAutoHand: false,  // Auto clicking logic
-            autoHandState: 'cooling', // overdrive or cooling
-            autoHandTimer: 0,
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -1060,7 +1022,6 @@
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
             { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
-            { id: 'sp-auto-hand', type: 'auto-hand', name: 'Robotic Hand', description: 'Automatically clicks. Fills heat bar for 10s, cools for 5s.', basePrice: 500000000000, count: 0, icon: '🤖' },
             { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
             { id: 'sp-cookie-quintet', type: 'cookie-quintet', name: 'Cookie Quintet', description: 'Attach 2 more cookies to your trio! QUINTUPLES all income and clicks.', basePrice: 50000000000000, count: 0, icon: '🍪🍪🍪🍪🍪' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
@@ -1363,7 +1324,6 @@
                 // One time purchases
                 if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-quintet' && state.hasCookieQuintet) continue;
-                if (item.id === 'sp-auto-hand' && state.hasAutoHand) continue;
                 
                 // Only show Quintet if Trio is owned
                 if (item.id === 'sp-cookie-quintet' && !state.hasCookieTrio) continue;
@@ -1389,8 +1349,6 @@
                     bonusText = `Effect: 300% Multiplier`;
                 } else if (item.type === 'cookie-quintet') {
                     bonusText = `Effect: 500% Multiplier`;
-                } else if (item.type === 'auto-hand') {
-                    bonusText = `Effect: Active Clicking`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
@@ -1520,11 +1478,6 @@
                 if (sp.type === 'cookie-quintet') {
                     state.hasCookieQuintet = true;
                     calculateCPS();
-                }
-                if (sp.type === 'auto-hand') {
-                    state.hasAutoHand = true;
-                    state.autoHandTimer = 10;
-                    state.autoHandState = 'overdrive';
                 }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
@@ -1835,30 +1788,6 @@
                     linkB.setAttribute('y2', by);
                 }
             }
-
-            // Robotic Hand logic
-            if (state.hasAutoHand) {
-                const handEl = document.getElementById('robotic-hand');
-                handEl.style.display = 'block';
-                const mainRect = mainCookie.getBoundingClientRect();
-                const time = Date.now() / 1000;
-
-                if (state.autoHandState === 'overdrive') {
-                    handEl.classList.add('hand-clicking');
-                    handEl.classList.remove('hand-cooling');
-                    const hx = mainRect.left + mainRect.width / 2 + Math.sin(time * 5) * 50;
-                    const hy = mainRect.top + mainRect.height / 2 + Math.cos(time * 5) * 50;
-                    handEl.style.left = hx + 'px';
-                    handEl.style.top = hy + 'px';
-                } else {
-                    handEl.classList.remove('hand-clicking');
-                    handEl.classList.add('hand-cooling');
-                    const hx = mainRect.left + mainRect.width / 2;
-                    const hy = mainRect.top - 100;
-                    handEl.style.left = hx + 'px';
-                    handEl.style.top = hy + 'px';
-                }
-            }
         }
 
         function showPrestigeModal() {
@@ -1907,7 +1836,6 @@
             state.nanoOvenLevel = 0;
             state.hasCookieTrio = false;
             state.hasCookieQuintet = false;
-            state.hasAutoHand = false;
             
             state.hasBird = false;
             state.hasGoldDrone = false;
@@ -2231,25 +2159,6 @@
             const decayPenalty = baseDecay * (1 - Math.min(0.9, state.heatResist));
             state.clickHeat = Math.max(0, state.clickHeat - (decayPenalty * delta));
             
-            // Auto Hand Logic Cycle
-            if (state.hasAutoHand) {
-                state.autoHandTimer -= delta;
-                if (state.autoHandState === 'overdrive') {
-                    state.clickHeat = 100; // Stay full
-                    // Fast virtual clicks
-                    clickCookie({ clientX: 0, clientY: 0 }, true); 
-                    if (state.autoHandTimer <= 0) {
-                        state.autoHandState = 'cooling';
-                        state.autoHandTimer = 5;
-                    }
-                } else {
-                    if (state.autoHandTimer <= 0) {
-                        state.autoHandState = 'overdrive';
-                        state.autoHandTimer = 10;
-                    }
-                }
-            }
-
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
                 if (pu.active > 0) {
