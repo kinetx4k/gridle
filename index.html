@@ -960,7 +960,7 @@
         };
 
         const PRESTIGE_THRESHOLD = 1000000000;
-        const PRESTIGE_MAX_BONUS_PER_RUN = 100;
+        const PRESTIGE_MAX_BONUS_PER_RUN = 500;
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
@@ -1991,7 +1991,7 @@
             const prestigeGainEl = document.getElementById('prestige-gain');
             if (prestigeGainEl) {
                 if (potentialPoints > 0) {
-                    prestigeGainEl.innerText = `+${potentialPoints}% (MAX 100)`;
+                    prestigeGainEl.innerText = `+${potentialPoints}% (MAX 500)`;
                     prestigeGainEl.classList.remove('hidden');
                 } else {
                     prestigeGainEl.classList.add('hidden');
