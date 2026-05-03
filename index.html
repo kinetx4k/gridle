@@ -49,24 +49,12 @@
             filter: drop-shadow(0 0 12px #ff4500);
         }
 
-        .universe-link {
-            stroke: #9333ea;
-            stroke-width: 2;
-            stroke-dasharray: 3;
-            animation: dash-insane 0.3s linear infinite;
-            filter: drop-shadow(0 0 15px #a855f7);
-        }
-
         @keyframes dash {
             to { stroke-dashoffset: -20; }
         }
 
         @keyframes dash-fast {
             to { stroke-dashoffset: -15; }
-        }
-
-        @keyframes dash-insane {
-            to { stroke-dashoffset: -10; }
         }
 
         .side-cookie {
@@ -82,12 +70,6 @@
             width: 80px;
             height: 80px;
             filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
-        }
-
-        .universe-cookie {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 20px rgba(147, 51, 234, 0.8));
         }
 
         #prestige-overlay {
@@ -801,9 +783,9 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Cookie Trio/Quintet/Decet/Vices/Centum/Universe Visuals -->
+            <!-- Cookie Trio/Quintet/Decet Visuals -->
             <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
-                <svg id="link-container" class="absolute inset-0 w-full h-full">
+                <svg class="absolute inset-0 w-full h-full">
                     <!-- Standard Links -->
                     <line id="link-left" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-right" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
@@ -816,43 +798,37 @@
                     <line id="link-top-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-bottom-l" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-bottom-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
-
-                    <!-- Universe Links (generated dynamically in script for length/complexity) -->
                 </svg>
                 
-                <div id="cookie-nodes-container">
-                    <!-- Trio/Quintet Nodes -->
-                    <div id="cookie-left" class="side-cookie">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
-                    </div>
-                    <div id="cookie-right" class="side-cookie">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
-                    </div>
-                    <div id="cookie-top" class="side-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
-                    </div>
-                    <div id="cookie-bottom-node" class="side-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
-                    </div>
+                <!-- Quintet Cookies -->
+                <div id="cookie-left" class="side-cookie">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
+                </div>
+                <div id="cookie-right" class="side-cookie">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
+                </div>
+                <div id="cookie-top" class="side-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
+                </div>
+                <div id="cookie-bottom-node" class="side-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
+                </div>
 
-                    <!-- Decet Nodes -->
-                    <div id="cookie-deep-bottom" class="side-cookie decet-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
-                    </div>
-                    <div id="cookie-top-l" class="side-cookie decet-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
-                    </div>
-                    <div id="cookie-top-r" class="side-cookie decet-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
-                    </div>
-                    <div id="cookie-bottom-l" class="side-cookie decet-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
-                    </div>
-                    <div id="cookie-bottom-r" class="side-cookie decet-cookie opacity-0">
-                        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
-                    </div>
-
-                    <!-- Additional Universe/Centum/Vices nodes will be injected by script for maximum length/complexity -->
+                <!-- Decet Additional Cookies -->
+                <div id="cookie-deep-bottom" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-top-l" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-top-r" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-bottom-l" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-bottom-r" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
             </div>
             
@@ -982,10 +958,7 @@
             numberFormat: 'short',
             hasCookieTrio: false, 
             hasCookieQuintet: false,
-            hasCookieDecet: false,
-            hasCookieVices: false,
-            hasCookieCentum: false,
-            hasCookieUniverse: false,
+            hasCookieDecet: false, // 10 Cookies total
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -997,6 +970,7 @@
         const MILESTONES = [10, 25, 50, 100, 200, 500, 1000];
         
         let keysPressed = {};
+        
         let frameCount = 0;
         let lastFpsUpdate = performance.now();
         let fps = 60;
@@ -1044,6 +1018,7 @@
 
         function checkMilestoneAchievements() {
             const current = state.cookies; 
+            
             for (let e = 6; e <= 33; e++) {
                 const threshold = Math.pow(10, e);
                 if (current >= threshold) {
@@ -1074,10 +1049,7 @@
             { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
             { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
             { id: 'sp-cookie-quintet', type: 'cookie-quintet', name: 'Cookie Quintet', description: 'Attach 2 more cookies to your trio! QUINTUPLES all income and clicks.', basePrice: 50000000000000, count: 0, icon: '🍪🍪🍪🍪🍪' },
-            { id: 'sp-cookie-decet', type: 'cookie-decet', name: 'Cookie Decet', description: 'The ultimate cookie chain! 10x Multiplier for everything.', basePrice: 2500000000000000, count: 0, icon: '🍩' },
-            { id: 'sp-cookie-vices', type: 'cookie-vices', name: 'Cookie Vices', description: 'Complex branching with 20 cookies total. 20x Multiplier.', basePrice: 12500000000000000, count: 0, icon: '🌌' },
-            { id: 'sp-cookie-centum', type: 'cookie-centum', name: 'Cookie Centum', description: 'Dense cluster of 30 cookies. 30x Multiplier.', basePrice: 62500000000000000, count: 0, icon: '🎆' },
-            { id: 'sp-cookie-universe', type: 'cookie-universe', name: 'Cookie Universe', description: 'Maximum expansion: 50 cookies total! 50x Multiplier.', basePrice: 937500000000000000, count: 0, icon: '♾️' },
+            { id: 'sp-cookie-decet', type: 'cookie-decet', name: 'Cookie Decet', description: 'The ultimate cookie chain! 5 extra cookies attached in a complex pattern. 10x Multiplier for everything.', basePrice: 2500000000000000, count: 0, icon: '🍩🍩🍩🍩🍩' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -1088,25 +1060,6 @@
         let activeSpecialCookies = [];
         const collectorBird = document.getElementById('collector-bird');
         const goldenDrone = document.getElementById('golden-drone');
-
-        // Dynamic generation of additional cookie nodes for the complex visuals
-        function createExtraNodes() {
-            const container = document.getElementById('cookie-nodes-container');
-            const linkSvg = document.getElementById('link-container');
-            for(let i = 1; i <= 40; i++) {
-                const node = document.createElement('div');
-                node.id = `cookie-v${i}`;
-                node.className = 'side-cookie universe-cookie opacity-0';
-                node.innerHTML = `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#a855f7" /><circle cx="100" cy="100" r="80" fill="#9333ea" /><circle class="chip" cx="70" cy="70" r="10" fill="#3b0764" /></svg>`;
-                container.appendChild(node);
-
-                const link = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                link.id = `link-v${i}`;
-                link.setAttribute('class', 'universe-link opacity-0');
-                linkSvg.appendChild(link);
-            }
-        }
-        createExtraNodes();
 
         function setNumberFormat(format) {
             state.numberFormat = format;
@@ -1165,13 +1118,16 @@
         function unlockAchievement(id) {
             if (state.achievements.includes(id)) return;
             state.achievements.push(id);
+            
             if (id.startsWith('milestone_')) calculateCPS();
+
             let ach;
             if (id.startsWith('milestone_')) {
                 ach = getMilestoneInfo(parseInt(id.split('_')[1]));
             } else {
                 ach = achievementsList.find(a => a.id === id);
             }
+
             if (ach) {
                 showAchievementNotification(ach);
                 saveGame();
@@ -1182,11 +1138,16 @@
             const toast = document.getElementById('achievement-toast');
             const iconEl = document.getElementById('toast-icon');
             const nameEl = document.getElementById('toast-name');
+
             if (!toast || !iconEl || !nameEl) return;
+
             iconEl.innerText = ach.icon;
             nameEl.innerText = ach.name;
+
             toast.classList.add('visible');
-            setTimeout(() => toast.classList.remove('visible'), 5000);
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 5000);
         }
 
         function toggleSettings() {
@@ -1215,7 +1176,9 @@
             URL.revokeObjectURL(url);
         }
 
-        function triggerFileLoad() { document.getElementById('file-loader').click(); }
+        function triggerFileLoad() {
+            document.getElementById('file-loader').click();
+        }
 
         function loadFromFile(event) {
             const file = event.target.files[0];
@@ -1226,7 +1189,9 @@
                     const data = JSON.parse(e.target.result);
                     applySaveData(data);
                     location.reload(); 
-                } catch (err) { console.error("Load failed", err); }
+                } catch (err) {
+                    console.error("Load failed", err);
+                }
             };
             reader.readAsText(file);
         }
@@ -1238,10 +1203,11 @@
                 while (index >= buildings.length) generateNextUpgrade();
                 if (buildings[index]) buildings[index].count = savedUp.count;
             });
-            data.specialCounts.forEach((savedSp) => {
+            data.specialCounts.forEach((savedSp, index) => {
                 const sp = specials.find(s => s.id === savedSp.id);
                 if (sp) sp.count = savedSp.count;
             });
+            
             calculateCPS();
             updateParticleUI();
             saveGame(); 
@@ -1257,7 +1223,9 @@
 
         function getUpgradeEfficiencyMult(count) {
             let mult = 1;
-            MILESTONES.forEach(m => { if (count >= m) mult *= 2; });
+            MILESTONES.forEach(m => {
+                if (count >= m) mult *= 2;
+            });
             return mult;
         }
 
@@ -1278,10 +1246,13 @@
             const prefixPool = ['Quantum', 'Cosmic', 'Hyper', 'Galactic', 'Infinite', 'Divine', 'Chrono', 'Void', 'Nebula', 'Omega'];
             const entityPool = ['Synthesizer', 'Engine', 'Network', 'Dyson Sphere', 'Empire', 'God', 'Fractal', 'Singularity', 'Pulse', 'Core'];
             const iconPool = ['🧬', '🪐', '⚡', '🤖', '🔱', '🧿', '💎', '🛸', '💥', '✨'];
+
             const randPrefix = prefixPool[Math.floor(Math.random() * prefixPool.length)];
             const randEntity = entityPool[Math.floor(Math.random() * entityPool.length)];
             const randIcon = iconPool[Math.floor(Math.random() * iconPool.length)];
+            
             const name = `${randPrefix} ${randEntity}`;
+            
             buildings.push({
                 id: 'gen-' + buildings.length,
                 name: name,
@@ -1311,14 +1282,23 @@
 
         function initShop() {
             shopItems.innerHTML = '';
+            
             if (state.activeTab === 'achievements') {
                 achievementsList.forEach(ach => {
                     const isUnlocked = state.achievements.includes(ach.id);
                     const card = document.createElement('div');
                     card.className = `achievement-card ${isUnlocked ? 'unlocked' : ''}`;
-                    card.innerHTML = `<div class="icon">${ach.icon}</div><div class="flex-1"><div class="font-bold text-sm ${isUnlocked ? 'text-yellow-400' : 'text-zinc-500'}">${ach.name}</div><div class="text-[10px] text-zinc-500">${ach.description}</div></div>${isUnlocked ? '<div class="text-yellow-400 text-xs">✓</div>' : ''}`;
+                    card.innerHTML = `
+                        <div class="icon">${ach.icon}</div>
+                        <div class="flex-1">
+                            <div class="font-bold text-sm ${isUnlocked ? 'text-yellow-400' : 'text-zinc-500'}">${ach.name}</div>
+                            <div class="text-[10px] text-zinc-500">${ach.description}</div>
+                        </div>
+                        ${isUnlocked ? '<div class="text-yellow-400 text-xs">✓</div>' : ''}
+                    `;
                     shopItems.appendChild(card);
                 });
+
                 let maxE = 0;
                 for (let e = 6; e <= 33; e++) {
                     const id = `milestone_${e}`;
@@ -1327,16 +1307,32 @@
                         const ach = getMilestoneInfo(e);
                         const card = document.createElement('div');
                         card.className = `achievement-card unlocked`;
-                        card.innerHTML = `<div class="icon">${ach.icon}</div><div class="flex-1"><div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+15% Bonus</span></div><div class="text-[10px] text-zinc-500">${ach.description}</div></div><div class="text-yellow-400 text-xs">✓</div>`;
+                        card.innerHTML = `
+                            <div class="icon">${ach.icon}</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+15% Bonus</span></div>
+                                <div class="text-[10px] text-zinc-500">${ach.description}</div>
+                            </div>
+                            <div class="text-yellow-400 text-xs">✓</div>
+                        `;
                         shopItems.appendChild(card);
                     }
                 }
+
                 const nextE = Math.max(6, maxE + 1);
                 const nextAch = getMilestoneInfo(nextE);
                 const card = document.createElement('div');
                 card.className = `achievement-card opacity-60 border-dashed border-zinc-700`;
-                card.innerHTML = `<div class="icon grayscale opacity-20">${nextAch.icon}</div><div class="flex-1"><div class="font-bold text-sm text-zinc-500">Goal: ${nextAch.name}</div><div class="text-[10px] text-zinc-600">Locked Challenge</div></div><div class="text-zinc-700 text-xs">🔒</div>`;
+                card.innerHTML = `
+                    <div class="icon grayscale opacity-20">${nextAch.icon}</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-sm text-zinc-500">Goal: ${nextAch.name}</div>
+                        <div class="text-[10px] text-zinc-600">Locked Challenge</div>
+                    </div>
+                    <div class="text-zinc-700 text-xs">🔒</div>
+                `;
                 shopItems.appendChild(card);
+
                 return;
             }
 
@@ -1346,20 +1342,15 @@
             for (let i = 0; i < unlockLimit; i++) {
                 const item = list[i];
                 if (!item) continue;
+
                 if (item.id === 'sp-bird' && state.hasBird) continue;
                 if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
                 if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-quintet' && state.hasCookieQuintet) continue;
                 if (item.id === 'sp-cookie-decet' && state.hasCookieDecet) continue;
-                if (item.id === 'sp-cookie-vices' && state.hasCookieVices) continue;
-                if (item.id === 'sp-cookie-centum' && state.hasCookieCentum) continue;
-                if (item.id === 'sp-cookie-universe' && state.hasCookieUniverse) continue;
                 
                 if (item.id === 'sp-cookie-quintet' && !state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-decet' && !state.hasCookieQuintet) continue;
-                if (item.id === 'sp-cookie-vices' && !state.hasCookieDecet) continue;
-                if (item.id === 'sp-cookie-centum' && !state.hasCookieVices) continue;
-                if (item.id === 'sp-cookie-universe' && !state.hasCookieCentum) continue;
 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1367,51 +1358,84 @@
                 card.onclick = () => state.activeTab === 'buildings' ? buyBuilding(i) : buySpecial(i);
                 
                 let bonusText = "";
-                if (item.type === 'click') bonusText = `Power x${item.factor}`;
-                else if (item.type === 'powerup') bonusText = state.powerups[item.powerupId].cd > 0 ? "On Cooldown" : "Ready to activate";
-                else if (item.type === 'heat-resist') bonusText = `Resist: ${(state.heatResist * 100).toFixed(0)}%`;
-                else if (item.type === 'quantum-chip') bonusText = `Mult: +${(state.quantumChipLevel * 10).toFixed(0)}%`;
-                else if (item.type === 'nano-oven') bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
-                else if (item.type === 'cookie-trio') bonusText = `Effect: 3x Multiplier`;
-                else if (item.type === 'cookie-quintet') bonusText = `Effect: 5x Multiplier`;
-                else if (item.type === 'cookie-decet') bonusText = `Effect: 10x Multiplier`;
-                else if (item.type === 'cookie-vices') bonusText = `Effect: 20x Multiplier`;
-                else if (item.type === 'cookie-centum') bonusText = `Effect: 30x Multiplier`;
-                else if (item.type === 'cookie-universe') bonusText = `Effect: 50x Multiplier`;
-                else if (state.activeTab === 'buildings') bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
-                else bonusText = "One-time purchase";
+                if (item.type === 'click') {
+                    bonusText = `Power x${item.factor}`;
+                } else if (item.type === 'powerup') {
+                    const onCd = state.powerups[item.powerupId].cd > 0;
+                    bonusText = onCd ? "On Cooldown" : "Ready to activate";
+                } else if (item.type === 'heat-resist') {
+                    bonusText = `Resist: ${(state.heatResist * 100).toFixed(0)}%`;
+                } else if (item.type === 'quantum-chip') {
+                    bonusText = `Mult: +${(state.quantumChipLevel * 10).toFixed(0)}%`;
+                } else if (item.type === 'nano-oven') {
+                    bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
+                } else if (item.type === 'cookie-trio') {
+                    bonusText = `Effect: 300% Multiplier`;
+                } else if (item.type === 'cookie-quintet') {
+                    bonusText = `Effect: 500% Multiplier`;
+                } else if (item.type === 'cookie-decet') {
+                    bonusText = `Effect: 1000% Multiplier`;
+                } else if (state.activeTab === 'buildings') {
+                    bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
+                } else {
+                    bonusText = "One-time purchase";
+                }
                 
-                card.innerHTML = `<div class="text-3xl">${item.icon}</div><div class="flex-1"><div class="flex justify-between"><span class="font-bold">${item.name}</span><span class="text-orange-400 font-bold" id="price-${item.id}">${formatNumber(getPrice(item))}</span></div><div class="text-xs text-zinc-400">${item.description}</div><div class="flex items-center gap-2 mt-1"><div class="text-[10px] text-zinc-500">${bonusText}</div><div class="text-[10px] text-orange-500 font-bold hidden" id="bonus-${item.id}">Bonus: x1</div></div></div><div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count || 0}</div>`;
+                card.innerHTML = `
+                    <div class="text-3xl">${item.icon}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <span class="font-bold">${item.name}</span>
+                            <span class="text-orange-400 font-bold" id="price-${item.id}">${formatNumber(getPrice(item))}</span>
+                        </div>
+                        <div class="text-xs text-zinc-400">${item.description}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="text-[10px] text-zinc-500">${bonusText}</div>
+                            <div class="text-[10px] text-orange-500 font-bold hidden" id="bonus-${item.id}">Bonus: x1</div>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold opacity-20" id="count-${item.id}">${item.count || 0}</div>
+                `;
                 shopItems.appendChild(card);
             }
         }
 
         function formatNumber(num) {
-            if (state.numberFormat === 'full') return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (state.numberFormat === 'full') {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
             const shortWords = ["", " k", " M", " B", " T", " Qa", " Qi", " Sx", " Sp", " Oc", " No", " Dc"];
             const longWords = ["", " Thousand", " Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion"];
+            
             let words = state.numberFormat === 'long' ? longWords : shortWords;
+
             if (num < 1000) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             let exponent = Math.floor(Math.log10(Math.abs(num)) / 3);
             if (exponent >= words.length) exponent = words.length - 1;
+
             let shortValue = num / Math.pow(10, exponent * 3);
             return shortValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + words[exponent];
         }
 
         function clickCookie(e, silent = false) {
             if (state.isPrestiging) return;
+            
             let cookieMult = 1;
-            if (state.hasCookieUniverse) cookieMult = 50;
-            else if (state.hasCookieCentum) cookieMult = 30;
-            else if (state.hasCookieVices) cookieMult = 20;
-            else if (state.hasCookieDecet) cookieMult = 10;
+            if (state.hasCookieDecet) cookieMult = 10;
             else if (state.hasCookieQuintet) cookieMult = 5;
             else if (state.hasCookieTrio) cookieMult = 3;
+
             const amount = state.clickPower * state.multiplier * state.prestigeBonus * cookieMult;
+            
             addCookies(amount);
             state.totalClicks++;
+            
             unlockAchievement('first_click');
+            
             state.clickHeat = Math.min(100, state.clickHeat + 4.0);
+            
             if (!silent) {
                 createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
                 spawnFloatingCookie();
@@ -1432,6 +1456,7 @@
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 up.count++;
+                
                 if (index === state.unlockedUpgrades - 1 && up.count >= 5) {
                     state.unlockedUpgrades++;
                     if (state.unlockedUpgrades > buildings.length) generateNextUpgrade();
@@ -1446,59 +1471,104 @@
         function buySpecial(index) {
             const sp = specials[index];
             const currentPrice = getPrice(sp);
+            
             if (sp.type === 'powerup') {
                 if (state.cookies >= currentPrice && state.powerups[sp.powerupId].cd <= 0) {
                     state.cookies -= currentPrice;
                     state.powerups[sp.powerupId].active = sp.duration;
                     state.powerups[sp.powerupId].cd = sp.cooldown;
-                    calculateCPS(); updateUI(); initShop();
+                    calculateCPS();
+                    updateUI();
+                    initShop();
                 }
                 return;
             }
+
             if (state.cookies >= currentPrice) {
                 state.cookies -= currentPrice;
                 sp.count++;
+
                 if (sp.type === 'click') state.clickPower *= sp.factor;
-                if (sp.type === 'bird') { state.hasBird = true; unlockAchievement('bird_buy'); }
-                if (sp.type === 'gold-drone') state.hasGoldDrone = true;
-                if (sp.type === 'cookie-trio') { state.hasCookieTrio = true; calculateCPS(); }
-                if (sp.type === 'cookie-quintet') { state.hasCookieQuintet = true; calculateCPS(); }
-                if (sp.type === 'cookie-decet') { state.hasCookieDecet = true; calculateCPS(); }
-                if (sp.type === 'cookie-vices') { state.hasCookieVices = true; calculateCPS(); }
-                if (sp.type === 'cookie-centum') { state.hasCookieCentum = true; calculateCPS(); }
-                if (sp.type === 'cookie-universe') { state.hasCookieUniverse = true; calculateCPS(); }
-                if (sp.type === 'heat-resist') state.heatResist += sp.factor;
-                if (sp.type === 'quantum-chip') { state.quantumChipLevel++; calculateCPS(); }
-                if (sp.type === 'nano-oven') state.nanoOvenLevel++;
-                initShop(); updateUI(); saveGame();
+                if (sp.type === 'bird') {
+                    state.hasBird = true;
+                    unlockAchievement('bird_buy');
+                }
+                if (sp.type === 'gold-drone') {
+                    state.hasGoldDrone = true;
+                }
+                if (sp.type === 'cookie-trio') {
+                    state.hasCookieTrio = true;
+                    calculateCPS();
+                }
+                if (sp.type === 'cookie-quintet') {
+                    state.hasCookieQuintet = true;
+                    calculateCPS();
+                }
+                if (sp.type === 'cookie-decet') {
+                    state.hasCookieDecet = true;
+                    calculateCPS();
+                }
+                if (sp.type === 'heat-resist') {
+                    state.heatResist += sp.factor;
+                }
+                if (sp.type === 'quantum-chip') {
+                    state.quantumChipLevel++;
+                    calculateCPS();
+                }
+                if (sp.type === 'nano-oven') {
+                    state.nanoOvenLevel++;
+                }
+                
+                initShop();
+                updateUI();
+                saveGame();
             }
         }
 
         function getPrice(item) {
             if (item.type === 'powerup') return item.basePrice;
+            
             let scaling = 1.15;
             if (item.id === 'sp-clicker') scaling = 5.0;
             if (item.type === 'quantum-chip') scaling = 3.0;
             if (item.type === 'nano-oven') scaling = 4.0;
             if (item.type === 'heat-resist') scaling = 2.0;
+
             let price = Math.floor(item.basePrice * Math.pow(scaling, item.count || 0));
+            
             const isBuilding = buildings.some(b => b.id === item.id);
-            if (isBuilding) price = Math.floor(price * (1 - (state.nanoOvenLevel * 0.01)));
+            if (isBuilding) {
+                const discount = 1 - (state.nanoOvenLevel * 0.01);
+                price = Math.floor(price * discount);
+            }
+
             return price;
         }
 
         function calculateCPS() {
-            let baseCps = buildings.reduce((sum, up) => sum + (up.count * (up.baseCps || 0) * getUpgradeEfficiencyMult(up.count)), 0);
-            baseCps *= (1 + (state.achievements.filter(id => id.startsWith('milestone_')).length * 0.15));
-            baseCps *= (1 + ((state.unlockedUpgrades - 1) * 0.05));
-            baseCps *= (1 + (state.quantumChipLevel * 0.1));
-            if (state.hasCookieUniverse) baseCps *= 50;
-            else if (state.hasCookieCentum) baseCps *= 30;
-            else if (state.hasCookieVices) baseCps *= 20;
-            else if (state.hasCookieDecet) baseCps *= 10;
+            let baseCps = buildings.reduce((sum, up) => {
+                const mult = getUpgradeEfficiencyMult(up.count);
+                return sum + (up.count * (up.baseCps || 0) * mult);
+            }, 0);
+
+            const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
+            const milestoneBoost = 1 + (milestoneCount * 0.15);
+            baseCps *= milestoneBoost;
+
+            const upgradeBoost = 1 + ((state.unlockedUpgrades - 1) * 0.05);
+            baseCps *= upgradeBoost;
+
+            const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
+            baseCps *= quantumBoost;
+
+            if (state.hasCookieDecet) baseCps *= 10;
             else if (state.hasCookieQuintet) baseCps *= 5;
             else if (state.hasCookieTrio) baseCps *= 3;
-            if (state.powerups.production.active > 0) baseCps *= 5;
+
+            if (state.powerups.production.active > 0) {
+                baseCps *= 5;
+            }
+
             state.cps = baseCps;
         }
 
@@ -1506,7 +1576,9 @@
             if (!state.showParticles) return;
             const p = document.createElement('div');
             p.className = 'particle text-orange-400';
-            p.style.left = x + 'px'; p.style.top = y + 'px'; p.innerText = text;
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            p.innerText = text;
             particleContainer.appendChild(p);
             setTimeout(() => p.remove(), 1000);
         }
@@ -1516,11 +1588,15 @@
             const f = document.createElement('div');
             f.className = 'floating-cookie';
             const size = 20 + Math.random() * 30;
-            f.style.width = size + 'px'; f.style.height = size + 'px';
-            const angle = Math.random() * Math.PI * 2, dist = 100 + Math.random() * 100;
-            f.style.setProperty('--tx', Math.cos(angle) * dist + 'px'); f.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+            f.style.width = size + 'px';
+            f.style.height = size + 'px';
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 100 + Math.random() * 100;
+            f.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+            f.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
             const rect = mainCookie.getBoundingClientRect();
-            f.style.left = (rect.left + rect.width / 2) + 'px'; f.style.top = (rect.top + rect.height / 2) + 'px';
+            f.style.left = (rect.left + rect.width / 2) + 'px';
+            f.style.top = (rect.top + rect.height / 2) + 'px';
             f.innerHTML = `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="60" cy="60" r="10" fill="#4b3621" /><circle cx="140" cy="140" r="10" fill="#4b3621" /></svg>`;
             document.body.appendChild(f);
             setTimeout(() => f.remove(), 2000);
@@ -1530,19 +1606,52 @@
             if (state.isPrestiging) return;
             const wrapper = document.createElement('div');
             wrapper.className = `special-cookie-wrapper ${type}-cookie`;
-            const shopLeftBound = document.getElementById('shop-container').getBoundingClientRect().left;
-            let startX = x !== undefined ? x : 50 + Math.random() * (shopLeftBound - 150), startY = y !== undefined ? y : -100;
+            
+            const shopContainer = document.getElementById('shop-container');
+            const shopLeftBound = shopContainer.getBoundingClientRect().left;
+            
+            let startX = x !== undefined ? x : 50 + Math.random() * (shopLeftBound - 150);
+            let startY = y !== undefined ? y : -100;
+            
             const colorMap = { 'red': '#ff0000', 'golden': '#ffd700', 'blue': '#00aaff', 'green': '#00ff44' };
             const shadowMap = { 'red': '#cc0000', 'golden': '#ffcc00', 'blue': '#0077ff', 'green': '#00cc33' };
-            wrapper.innerHTML = `<svg class="wings" viewBox="0 0 100 40"><path class="wing-left" d="M30 20 C10 0, 0 10, 30 20" fill="white" stroke="gray" /><path class="wing-right" d="M70 20 C90 0, 100 10, 70 20" fill="white" stroke="gray" /></svg><div class="special-cookie-hitbox"><div class="countdown-text"></div><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="${colorMap[type]}" /><circle cx="100" cy="100" r="80" fill="${shadowMap[type]}" /><circle cx="60" cy="60" r="8" fill="rgba(0,0,0,0.2)" /><circle cx="140" cy="140" r="10" fill="rgba(0,0,0,0.2)" /></svg></div>`;
+
+            wrapper.innerHTML = `
+                <svg class="wings" viewBox="0 0 100 40">
+                    <path class="wing-left" d="M30 20 C10 0, 0 10, 30 20" fill="white" stroke="gray" />
+                    <path class="wing-right" d="M70 20 C90 0, 100 10, 70 20" fill="white" stroke="gray" />
+                </svg>
+                <div class="special-cookie-hitbox">
+                    <div class="countdown-text"></div>
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="${colorMap[type]}" />
+                        <circle cx="100" cy="100" r="80" fill="${shadowMap[type]}" />
+                        <circle cx="60" cy="60" r="8" fill="rgba(0,0,0,0.2)" />
+                        <circle cx="140" cy="140" r="10" fill="rgba(0,0,0,0.2)" />
+                    </svg>
+                </div>
+            `;
             document.body.appendChild(wrapper);
-            const cookieObj = { element: wrapper, hitbox: wrapper.querySelector('.special-cookie-hitbox'), countdownEl: wrapper.querySelector('.countdown-text'), wingsEl: wrapper.querySelector('.wings'), type: type, x: startX, y: startY, vx: vx, vy: vy, gravity: 0.12, friction: 0.98, bounce: 0.6, state: 'falling', timer: 0, id: Math.random(), flyVx: 0 };
+
+            const cookieObj = {
+                element: wrapper,
+                hitbox: wrapper.querySelector('.special-cookie-hitbox'),
+                countdownEl: wrapper.querySelector('.countdown-text'),
+                wingsEl: wrapper.querySelector('.wings'),
+                type: type, x: startX, y: startY, vx: vx, vy: vy,
+                gravity: 0.12, friction: 0.98, bounce: 0.6,
+                state: 'falling', timer: 0, settledAt: 0, id: Math.random(), flyVx: 0,
+                radius: 30
+            };
+
             cookieObj.hitbox.onclick = (e) => triggerCookie(cookieObj, e?.clientX, e?.clientY);
             activeSpecialCookies.push(cookieObj);
         }
 
         function triggerCookie(cookieObj, clickX, clickY) {
-            const x = clickX || cookieObj.x + 30, y = clickY || cookieObj.y + 30;
+            const x = clickX || cookieObj.x + 30;
+            const y = clickY || cookieObj.y + 30;
+            
             if (cookieObj.type === 'red') {
                 unlockAchievement('red_click');
                 for(let i=0; i<3; i++) spawnSpecialCookie('blue', x - 30, y - 30, (Math.random()-0.5)*15, -6 - Math.random()*6);
@@ -1557,7 +1666,8 @@
                 createParticle(x, y, "FRAGMENTS!");
             } else if (cookieObj.type === 'golden') {
                 unlockAchievement('golden_click');
-                const bonus = Math.max(10, state.cps * 60); addCookies(bonus);
+                const bonus = Math.max(10, state.cps * 60); 
+                addCookies(bonus);
                 createParticle(x, y, `GOLDEN! +${formatNumber(bonus)}`);
             }
             removeCookie(cookieObj.id);
@@ -1565,82 +1675,205 @@
 
         function removeCookie(id) {
             const idx = activeSpecialCookies.findIndex(c => c.id === id);
-            if (idx !== -1) { activeSpecialCookies[idx].element.remove(); activeSpecialCookies.splice(idx, 1); }
+            if (idx !== -1) {
+                activeSpecialCookies[idx].element.remove();
+                activeSpecialCookies.splice(idx, 1);
+            }
         }
 
         function updateSpecialPhysics() {
             if (state.isPrestiging) return;
-            const ground = window.innerHeight - 80, shopLeftBound = document.getElementById('shop-container').getBoundingClientRect().left;
+            const ground = window.innerHeight - 80;
+            const shopContainer = document.getElementById('shop-container');
+            const shopLeftBound = shopContainer.getBoundingClientRect().left;
+
             activeSpecialCookies.forEach(c => {
                 if (c.state === 'falling') {
                     c.vy += c.gravity; c.x += c.vx; c.y += c.vy;
-                    if (c.y >= ground) { c.y = ground; c.vy *= -c.bounce; c.vx *= 0.8; if (Math.abs(c.vy) < 1) { c.state = 'settled'; c.timer = 5.0; } }
-                    if (c.x < 0) { c.x = 0; c.vx *= -1; } if (c.x > shopLeftBound - 60) { c.x = shopLeftBound - 60; c.vx *= -1; }
+                    if (c.y >= ground) {
+                        c.y = ground; c.vy *= -c.bounce; c.vx *= 0.8;
+                        if (Math.abs(c.vy) < 1) {
+                            c.state = 'settled'; 
+                            c.timer = 5.0; 
+                        }
+                    }
+                    if (c.x < 0) { c.x = 0; c.vx *= -1; }
+                    if (c.x > shopLeftBound - 60) { c.x = shopLeftBound - 60; c.vx *= -1; }
                 } else if (c.state === 'settled') {
-                    c.timer -= 0.016; if (c.timer <= 0) { c.state = 'flying'; if (c.wingsEl) c.wingsEl.classList.add('wings-visible'); c.flyVx = (Math.random() > 0.5 ? 1.5 : -1.5) * (Math.random() * 2 + 1); } else if (c.countdownEl) c.countdownEl.innerText = c.timer.toFixed(1);
+                    c.timer -= 0.016; 
+                    if (c.timer <= 0) {
+                        c.state = 'flying';
+                        if (c.wingsEl) c.wingsEl.classList.add('wings-visible');
+                        c.flyVx = (Math.random() > 0.5 ? 1.5 : -1.5) * (Math.random() * 2 + 1);
+                    } else if (c.countdownEl) c.countdownEl.innerText = c.timer.toFixed(1);
                 } else if (c.state === 'flying') {
-                    c.y -= 1.8; c.x += c.flyVx; if (c.y < -100 || c.x < -100 || c.x > window.innerWidth + 100) removeCookie(c.id);
+                    c.y -= 1.8; c.x += c.flyVx;
+                    if (c.y < -100 || c.x < -100 || c.x > window.innerWidth + 100) removeCookie(c.id);
                 }
                 c.element.style.transform = `translate(${c.x}px, ${c.y}px)`;
             });
-            if (state.hasBird && collectorBird) {
-                collectorBird.style.display = 'block';
-                const target = activeSpecialCookies.find(c => c.state === 'settled');
-                if (target) {
-                    const birdX = parseFloat(collectorBird.style.left) || 0, birdY = parseFloat(collectorBird.style.top) || 0, dx = target.x - birdX, dy = target.y - birdY, dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 30) triggerCookie(target); else { collectorBird.style.left = (birdX + dx * 0.05) + 'px'; collectorBird.style.top = (birdY + dy * 0.05) + 'px'; collectorBird.style.transform = dx > 0 ? 'scaleX(-1)' : 'scaleX(1)'; }
-                } else { const time = Date.now() / 1000; collectorBird.style.left = (200 + Math.sin(time) * 100) + 'px'; collectorBird.style.top = (200 + Math.cos(time * 0.5) * 50) + 'px'; }
-            }
-            if (state.hasGoldDrone) {
-                goldenDrone.style.display = 'block'; const time = Date.now() / 1000;
-                goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`; goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
+
+            if (state.hasBird) {
+                if (collectorBird) {
+                    collectorBird.style.display = 'block';
+                    const target = activeSpecialCookies.find(c => c.state === 'settled');
+                    if (target) {
+                        const birdX = parseFloat(collectorBird.style.left) || 0;
+                        const birdY = parseFloat(collectorBird.style.top) || 0;
+                        const dx = target.x - birdX;
+                        const dy = target.y - birdY;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 30) triggerCookie(target);
+                        else {
+                            collectorBird.style.left = (birdX + dx * 0.05) + 'px';
+                            collectorBird.style.top = (birdY + dy * 0.05) + 'px';
+                            collectorBird.style.transform = dx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+                        }
+                    } else {
+                        const time = Date.now() / 1000;
+                        collectorBird.style.left = (200 + Math.sin(time) * 100) + 'px';
+                        collectorBird.style.top = (200 + Math.cos(time * 0.5) * 50) + 'px';
+                    }
+                }
             }
 
-            // Visual branch rendering for the complex cookie networks
+            if (state.hasGoldDrone) {
+                goldenDrone.style.display = 'block';
+                const time = Date.now() / 1000;
+                goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`;
+                goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
+            }
+
             if (state.hasCookieTrio) {
-                document.getElementById('trio-visuals').classList.remove('opacity-0');
-                const mainRect = mainCookie.getBoundingClientRect(), mainX = mainRect.left + mainRect.width / 2, mainY = mainRect.top + mainRect.height / 2;
-                const time = Date.now() / 1000, dist = 220, offX = Math.sin(time * 0.8) * 20, offY = Math.cos(time * 1.2) * 20;
-                const setPos = (id, lx, ly, linkId) => {
-                    const el = document.getElementById(id), l = document.getElementById(linkId);
-                    el.style.left = (lx - 60) + 'px'; el.style.top = (ly - 60) + 'px';
-                    if(l){ l.setAttribute('x1', mainX); l.setAttribute('y1', mainY); l.setAttribute('x2', lx); l.setAttribute('y2', ly); }
-                };
-                setPos('cookie-left', mainX - dist + offX, mainY + offY, 'link-left');
-                setPos('cookie-right', mainX + dist - offX, mainY - offY, 'link-right');
+                const trioEl = document.getElementById('trio-visuals');
+                trioEl.classList.remove('opacity-0');
+                const mainRect = mainCookie.getBoundingClientRect();
+                const mainX = mainRect.left + mainRect.width / 2;
+                const mainY = mainRect.top + mainRect.height / 2;
+
+                const leftC = document.getElementById('cookie-left');
+                const rightC = document.getElementById('cookie-right');
+                const linkL = document.getElementById('link-left');
+                const linkR = document.getElementById('link-right');
+
+                const time = Date.now() / 1000;
+                const dist = 220;
+                const offX = Math.sin(time * 0.8) * 20;
+                const offY = Math.cos(time * 1.2) * 20;
+
+                const lx = mainX - dist + offX;
+                const ly = mainY + offY;
+                const rx = mainX + dist - offX;
+                const ry = mainY - offY;
+
+                leftC.style.left = (lx - 60) + 'px';
+                leftC.style.top = (ly - 60) + 'px';
+                rightC.style.left = (rx - 60) + 'px';
+                rightC.style.top = (ry - 60) + 'px';
+
+                linkL.setAttribute('x1', mainX);
+                linkL.setAttribute('y1', mainY);
+                linkL.setAttribute('x2', lx);
+                linkL.setAttribute('y2', ly);
+
+                linkR.setAttribute('x1', mainX);
+                linkR.setAttribute('y1', mainY);
+                linkR.setAttribute('x2', rx);
+                linkR.setAttribute('y2', ry);
 
                 if (state.hasCookieQuintet) {
-                    ['cookie-top', 'cookie-bottom-node', 'link-top', 'link-bottom'].forEach(id => document.getElementById(id).classList.remove('opacity-0'));
-                    setPos('cookie-top', mainX + offY, mainY - dist - offX, 'link-top');
-                    setPos('cookie-bottom-node', mainX - offY, mainY + dist + offX, 'link-bottom');
+                    const topC = document.getElementById('cookie-top');
+                    const bottomC = document.getElementById('cookie-bottom-node');
+                    const linkT = document.getElementById('link-top');
+                    const linkB = document.getElementById('link-bottom');
+
+                    topC.classList.remove('opacity-0');
+                    bottomC.classList.remove('opacity-0');
+                    linkT.classList.remove('opacity-0');
+                    linkB.classList.remove('opacity-0');
+
+                    const tx = mainX + offY;
+                    const ty = mainY - dist - offX;
+                    const bx = mainX - offY;
+                    const by = mainY + dist + offX;
+
+                    topC.style.left = (tx - 60) + 'px';
+                    topC.style.top = (ty - 60) + 'px';
+                    bottomC.style.left = (bx - 60) + 'px';
+                    bottomC.style.top = (by - 60) + 'px';
+
+                    linkT.setAttribute('x1', mainX);
+                    linkT.setAttribute('y1', mainY);
+                    linkT.setAttribute('x2', tx);
+                    linkT.setAttribute('y2', ty);
+
+                    linkB.setAttribute('x1', mainX);
+                    linkB.setAttribute('y1', mainY);
+                    linkB.setAttribute('x2', bx);
+                    linkB.setAttribute('y2', by);
 
                     if (state.hasCookieDecet) {
-                        ['cookie-deep-bottom', 'cookie-top-l', 'cookie-top-r', 'cookie-bottom-l', 'cookie-bottom-r', 'link-deep-bottom', 'link-top-l', 'link-top-r', 'link-bottom-l', 'link-bottom-r'].forEach(id => document.getElementById(id).classList.remove('opacity-0'));
-                        const lx = mainX - dist + offX, ly = mainY + offY, rx = mainX + dist - offX, ry = mainY - offY, tx = mainX + offY, ty = mainY - dist - offX, bx = mainX - offY, by = mainY + dist + offX;
-                        const setChild = (id, px, py, cx, cy, lid) => {
-                            const el = document.getElementById(id), l = document.getElementById(lid);
-                            el.style.left = (cx - 40) + 'px'; el.style.top = (cy - 40) + 'px';
-                            l.setAttribute('x1', px); l.setAttribute('y1', py); l.setAttribute('x2', cx); l.setAttribute('y2', cy);
-                        };
-                        setChild('cookie-deep-bottom', bx, by, bx + Math.sin(time*1.5)*40, by + 150 + Math.cos(time*1.5)*40, 'link-deep-bottom');
-                        setChild('cookie-top-l', tx, ty, tx - 120 + Math.sin(time*2)*20, ty - 120 + Math.cos(time*2)*20, 'link-top-l');
-                        setChild('cookie-top-r', tx, ty, tx + 120 + Math.sin(time*2.2)*20, ty - 120 + Math.cos(time*2.2)*20, 'link-top-r');
-                        setChild('cookie-bottom-l', bx, by, bx - 120 + Math.sin(time*1.8)*20, by + 120 + Math.cos(time*1.8)*20, 'link-bottom-l');
-                        setChild('cookie-bottom-r', bx, by, bx + 120 + Math.sin(time*1.6)*20, by + 120 + Math.cos(time*1.6)*20, 'link-bottom-r');
+                        const deepB = document.getElementById('cookie-deep-bottom');
+                        const topL = document.getElementById('cookie-top-l');
+                        const topR = document.getElementById('cookie-top-r');
+                        const botL = document.getElementById('cookie-bottom-l');
+                        const botR = document.getElementById('cookie-bottom-r');
+                        
+                        const linkDB = document.getElementById('link-deep-bottom');
+                        const linkTL = document.getElementById('link-top-l');
+                        const linkTR = document.getElementById('link-top-r');
+                        const linkBL = document.getElementById('link-bottom-l');
+                        const linkBR = document.getElementById('link-bottom-r');
 
-                        // Vices, Centum, Universe complex nodes
-                        if (state.hasCookieVices || state.hasCookieCentum || state.hasCookieUniverse) {
-                            const maxNode = state.hasCookieUniverse ? 40 : (state.hasCookieCentum ? 20 : 10);
-                            for (let i = 1; i <= maxNode; i++) {
-                                const node = document.getElementById(`cookie-v${i}`), link = document.getElementById(`link-v${i}`);
-                                node.classList.remove('opacity-0'); link.classList.remove('opacity-0');
-                                const angle = (i * (360 / maxNode)) * (Math.PI / 180);
-                                const radius = 350 + (i % 2 === 0 ? 50 : 0) + Math.sin(time + i) * 30;
-                                const nx = mainX + Math.cos(angle) * radius, ny = mainY + Math.sin(angle) * radius;
-                                node.style.left = (nx - 25) + 'px'; node.style.top = (ny - 25) + 'px';
-                                link.setAttribute('x1', mainX); link.setAttribute('y1', mainY); link.setAttribute('x2', nx); link.setAttribute('y2', ny);
-                            }
-                        }
+                        [deepB, topL, topR, botL, botR, linkDB, linkTL, linkTR, linkBL, linkBR].forEach(el => el.classList.remove('opacity-0'));
+
+                        // Deep Bottom (An Main gebunden)
+                        const dbx = mainX + Math.sin(time * 1.5) * 40;
+                        const dby = mainY + dist + 150 + Math.cos(time * 1.5) * 40;
+                        deepB.style.left = (dbx - 40) + 'px';
+                        deepB.style.top = (dby - 40) + 'px';
+                        linkDB.setAttribute('x1', mainX);
+                        linkDB.setAttribute('y1', mainY + dist);
+                        linkDB.setAttribute('x2', dbx);
+                        linkDB.setAttribute('y2', dby);
+
+                        // Top Children (An Cookie Top gebunden)
+                        const tlx = tx - 120 + Math.sin(time * 2) * 20;
+                        const tly = ty - 120 + Math.cos(time * 2) * 20;
+                        topL.style.left = (tlx - 40) + 'px';
+                        topL.style.top = (tly - 40) + 'px';
+                        linkTL.setAttribute('x1', tx);
+                        linkTL.setAttribute('y1', ty);
+                        linkTL.setAttribute('x2', tlx);
+                        linkTL.setAttribute('y2', tly);
+
+                        const trx = tx + 120 + Math.sin(time * 2.2) * 20;
+                        const try_ = ty - 120 + Math.cos(time * 2.2) * 20;
+                        topR.style.left = (trx - 40) + 'px';
+                        topR.style.top = (try_ - 40) + 'px';
+                        linkTR.setAttribute('x1', tx);
+                        linkTR.setAttribute('y1', ty);
+                        linkTR.setAttribute('x2', trx);
+                        linkTR.setAttribute('y2', try_);
+
+                        // Bottom Children (An Cookie Bottom gebunden)
+                        const blx = bx - 120 + Math.sin(time * 1.8) * 20;
+                        const bly = by + 120 + Math.cos(time * 1.8) * 20;
+                        botL.style.left = (blx - 40) + 'px';
+                        botL.style.top = (bly - 40) + 'px';
+                        linkBL.setAttribute('x1', bx);
+                        linkBL.setAttribute('y1', by);
+                        linkBL.setAttribute('x2', blx);
+                        linkBL.setAttribute('y2', bly);
+
+                        const brx = bx + 120 + Math.sin(time * 1.6) * 20;
+                        const bry = by + 120 + Math.cos(time * 1.6) * 20;
+                        botR.style.left = (brx - 40) + 'px';
+                        botR.style.top = (bry - 40) + 'px';
+                        linkBR.setAttribute('x1', bx);
+                        linkBR.setAttribute('y1', by);
+                        linkBR.setAttribute('x2', brx);
+                        linkBR.setAttribute('y2', bry);
                     }
                 }
             }
@@ -1653,115 +1886,397 @@
             document.getElementById('prestige-confirm-modal').style.display = 'flex';
         }
 
-        function closePrestigeModal() { document.getElementById('prestige-confirm-modal').style.display = 'none'; }
+        function closePrestigeModal() {
+            document.getElementById('prestige-confirm-modal').style.display = 'none';
+        }
 
         async function executePrestige() {
             if (state.cookies < PRESTIGE_THRESHOLD || state.isPrestiging) return;
-            closePrestigeModal(); state.isPrestiging = true; unlockAchievement('first_prestige');
-            let newPoints = Math.min(PRESTIGE_MAX_BONUS_PER_RUN, Math.floor(state.cookies / PRESTIGE_THRESHOLD));
+            closePrestigeModal();
+            state.isPrestiging = true;
+            unlockAchievement('first_prestige');
+            let newPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            if (newPoints > PRESTIGE_MAX_BONUS_PER_RUN) newPoints = PRESTIGE_MAX_BONUS_PER_RUN;
+            const extraBonus = newPoints * 0.01; 
             document.body.classList.add('black-hole-active');
-            const wrapper = document.getElementById('main-content-wrapper'); wrapper.classList.add('sucking-effect');
+            const wrapper = document.getElementById('main-content-wrapper');
+            wrapper.classList.add('sucking-effect');
             await new Promise(r => setTimeout(r, 2000));
-            state.prestigeBonus += (newPoints * 0.01); state.prestigeLevel++; state.cookies = 0; state.cps = 0; state.clickPower = 1; state.unlockedUpgrades = 1; state.clickHeat = 0; state.heatResist = 0; state.quantumChipLevel = 0; state.nanoOvenLevel = 0;
-            state.hasCookieTrio = state.hasCookieQuintet = state.hasCookieDecet = state.hasCookieVices = state.hasCookieCentum = state.hasCookieUniverse = state.hasBird = state.hasGoldDrone = false;
-            buildings.forEach(b => b.count = 0); specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
-            initShop(); updateUI(); await new Promise(r => setTimeout(r, 500));
-            wrapper.classList.replace('sucking-effect', 'spitting-effect');
+            state.totalPrestigeEarned += state.prestigeLevel + 1;
+            state.prestigeBonus += extraBonus;
+            state.prestigeLevel++;
+            state.achievements = state.achievements.filter(id => !id.startsWith('milestone_'));
+            state.cookies = 0; 
+            state.cps = 0; 
+            state.clickPower = 1;
+            state.unlockedUpgrades = 1; 
+            state.clickHeat = 0;
+            state.heatResist = 0;
+            state.quantumChipLevel = 0;
+            state.nanoOvenLevel = 0;
+            state.hasCookieTrio = false;
+            state.hasCookieQuintet = false;
+            state.hasCookieDecet = false;
+            state.hasBird = false;
+            state.hasGoldDrone = false;
+            if (collectorBird) collectorBird.style.display = 'none';
+            if (goldenDrone) goldenDrone.style.display = 'none';
+            [...activeSpecialCookies].forEach(c => removeCookie(c.id));
+            buildings.forEach(b => b.count = 0);
+            specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
+            initShop(); 
+            updateUI(); 
+            await new Promise(r => setTimeout(r, 500));
+            wrapper.classList.remove('sucking-effect');
+            wrapper.classList.add('spitting-effect');
             await new Promise(r => setTimeout(r, 1500));
-            document.body.classList.remove('black-hole-active'); wrapper.classList.remove('spitting-effect'); state.isPrestiging = false; saveGame();
+            document.body.classList.remove('black-hole-active');
+            wrapper.classList.remove('spitting-effect');
+            state.isPrestiging = false;
+            saveGame();
         }
 
-        function showResetModal() { document.getElementById('reset-modal').style.display = 'flex'; document.getElementById('reset-confirm-input').focus(); }
-        function closeResetModal() { document.getElementById('reset-modal').style.display = 'none'; document.getElementById('reset-confirm-input').value = ''; }
-        function executeFullReset() { if (document.getElementById('reset-confirm-input').value === 'CONFIRM') { localStorage.removeItem('kinetx_cookie_save_v4'); location.reload(); } }
+        function showResetModal() {
+            document.getElementById('reset-modal').style.display = 'flex';
+            document.getElementById('reset-confirm-input').focus();
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').style.display = 'none';
+            document.getElementById('reset-confirm-input').value = '';
+        }
+
+        function executeFullReset() {
+            const input = document.getElementById('reset-confirm-input').value;
+            if (input === 'CONFIRM') {
+                localStorage.removeItem('kinetx_cookie_save_v4');
+                location.reload();
+            }
+        }
 
         function lerpColor(a, b, amount) {
-            const ah = parseInt(a.replace(/#/g, ''), 16), ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff, bh = parseInt(b.replace(/#/g, ''), 16), br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff, rr = ar + amount * (br - ar), rg = ag + amount * (bg - ag), rb = ab + amount * (bb - ab);
+            const ah = parseInt(a.replace(/#/g, ''), 16),
+                  ar = ah >> 16, ag = (ah >> 8) & 0xff, ab = ah & 0xff,
+                  bh = parseInt(b.replace(/#/g, ''), 16),
+                  br = bh >> 16, bg = (bh >> 8) & 0xff, bb = bh & 0xff,
+                  rr = ar + amount * (br - ar),
+                  rg = ag + amount * (bg - ag),
+                  rb = ab + amount * (bb - ab);
             return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
         }
 
         function updateUI() {
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            const bonusPercent = state.achievements.filter(id => id.startsWith('milestone_')).length * 15;
+            const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
+            const bonusPercent = milestoneCount * 15;
             const totalCps = (state.cps * state.multiplier * state.prestigeBonus);
-            if (cpsDisplay) cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-purple-400 font-bold ml-1">+${((state.prestigeBonus - 1) * 100).toFixed(0)}% Prestige</span> <span class="text-yellow-400 font-bold ml-1">+${(state.unlockedUpgrades - 1) * 5}% Upgrades</span> <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span>`;
+            const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
+            const upgradeBonusPercent = (state.unlockedUpgrades - 1) * 5;
+            if (cpsDisplay) {
+                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span> <span class="text-yellow-400 font-bold ml-1">+${upgradeBonusPercent}% Upgrades</span> <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span>`;
+            }
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             if (clickPowerDisplay) {
-                let cm = 1;
-                if (state.hasCookieUniverse) cm = 50; else if (state.hasCookieCentum) cm = 30; else if (state.hasCookieVices) cm = 20; else if (state.hasCookieDecet) cm = 10; else if (state.hasCookieQuintet) cm = 5; else if (state.hasCookieTrio) cm = 3;
-                clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * cm)}`;
+                let cookieMult = 1;
+                if (state.hasCookieDecet) cookieMult = 10;
+                else if (state.hasCookieQuintet) cookieMult = 5;
+                else if (state.hasCookieTrio) cookieMult = 3;
+                clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * cookieMult)}`;
             }
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
-            state.multiplier = state.clickHeat >= 95 ? 10 : (state.clickHeat >= 85 ? 5 : (state.clickHeat >= 60 ? 3 : (state.clickHeat >= 25 ? 1.5 : 1)));
-            if(state.multiplier >= 10) unlockAchievement('multiplier_10'); else if(state.multiplier >= 5) unlockAchievement('multiplier_5'); else if(state.multiplier >= 3) unlockAchievement('multiplier_3');
-            const h = state.clickHeat / 100;
-            document.getElementById('cookie-bottom-main').setAttribute('fill', lerpColor("#d2691e", "#b8860b", h));
-            document.getElementById('cookie-top-main').setAttribute('fill', lerpColor("#cd853f", "#ffd700", h));
-            const gl = document.getElementById('gold-layer'); gl.setAttribute('opacity', h); gl.style.transform = `scale(${0.8 + h * 0.2})`; gl.style.transformOrigin = 'center';
-            mainCookie.style.filter = `drop-shadow(0 0 20px rgba(255, 215, 0, ${0.4 + h * 0.4}))`;
-            let r, g, b; if (h < 0.5) { const l = h / 0.5; r = 26 + (180 - 26) * l; g = 26 + (160 - 26) * l; b = 26 + (20 - 26) * l; } else { const l = (h - 0.5) / 0.5; r = 180 + (150 - 180) * l; g = 160 + (0 - 160) * l; b = 20 + (0 - 20) * l; }
+            
+            if (state.clickHeat >= 95) {
+                state.multiplier = 10.0;
+                unlockAchievement('multiplier_10');
+            }
+            else if (state.clickHeat >= 85) {
+                state.multiplier = 5.0;
+                unlockAchievement('multiplier_5');
+            }
+            else if (state.clickHeat >= 60) {
+                state.multiplier = 3.0;
+                unlockAchievement('multiplier_3');
+            }
+            else if (state.clickHeat >= 25) state.multiplier = 1.5;
+            else state.multiplier = 1.0;
+
+            const bottom = document.getElementById('cookie-bottom-main');
+            const top = document.getElementById('cookie-top-main');
+            const goldLayer = document.getElementById('gold-layer');
+            const mainCookieSVG = document.getElementById('main-cookie');
+            const heatRatio = state.clickHeat / 100;
+            const targetGold = "#ffd700";
+            const targetDarkGold = "#b8860b";
+            const currentTopColor = lerpColor("#cd853f", targetGold, heatRatio);
+            const currentBottomColor = lerpColor("#d2691e", targetDarkGold, heatRatio);
+            bottom.setAttribute('fill', currentBottomColor);
+            top.setAttribute('fill', currentTopColor);
+            if (goldLayer) {
+                goldLayer.setAttribute('opacity', heatRatio);
+                goldLayer.style.transform = `scale(${0.8 + heatRatio * 0.2})`;
+                goldLayer.style.transformOrigin = 'center';
+            }
+            const glowAlpha = 0.4 + heatRatio * 0.4;
+            mainCookieSVG.style.filter = `drop-shadow(0 0 20px rgba(255, 215, 0, ${glowAlpha}))`;
+            let r, g, b;
+            if (heatRatio < 0.5) {
+                const localRatio = heatRatio / 0.5;
+                r = Math.round(26 + (180 - 26) * localRatio);
+                g = Math.round(26 + (160 - 26) * localRatio);
+                b = Math.round(26 + (20 - 26) * localRatio);
+            } else {
+                const localRatio = (heatRatio - 0.5) / 0.5;
+                r = Math.round(180 + (150 - 180) * localRatio);
+                g = Math.round(160 + (0 - 160) * localRatio);
+                b = Math.round(20 + (0 - 20) * localRatio);
+            }
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
             if (frenzyBar) frenzyBar.style.width = state.clickHeat + '%';
             if (multiplierDisplay) multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
-            if (state.clickHeat >= 30) document.body.classList.add('golden-frenzy'); else document.body.classList.remove('golden-frenzy');
-            const prog = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
-            if (prestigeBar) prestigeBar.style.width = prog + '%';
-            if (prestigePercent) prestigePercent.innerText = Math.floor(prog) + '%';
-            let pt = Math.min(PRESTIGE_MAX_BONUS_PER_RUN, Math.floor(state.cookies / PRESTIGE_THRESHOLD));
-            if (document.getElementById('prestige-gain')) { document.getElementById('prestige-gain').innerText = pt > 0 ? `+${pt}% (MAX 500)` : ''; document.getElementById('prestige-gain').classList.toggle('hidden', pt <= 0); }
-            if (state.cookies >= PRESTIGE_THRESHOLD) { if (prestigeBtn) prestigeBtn.classList.remove('hidden'); if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!"; } else if (prestigeBtn) prestigeBtn.classList.add('hidden');
-            if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${((state.prestigeBonus - 1) * 100).toFixed(0)}%`;
-            const playtimeEl = document.getElementById('stat-playtime'); if (playtimeEl) playtimeEl.innerText = `${Math.floor(state.totalPlaytime / 3600)}h ${Math.floor((state.totalPlaytime % 3600) / 60)}m ${Math.floor(state.totalPlaytime % 60)}s`;
+            if (state.clickHeat >= 30) document.body.classList.add('golden-frenzy');
+            else document.body.classList.remove('golden-frenzy');
+            if (state.multiplier >= 5 && frenzyBar) frenzyBar.classList.add('animate-pulse');
+            else if (frenzyBar) frenzyBar.classList.remove('animate-pulse');
+            const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
+            if (prestigeNeeded) prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
+            const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
+            if (prestigeBar) prestigeBar.style.width = prestigeProg + '%';
+            if (prestigePercent) prestigePercent.innerText = Math.floor(prestigeProg) + '%';
+            let potentialPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
+            if (potentialPoints > PRESTIGE_MAX_BONUS_PER_RUN) potentialPoints = PRESTIGE_MAX_BONUS_PER_RUN;
+            const prestigeGainEl = document.getElementById('prestige-gain');
+            if (prestigeGainEl) {
+                if (potentialPoints > 0) {
+                    prestigeGainEl.innerText = `+${potentialPoints}% (MAX 500)`;
+                    prestigeGainEl.classList.remove('hidden');
+                } else prestigeGainEl.classList.add('hidden');
+            }
+            if (state.cookies >= PRESTIGE_THRESHOLD) {
+                if (prestigeBtn) prestigeBtn.classList.remove('hidden');
+                if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!";
+            } else if (prestigeBtn) prestigeBtn.classList.add('hidden');
+            if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${currentPrestigeBonusText}%`;
+            const hours = Math.floor(state.totalPlaytime / 3600);
+            const minutes = Math.floor((state.totalPlaytime % 3600) / 60);
+            const seconds = Math.floor(state.totalPlaytime % 60);
+            const playtimeEl = document.getElementById('stat-playtime');
+            if (playtimeEl) playtimeEl.innerText = `${hours}h ${minutes}m ${seconds}s`;
             updatePowerupHotbar();
-            if (state.hasGoldDrone) { const df = document.getElementById('drone-fill'), dc = document.getElementById('drone-cookie'); df.style.width = (state.goldDroneTimer / 15) * 100 + '%'; dc.style.opacity = 0.2 + (state.goldDroneTimer / 15) * 0.8; dc.style.transform = `translateX(-50%) scale(${0.5 + (state.goldDroneTimer / 15) * 0.5})`; }
+            if (state.hasGoldDrone) {
+                const droneFill = document.getElementById('drone-fill');
+                const droneCookie = document.getElementById('drone-cookie');
+                const progress = (state.goldDroneTimer / 15) * 100;
+                if (droneFill) droneFill.style.width = progress + '%';
+                if (droneCookie) {
+                    droneCookie.style.opacity = (0.2 + (state.goldDroneTimer / 15) * 0.8);
+                    droneCookie.style.transform = `translateX(-50%) scale(${0.5 + (state.goldDroneTimer / 15) * 0.5})`;
+                }
+            }
             if (state.activeTab !== 'achievements') {
-                (state.activeTab === 'buildings' ? buildings : specials).forEach(item => {
-                    const card = document.getElementById(`upgrade-${item.id}`); if (!card) return;
-                    const p = getPrice(item), cd = item.type === 'powerup' && state.powerups[item.powerupId].cd > 0;
-                    card.classList.toggle('disabled', state.cookies < p || cd);
-                    if (document.getElementById(`count-${item.id}`)) document.getElementById(`count-${item.id}`).innerText = item.count || 0;
-                    if (document.getElementById('price-' + item.id)) document.getElementById('price-' + item.id).innerText = formatNumber(p);
-                    if (state.activeTab === 'buildings') { const bl = document.getElementById('bonus-' + item.id), em = getUpgradeEfficiencyMult(item.count); if (em > 1) { bl.innerText = `${getStarsForCount(item.count)} Bonus: x${em}`; bl.classList.remove('hidden'); } else if (bl) bl.classList.add('hidden'); }
+                let list = state.activeTab === 'buildings' ? buildings : specials;
+                list.forEach(item => {
+                    const card = document.getElementById(`upgrade-${item.id}`);
+                    if (card) {
+                        const price = getPrice(item);
+                        const isPowerup = item.type === 'powerup';
+                        const onCd = isPowerup ? state.powerups[item.powerupId].cd > 0 : false;
+                        if (state.cookies >= price && !onCd) card.classList.remove('disabled');
+                        else card.classList.add('disabled');
+                        const countEl = document.getElementById(`count-${item.id}`);
+                        if (countEl) countEl.innerText = item.count || 0;
+                        const priceEl = document.getElementById('price-' + item.id);
+                        if (priceEl) priceEl.innerText = formatNumber(price);
+                        if (state.activeTab === 'buildings') {
+                            const bonusLabel = document.getElementById('bonus-' + item.id);
+                            const effMult = getUpgradeEfficiencyMult(item.count);
+                            const stars = getStarsForCount(item.count);
+                            if (effMult > 1) {
+                                bonusLabel.innerText = `${stars} Bonus: x${effMult}`;
+                                bonusLabel.classList.remove('hidden');
+                            } else if (bonusLabel) bonusLabel.classList.add('hidden');
+                        }
+                    }
                 });
             }
         }
 
         function updatePowerupHotbar() {
-            const up = (id, data) => {
-                const s = document.getElementById(`pu-slot-${id}`), t = document.getElementById(`pu-timer-${id}`), c = document.getElementById(`pu-cd-${id}`);
-                if (data.active > 0) { s.className = 'powerup-slot active'; t.classList.remove('hidden'); t.innerText = Math.ceil(data.active) + 's'; c.classList.add('hidden'); }
-                else if (data.cd > 0) { s.className = 'powerup-slot on-cooldown'; t.classList.add('hidden'); c.classList.remove('hidden'); c.innerText = formatPowerupTime(data.cd); }
-                else { s.className = 'powerup-slot'; t.classList.add('hidden'); c.classList.add('hidden'); }
-            };
-            up('production', state.powerups.production); up('golden', state.powerups.golden);
+            const pSlot = document.getElementById('pu-slot-production');
+            const pTimer = document.getElementById('pu-timer-production');
+            const pCd = document.getElementById('pu-cd-production');
+            const pData = state.powerups.production;
+            if (pSlot && pTimer && pCd) {
+                if (pData.active > 0) {
+                    pSlot.className = 'powerup-slot active';
+                    pTimer.classList.remove('hidden');
+                    pTimer.innerText = Math.ceil(pData.active) + 's';
+                    pCd.classList.add('hidden');
+                } else if (pData.cd > 0) {
+                    pSlot.className = 'powerup-slot on-cooldown';
+                    pTimer.classList.add('hidden');
+                    pCd.classList.remove('hidden');
+                    pCd.innerText = formatPowerupTime(pData.cd);
+                } else {
+                    pSlot.className = 'powerup-slot';
+                    pTimer.classList.add('hidden');
+                    pCd.classList.add('hidden');
+                }
+            }
+            const gSlot = document.getElementById('pu-slot-golden');
+            const gTimer = document.getElementById('pu-timer-golden');
+            const gCd = document.getElementById('pu-cd-golden');
+            const gData = state.powerups.golden;
+            if (gSlot && gTimer && gCd) {
+                if (gData.active > 0) {
+                    gSlot.className = 'powerup-slot active';
+                    gTimer.classList.remove('hidden');
+                    gTimer.innerText = Math.ceil(gData.active) + 's';
+                    gCd.classList.add('hidden');
+                } else if (gData.cd > 0) {
+                    gSlot.className = 'powerup-slot on-cooldown';
+                    gTimer.classList.add('hidden');
+                    gCd.classList.remove('hidden');
+                    gCd.innerText = formatPowerupTime(gData.cd);
+                } else {
+                    gSlot.className = 'powerup-slot';
+                    gTimer.classList.add('hidden');
+                    gCd.classList.add('hidden');
+                }
+            }
         }
 
-        function formatPowerupTime(s) { return `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`; }
-        function saveGame() { localStorage.setItem('kinetx_cookie_save_v4', JSON.stringify({ state, buildingCounts: buildings.map(u => ({ id: u.id, count: u.count })), specialCounts: specials.map(s => ({ id: s.id, count: s.count || 0 })) })); }
-        function loadGame() { const s = localStorage.getItem('kinetx_cookie_save_v4'); if (s) { try { const d = JSON.parse(s); applySaveData(d); setNumberFormat(state.numberFormat || 'short'); } catch (e) {} } }
+        function formatPowerupTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function saveGame() {
+            const saveData = { 
+                state: state, 
+                buildingCounts: buildings.map(u => ({ id: u.id, count: u.count })),
+                specialCounts: specials.map(s => ({ id: s.id, count: s.count || 0 }))
+            };
+            localStorage.setItem('kinetx_cookie_save_v4', JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('kinetx_cookie_save_v4');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    applySaveData(data);
+                    setNumberFormat(state.numberFormat || 'short');
+                } catch (e) { console.error("Load failed", e); }
+            }
+        }
 
         function runTick() {
-            const now = Date.now(), delta = (now - state.lastTick) / 1000; if (delta < 0.001) { updateUI(); return; }
-            state.lastTick = now; if (state.isPrestiging) return; state.totalPlaytime += delta;
-            state.clickHeat = Math.max(0, state.clickHeat - (22 * (1 - Math.min(0.9, state.heatResist)) * delta));
-            Object.keys(state.powerups).forEach(k => { const p = state.powerups[k]; if (p.active > 0) { p.active = Math.max(0, p.active - delta); if (k === 'production' && p.active === 0) calculateCPS(); } if (p.cd > 0) p.cd = Math.max(0, p.cd - delta); });
+            const now = Date.now();
+            const delta = (now - state.lastTick) / 1000;
+            if (delta < 0.001) { updateUI(); return; }
+            state.lastTick = now;
+            if (state.isPrestiging) { updateUI(); return; }
+            state.totalPlaytime += delta;
+            const baseDecay = 22;
+            const decayPenalty = baseDecay * (1 - Math.min(0.9, state.heatResist));
+            state.clickHeat = Math.max(0, state.clickHeat - (decayPenalty * delta));
+            Object.keys(state.powerups).forEach(key => {
+                const pu = state.powerups[key];
+                if (pu.active > 0) {
+                    const oldActive = pu.active;
+                    pu.active = Math.max(0, pu.active - delta);
+                    if (key === 'production' && oldActive > 0 && pu.active === 0) calculateCPS();
+                }
+                if (pu.cd > 0) pu.cd = Math.max(0, pu.cd - delta);
+            });
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
-            if (state.hasGoldDrone) { state.goldDroneTimer += delta; if (state.goldDroneTimer >= 15) { const p = ['golden', 'blue', 'green', 'red'], w = [0.6, 0.2, 0.15, 0.05]; let r = Math.random(), c = 'golden'; for(let i=0; i<w.length; i++) { if(r < w[i]){ c = p[i]; break; } r -= w[i]; } spawnSpecialCookie(c); state.goldDroneTimer = 0; } }
-            const sm = state.powerups.golden.active > 0 ? 5 : 1;
-            if (state.multiplier >= 3.0) { state.goldenCookieTimer += delta * sm; if (state.goldenCookieTimer >= 5) { spawnSpecialCookie('golden'); state.goldenCookieTimer = 0; } }
-            state.randomGoldenSpawnTimer += delta * sm; if (state.randomGoldenSpawnTimer >= 1.0) { if (Math.random() < 0.002 * sm) spawnSpecialCookie('golden'); state.randomGoldenSpawnTimer = 0; }
-            state.blueCookieSpawnTimer += delta; if (state.blueCookieSpawnTimer >= 1.0) { if (Math.random() < 0.01) spawnSpecialCookie('blue'); state.blueCookieSpawnTimer = 0; }
-            state.redCookieSpawnTimer += delta; if (state.redCookieSpawnTimer >= 1.0) { if (Math.random() < 0.001) spawnSpecialCookie('red'); state.redCookieSpawnTimer = 0; }
-            updateSpecialPhysics(); updateUI();
+            if (state.hasGoldDrone) {
+                state.goldDroneTimer += delta;
+                if (state.goldDroneTimer >= 15) {
+                    const pool = ['golden', 'blue', 'green', 'red'];
+                    const weights = [0.6, 0.2, 0.15, 0.05];
+                    let r = Math.random();
+                    let chosen = 'golden';
+                    for (let i = 0; i < weights.length; i++) {
+                        if (r < weights[i]) { chosen = pool[i]; break; }
+                        r -= weights[i];
+                    }
+                    spawnSpecialCookie(chosen);
+                    state.goldDroneTimer = 0;
+                }
+            }
+            const spawnMult = state.powerups.golden.active > 0 ? 5 : 1;
+            if (state.multiplier >= 3.0) {
+                state.goldenCookieTimer += delta * spawnMult;
+                if (state.goldenCookieTimer >= 5) {
+                    spawnSpecialCookie('golden');
+                    state.goldenCookieTimer = 0;
+                }
+            } else state.goldenCookieTimer = 0;
+            state.randomGoldenSpawnTimer += delta * spawnMult;
+            if (state.randomGoldenSpawnTimer >= 1.0) {
+                if (Math.random() < 0.002 * spawnMult) spawnSpecialCookie('golden');
+                state.randomGoldenSpawnTimer = 0;
+            }
+            state.blueCookieSpawnTimer += delta;
+            if (state.blueCookieSpawnTimer >= 1.0) {
+                if (Math.random() < 0.01) spawnSpecialCookie('blue');
+                state.blueCookieSpawnTimer = 0;
+            }
+            state.redCookieSpawnTimer += delta;
+            if (state.redCookieSpawnTimer >= 1.0) {
+                if (Math.random() < 0.001) spawnSpecialCookie('red');
+                state.redCookieSpawnTimer = 0;
+            }
+            updateSpecialPhysics();
+            updateUI();
         }
 
-        function updateFPS() { frameCount++; const n = performance.now(), d = n - lastFpsUpdate; if (d >= 1000) { fps = Math.round((frameCount * 1000) / d); document.getElementById('fps-counter').innerText = `FPS: ${fps}`; frameCount = 0; lastFpsUpdate = n; if (document.getElementById('startup-modal').style.display === 'none' && fps < 40 && state.showParticles && !state.performanceWarningShown) showPerformanceModal(); } }
-        setInterval(runTick, 16); function rl() { updateFPS(); requestAnimationFrame(rl); } setInterval(saveGame, 30000);
-        mainCookie.addEventListener('mousedown', (e) => clickCookie(e)); mainCookie.addEventListener('contextmenu', e => e.preventDefault());
-        window.addEventListener('keydown', (e) => { const k = e.key.toLowerCase(); keysPressed[k] = true; if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) showResetModal(); if (e.code === 'Space') { e.preventDefault(); const r = mainCookie.getBoundingClientRect(); clickCookie({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }); mainCookie.style.transform = 'scale(0.95)'; } });
-        window.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; if (e.code === 'Space') mainCookie.style.transform = ''; });
-        loadGame(); initShop(); updateParticleUI(); updateUI(); rl();
+        function updateFPS() {
+            frameCount++;
+            const now = performance.now();
+            const duration = now - lastFpsUpdate;
+            if (duration >= 1000) {
+                fps = Math.round((frameCount * 1000) / duration);
+                const fpsEl = document.getElementById('fps-counter');
+                if (fpsEl) fpsEl.innerText = `FPS: ${fps}`;
+                frameCount = 0;
+                lastFpsUpdate = now;
+                const startup = document.getElementById('startup-modal');
+                if (startup && startup.style.display === 'none') {
+                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) showPerformanceModal();
+                }
+            }
+        }
+
+        setInterval(runTick, 16); 
+        function renderLoop() { updateFPS(); requestAnimationFrame(renderLoop); }
+        setInterval(saveGame, 30000);
+        mainCookie.addEventListener('mousedown', (e) => { clickCookie(e); });
+        mainCookie.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keysPressed[key] = true;
+            if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) showResetModal();
+            if (e.code === 'Space') {
+                e.preventDefault();
+                const rect = mainCookie.getBoundingClientRect();
+                clickCookie({ clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2 });
+                mainCookie.style.transform = 'scale(0.95)';
+            }
+        });
+        window.addEventListener('keyup', (key) => { 
+            const k = key.key.toLowerCase();
+            keysPressed[k] = false;
+            if (key.code === 'Space') mainCookie.style.transform = ''; 
+        });
+        loadGame();
+        initShop();
+        updateParticleUI();
+        updateUI();
+        renderLoop();
     </script>
 </body>
 </html>
