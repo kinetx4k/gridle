@@ -1303,7 +1303,7 @@
                         card.innerHTML = `
                             <div class="icon">${ach.icon}</div>
                             <div class="flex-1">
-                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+5% Bonus</span></div>
+                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+15% Bonus</span></div>
                                 <div class="text-[10px] text-zinc-500">${ach.description}</div>
                             </div>
                             <div class="text-yellow-400 text-xs">✓</div>
@@ -1537,7 +1537,7 @@
             }, 0);
 
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
-            const milestoneBoost = 1 + (milestoneCount * 0.05);
+            const milestoneBoost = 1 + (milestoneCount * 0.15);
             baseCps *= milestoneBoost;
 
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
@@ -1897,7 +1897,7 @@
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
             
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
-            const bonusPercent = milestoneCount * 5;
+            const bonusPercent = milestoneCount * 15;
             
             const totalCps = (state.cps * state.multiplier * state.prestigeBonus);
             const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
