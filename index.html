@@ -49,12 +49,24 @@
             filter: drop-shadow(0 0 12px #ff4500);
         }
 
+        .vigentet-link {
+            stroke: #ff00ff;
+            stroke-width: 2;
+            stroke-dasharray: 3;
+            animation: dash-ultra 0.3s linear infinite;
+            filter: drop-shadow(0 0 15px #ff00ff);
+        }
+
         @keyframes dash {
             to { stroke-dashoffset: -20; }
         }
 
         @keyframes dash-fast {
             to { stroke-dashoffset: -15; }
+        }
+
+        @keyframes dash-ultra {
+            to { stroke-dashoffset: -10; }
         }
 
         .side-cookie {
@@ -70,6 +82,12 @@
             width: 80px;
             height: 80px;
             filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+        }
+
+        .vigentet-cookie {
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.8));
         }
 
         #prestige-overlay {
@@ -783,7 +801,7 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Cookie Trio/Quintet/Decet Visuals -->
+            <!-- Cookie Trio/Quintet/Decet/Vigentet Visuals -->
             <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
                 <svg class="absolute inset-0 w-full h-full">
                     <!-- Standard Links -->
@@ -798,6 +816,18 @@
                     <line id="link-top-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-bottom-l" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-bottom-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+
+                    <!-- Vigentet Specific Links -->
+                    <line id="link-v1" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v2" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v3" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v4" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v5" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v6" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v7" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v8" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v9" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-v10" class="trio-link vigentet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                 </svg>
                 
                 <!-- Quintet Cookies -->
@@ -830,6 +860,18 @@
                 <div id="cookie-bottom-r" class="side-cookie decet-cookie opacity-0">
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
+
+                <!-- Vigentet Additional Cookies -->
+                <div id="cookie-v1" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v2" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v3" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v4" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v5" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v6" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v7" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v8" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v9" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
+                <div id="cookie-v10" class="side-cookie vigentet-cookie opacity-0"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff00ff" /><circle cx="100" cy="100" r="80" fill="#ff77ff" /><circle class="chip" cx="80" cy="80" r="15" fill="#000" /></svg></div>
             </div>
             
             <!-- Drone Entity -->
@@ -958,7 +1000,8 @@
             numberFormat: 'short',
             hasCookieTrio: false, 
             hasCookieQuintet: false,
-            hasCookieDecet: false, // 10 Cookies total
+            hasCookieDecet: false, 
+            hasCookieVigentet: false, // 20 Cookies total
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -1050,6 +1093,7 @@
             { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
             { id: 'sp-cookie-quintet', type: 'cookie-quintet', name: 'Cookie Quintet', description: 'Attach 2 more cookies to your trio! QUINTUPLES all income and clicks.', basePrice: 50000000000000, count: 0, icon: '🍪🍪🍪🍪🍪' },
             { id: 'sp-cookie-decet', type: 'cookie-decet', name: 'Cookie Decet', description: 'The ultimate cookie chain! 5 extra cookies attached in a complex pattern. 10x Multiplier for everything.', basePrice: 2500000000000000, count: 0, icon: '🍩🍩🍩🍩🍩' },
+            { id: 'sp-cookie-vigentet', type: 'cookie-vigentet', name: 'Cookie Vigintet', description: 'The galactic cookie network! 10 additional satellites. 20x Multiplier for everything.', basePrice: 125000000000000000, count: 0, icon: '🌌🍪🌌' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -1348,9 +1392,11 @@
                 if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-quintet' && state.hasCookieQuintet) continue;
                 if (item.id === 'sp-cookie-decet' && state.hasCookieDecet) continue;
+                if (item.id === 'sp-cookie-vigentet' && state.hasCookieVigentet) continue;
                 
                 if (item.id === 'sp-cookie-quintet' && !state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-decet' && !state.hasCookieQuintet) continue;
+                if (item.id === 'sp-cookie-vigentet' && !state.hasCookieDecet) continue;
 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1375,6 +1421,8 @@
                     bonusText = `Effect: 500% Multiplier`;
                 } else if (item.type === 'cookie-decet') {
                     bonusText = `Effect: 1000% Multiplier`;
+                } else if (item.type === 'cookie-vigentet') {
+                    bonusText = `Effect: 2000% Multiplier`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
@@ -1423,7 +1471,8 @@
             if (state.isPrestiging) return;
             
             let cookieMult = 1;
-            if (state.hasCookieDecet) cookieMult = 10;
+            if (state.hasCookieVigentet) cookieMult = 20;
+            else if (state.hasCookieDecet) cookieMult = 10;
             else if (state.hasCookieQuintet) cookieMult = 5;
             else if (state.hasCookieTrio) cookieMult = 3;
 
@@ -1508,6 +1557,10 @@
                     state.hasCookieDecet = true;
                     calculateCPS();
                 }
+                if (sp.type === 'cookie-vigentet') {
+                    state.hasCookieVigentet = true;
+                    calculateCPS();
+                }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
                 }
@@ -1561,7 +1614,8 @@
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
             baseCps *= quantumBoost;
 
-            if (state.hasCookieDecet) baseCps *= 10;
+            if (state.hasCookieVigentet) baseCps *= 20;
+            else if (state.hasCookieDecet) baseCps *= 10;
             else if (state.hasCookieQuintet) baseCps *= 5;
             else if (state.hasCookieTrio) baseCps *= 3;
 
@@ -1827,7 +1881,6 @@
 
                         [deepB, topL, topR, botL, botR, linkDB, linkTL, linkTR, linkBL, linkBR].forEach(el => el.classList.remove('opacity-0'));
 
-                        // Deep Bottom (An Main gebunden)
                         const dbx = mainX + Math.sin(time * 1.5) * 40;
                         const dby = mainY + dist + 150 + Math.cos(time * 1.5) * 40;
                         deepB.style.left = (dbx - 40) + 'px';
@@ -1837,7 +1890,6 @@
                         linkDB.setAttribute('x2', dbx);
                         linkDB.setAttribute('y2', dby);
 
-                        // Top Children (An Cookie Top gebunden)
                         const tlx = tx - 120 + Math.sin(time * 2) * 20;
                         const tly = ty - 120 + Math.cos(time * 2) * 20;
                         topL.style.left = (tlx - 40) + 'px';
@@ -1856,7 +1908,6 @@
                         linkTR.setAttribute('x2', trx);
                         linkTR.setAttribute('y2', try_);
 
-                        // Bottom Children (An Cookie Bottom gebunden)
                         const blx = bx - 120 + Math.sin(time * 1.8) * 20;
                         const bly = by + 120 + Math.cos(time * 1.8) * 20;
                         botL.style.left = (blx - 40) + 'px';
@@ -1874,6 +1925,32 @@
                         linkBR.setAttribute('y1', by);
                         linkBR.setAttribute('x2', brx);
                         linkBR.setAttribute('y2', bry);
+
+                        if (state.hasCookieVigentet) {
+                            const vNodes = [];
+                            const vLinks = [];
+                            for(let i=1; i<=10; i++) {
+                                vNodes.push(document.getElementById(`cookie-v${i}`));
+                                vLinks.push(document.getElementById(`link-v${i}`));
+                            }
+                            vNodes.forEach(n => n.classList.remove('opacity-0'));
+                            vLinks.forEach(l => l.classList.remove('opacity-0'));
+
+                            // Dynamic orbit for 10 satellites
+                            for(let i=0; i<10; i++) {
+                                const angle = (i / 10) * Math.PI * 2 + time;
+                                const rad = 450 + Math.sin(time * 0.5 + i) * 30;
+                                const vx = mainX + Math.cos(angle) * rad;
+                                const vy = mainY + Math.sin(angle) * rad;
+                                
+                                vNodes[i].style.left = (vx - 30) + 'px';
+                                vNodes[i].style.top = (vy - 30) + 'px';
+                                vLinks[i].setAttribute('x1', mainX);
+                                vLinks[i].setAttribute('y1', mainY);
+                                vLinks[i].setAttribute('x2', vx);
+                                vLinks[i].setAttribute('y2', vy);
+                            }
+                        }
                     }
                 }
             }
@@ -1917,6 +1994,7 @@
             state.hasCookieTrio = false;
             state.hasCookieQuintet = false;
             state.hasCookieDecet = false;
+            state.hasCookieVigentet = false;
             state.hasBird = false;
             state.hasGoldDrone = false;
             if (collectorBird) collectorBird.style.display = 'none';
@@ -1978,7 +2056,8 @@
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
             if (clickPowerDisplay) {
                 let cookieMult = 1;
-                if (state.hasCookieDecet) cookieMult = 10;
+                if (state.hasCookieVigentet) cookieMult = 20;
+                else if (state.hasCookieDecet) cookieMult = 10;
                 else if (state.hasCookieQuintet) cookieMult = 5;
                 else if (state.hasCookieTrio) cookieMult = 3;
                 clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * cookieMult)}`;
