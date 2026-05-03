@@ -1540,6 +1540,10 @@
             const milestoneBoost = 1 + (milestoneCount * 0.15);
             baseCps *= milestoneBoost;
 
+            // Upgrade Bonus: 5% extra pro freigeschaltetem Upgrade (über Cursor hinaus)
+            const upgradeBoost = 1 + ((state.unlockedUpgrades - 1) * 0.05);
+            baseCps *= upgradeBoost;
+
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
             baseCps *= quantumBoost;
 
@@ -1719,7 +1723,7 @@
             }
 
             // Drone Position Update
-            if (state.hasGoldDrone && goldenDrone) {
+            if (state.hasGoldDrone) {
                 goldenDrone.style.display = 'block';
                 const time = Date.now() / 1000;
                 goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`;
@@ -1901,9 +1905,10 @@
             
             const totalCps = (state.cps * state.multiplier * state.prestigeBonus);
             const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
+            const upgradeBonusPercent = (state.unlockedUpgrades - 1) * 5;
 
             if (cpsDisplay) {
-                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span> <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span>`;
+                cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span> <span class="text-yellow-400 font-bold ml-1">+${upgradeBonusPercent}% Upgrades</span> <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span>`;
             }
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
