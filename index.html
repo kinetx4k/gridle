@@ -2266,5 +2266,73 @@
         updateUI();
         renderLoop();
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+<script>
+    /**
+     * GLOBAL CONFIGURATION PARAMETERS
+     * These unique keys link your game to the Firebase cloud servers.
+     */
+    const firebaseGlobalSystemConfiguration = {
+        apiKey: "AIzaSyDDrL7ALl8BqM6cPhUc7JmKOjTXw72SLzo",
+        authDomain: "cookie-clicker-leaderboa-dd7d3.firebaseapp.com",
+        databaseURL: "https://cookie-clicker-leaderboa-dd7d3-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "cookie-clicker-leaderboa-dd7d3",
+        storageBucket: "cookie-clicker-leaderboa-dd7d3.firebasestorage.app",
+        messagingSenderId: "753442033326",
+        appId: "1:753442033326:web:ca3f6c455bb0df6ca7673f"
+    };
+
+    /**
+     * SYSTEM STATE STORAGE
+     * These variables manage the active communication channels.
+     */
+    let primaryFirebaseApplicationReference = null;
+    let globalRealtimeDatabaseInterface = null;
+
+    /**
+     * INITIALIZATION ROUTINE
+     * This function performs the necessary handshakes to connect to the internet.
+     */
+    const performGlobalCloudSystemInitialization = function() {
+        console.log("Starting the connection process to the global servers...");
+
+        try {
+            // Initialize the primary application layer
+            primaryFirebaseApplicationReference = firebase.initializeApp(firebaseGlobalSystemConfiguration);
+            
+            // Connect to the specific database service
+            globalRealtimeDatabaseInterface = firebase.database();
+            
+            console.log("Step 1: Application layer is ready.");
+            console.log("Step 2: Database interface is active.");
+
+            // Check if the internet connection is working correctly
+            const connectivityCheckReference = globalRealtimeDatabaseInterface.ref(".info/connected");
+            
+            connectivityCheckReference.on("value", function(snapshot) {
+                const isCurrentlyConnectedToCloud = snapshot.val();
+                
+                if (isCurrentlyConnectedToCloud === true) {
+                    console.log("STATUS: The game is now CONNECTED to the global leaderboard.");
+                } else {
+                    console.warn("STATUS: The game is currently DISCONNECTED from the global leaderboard.");
+                }
+            });
+
+        } catch (initializationError) {
+            console.error("The system could not start the cloud connection.");
+            console.error("Error details:", initializationError.message);
+            
+            alert("Warning: Could not reach the highscore server. Please check your internet.");
+        }
+    };
+
+    // Run the connection process immediately
+    performGlobalCloudSystemInitialization();
+
+    console.log("Setup complete. The game is waiting for your score data.");
+</script>
 </body>
 </html>
