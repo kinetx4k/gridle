@@ -804,6 +804,8 @@
                 <svg class="absolute inset-0 w-full h-full">
                     <line id="link-left" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-right" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-top" class="trio-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-bottom" class="trio-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                 </svg>
                 <div id="cookie-left" class="side-cookie">
                     <svg viewBox="0 0 200 200">
@@ -814,6 +816,22 @@
                     </svg>
                 </div>
                 <div id="cookie-right" class="side-cookie">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
+                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
+                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
+                    </svg>
+                </div>
+                <div id="cookie-top" class="side-cookie opacity-0">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
+                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
+                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
+                    </svg>
+                </div>
+                <div id="cookie-bottom" class="side-cookie opacity-0">
                     <svg viewBox="0 0 200 200">
                         <circle cx="100" cy="100" r="90" fill="#d2691e" />
                         <circle cx="100" cy="100" r="80" fill="#cd853f" />
@@ -950,6 +968,7 @@
             nanoOvenLevel: 0,
             numberFormat: 'short',
             hasCookieTrio: false, // Triple income/clicks
+            hasCookieQuintet: false, // Quintuple income/clicks
             hasAutoHand: false,  // Auto clicking logic
             autoHandState: 'cooling', // overdrive or cooling
             autoHandTimer: 0,
@@ -1043,6 +1062,7 @@
             { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
             { id: 'sp-auto-hand', type: 'auto-hand', name: 'Robotic Hand', description: 'Automatically clicks. Fills heat bar for 10s, cools for 5s.', basePrice: 500000000000, count: 0, icon: '🤖' },
             { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
+            { id: 'sp-cookie-quintet', type: 'cookie-quintet', name: 'Cookie Quintet', description: 'Attach 2 more cookies to your trio! QUINTUPLES all income and clicks.', basePrice: 50000000000000, count: 0, icon: '🍪🍪🍪🍪🍪' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -1342,8 +1362,12 @@
                 if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
                 // One time purchases
                 if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
+                if (item.id === 'sp-cookie-quintet' && state.hasCookieQuintet) continue;
                 if (item.id === 'sp-auto-hand' && state.hasAutoHand) continue;
                 
+                // Only show Quintet if Trio is owned
+                if (item.id === 'sp-cookie-quintet' && !state.hasCookieTrio) continue;
+
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
                 card.className = 'upgrade-card p-4 rounded-xl flex items-center gap-4 cursor-pointer disabled shadow-sm';
@@ -1363,6 +1387,8 @@
                     bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
                 } else if (item.type === 'cookie-trio') {
                     bonusText = `Effect: 300% Multiplier`;
+                } else if (item.type === 'cookie-quintet') {
+                    bonusText = `Effect: 500% Multiplier`;
                 } else if (item.type === 'auto-hand') {
                     bonusText = `Effect: Active Clicking`;
                 } else if (state.activeTab === 'buildings') {
@@ -1412,9 +1438,12 @@
         function clickCookie(e, silent = false) {
             if (state.isPrestiging) return;
             
-            // Apply Trio bonus
-            let trioMult = state.hasCookieTrio ? 3 : 1;
-            const amount = state.clickPower * state.multiplier * state.prestigeBonus * trioMult;
+            // Apply Trio/Quintet bonus
+            let cookieMult = 1;
+            if (state.hasCookieQuintet) cookieMult = 5;
+            else if (state.hasCookieTrio) cookieMult = 3;
+
+            const amount = state.clickPower * state.multiplier * state.prestigeBonus * cookieMult;
             
             addCookies(amount);
             state.totalClicks++;
@@ -1488,6 +1517,10 @@
                     state.hasCookieTrio = true;
                     calculateCPS();
                 }
+                if (sp.type === 'cookie-quintet') {
+                    state.hasCookieQuintet = true;
+                    calculateCPS();
+                }
                 if (sp.type === 'auto-hand') {
                     state.hasAutoHand = true;
                     state.autoHandTimer = 10;
@@ -1547,8 +1580,9 @@
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
             baseCps *= quantumBoost;
 
-            // Trio boost
-            if (state.hasCookieTrio) baseCps *= 3;
+            // Trio/Quintet boost
+            if (state.hasCookieQuintet) baseCps *= 5;
+            else if (state.hasCookieTrio) baseCps *= 3;
 
             if (state.powerups.production.active > 0) {
                 baseCps *= 5;
@@ -1730,7 +1764,7 @@
                 goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
             }
 
-            // Trio Visuals logic
+            // Trio/Quintet Visuals logic
             if (state.hasCookieTrio) {
                 const trioEl = document.getElementById('trio-visuals');
                 trioEl.classList.remove('opacity-0');
@@ -1767,6 +1801,39 @@
                 linkR.setAttribute('y1', mainY);
                 linkR.setAttribute('x2', rx);
                 linkR.setAttribute('y2', ry);
+
+                // Quintet additions
+                if (state.hasCookieQuintet) {
+                    const topC = document.getElementById('cookie-top');
+                    const bottomC = document.getElementById('cookie-bottom');
+                    const linkT = document.getElementById('link-top');
+                    const linkB = document.getElementById('link-bottom');
+
+                    topC.classList.remove('opacity-0');
+                    bottomC.classList.remove('opacity-0');
+                    linkT.classList.remove('opacity-0');
+                    linkB.classList.remove('opacity-0');
+
+                    const tx = mainX + offY;
+                    const ty = mainY - dist - offX;
+                    const bx = mainX - offY;
+                    const by = mainY + dist + offX;
+
+                    topC.style.left = (tx - 60) + 'px';
+                    topC.style.top = (ty - 60) + 'px';
+                    bottomC.style.left = (bx - 60) + 'px';
+                    bottomC.style.top = (by - 60) + 'px';
+
+                    linkT.setAttribute('x1', mainX);
+                    linkT.setAttribute('y1', mainY);
+                    linkT.setAttribute('x2', tx);
+                    linkT.setAttribute('y2', ty);
+
+                    linkB.setAttribute('x1', mainX);
+                    linkB.setAttribute('y1', mainY);
+                    linkB.setAttribute('x2', bx);
+                    linkB.setAttribute('y2', by);
+                }
             }
 
             // Robotic Hand logic
@@ -1839,6 +1906,7 @@
             state.quantumChipLevel = 0;
             state.nanoOvenLevel = 0;
             state.hasCookieTrio = false;
+            state.hasCookieQuintet = false;
             state.hasAutoHand = false;
             
             state.hasBird = false;
@@ -1913,7 +1981,12 @@
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
 
-            if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * (state.hasCookieTrio ? 3 : 1))}`;
+            if (clickPowerDisplay) {
+                let cookieMult = 1;
+                if (state.hasCookieQuintet) cookieMult = 5;
+                else if (state.hasCookieTrio) cookieMult = 3;
+                clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * cookieMult)}`;
+            }
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             
