@@ -31,17 +31,30 @@
             to { background-position: 80px 80px, 300px 300px; }
         }
 
-        /* --- Trio Effects --- */
+        /* --- Verknüpfungseffekte für die Keks-Kette --- */
         .trio-link {
             stroke: #ffd700;
             stroke-width: 4;
             stroke-dasharray: 10;
             animation: dash 1s linear infinite;
             filter: drop-shadow(0 0 8px #ffd700);
+            transition: opacity 0.5s ease;
+        }
+
+        .decet-link {
+            stroke: #ff4500;
+            stroke-width: 3;
+            stroke-dasharray: 5;
+            animation: dash-fast 0.5s linear infinite;
+            filter: drop-shadow(0 0 12px #ff4500);
         }
 
         @keyframes dash {
             to { stroke-dashoffset: -20; }
+        }
+
+        @keyframes dash-fast {
+            to { stroke-dashoffset: -15; }
         }
 
         .side-cookie {
@@ -50,6 +63,13 @@
             height: 120px;
             filter: drop-shadow(0 0 10px rgba(210, 105, 30, 0.4));
             transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .decet-cookie {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
         }
 
         #prestige-overlay {
@@ -341,7 +361,6 @@
             display: none;
         }
 
-        /* Drone Styles */
         #golden-drone {
             position: absolute;
             width: 60px;
@@ -764,45 +783,52 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Cookie Trio Visuals -->
+            <!-- Cookie Trio/Quintet/Decet Visuals -->
             <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
                 <svg class="absolute inset-0 w-full h-full">
+                    <!-- Standard Links -->
                     <line id="link-left" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-right" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-top" class="trio-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                     <line id="link-bottom" class="trio-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    
+                    <!-- Decet Specific Links -->
+                    <line id="link-deep-bottom" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-top-l" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-top-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-bottom-l" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-bottom-r" class="trio-link decet-link opacity-0" x1="0" y1="0" x2="0" y2="0" />
                 </svg>
+                
+                <!-- Quintet Cookies -->
                 <div id="cookie-left" class="side-cookie">
-                    <svg viewBox="0 0 200 200">
-                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
-                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
-                    </svg>
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
                 </div>
                 <div id="cookie-right" class="side-cookie">
-                    <svg viewBox="0 0 200 200">
-                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
-                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
-                    </svg>
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
                 </div>
                 <div id="cookie-top" class="side-cookie opacity-0">
-                    <svg viewBox="0 0 200 200">
-                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
-                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
-                    </svg>
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
                 </div>
-                <div id="cookie-bottom" class="side-cookie opacity-0">
-                    <svg viewBox="0 0 200 200">
-                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
-                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
-                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
-                    </svg>
+                <div id="cookie-bottom-node" class="side-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
+                </div>
+
+                <!-- Decet Additional Cookies -->
+                <div id="cookie-deep-bottom" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-top-l" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-top-r" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-bottom-l" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
+                </div>
+                <div id="cookie-bottom-r" class="side-cookie decet-cookie opacity-0">
+                    <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
             </div>
             
@@ -820,9 +846,7 @@
                 </svg>
                 <div id="drone-cookie" class="drone-forming-cookie">
                     <svg viewBox="0 0 200 200" width="20" height="20">
-                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
-                        <circle cx="60" cy="60" r="10" fill="#4b3621" />
-                        <circle cx="140" cy="140" r="10" fill="#4b3621" />
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="60" cy="60" r="10" fill="#4b3621" /><circle cx="140" cy="140" r="10" fill="#4b3621" />
                     </svg>
                 </div>
             </div>
@@ -846,8 +870,8 @@
 
             <div class="cookie-container z-10">
                 <svg id="main-cookie" width="300" height="300" viewBox="0 0 200 200">
-                    <circle id="cookie-bottom" cx="100" cy="100" r="90" fill="#d2691e" />
-                    <circle id="cookie-top" cx="100" cy="100" r="80" fill="#cd853f" />
+                    <circle id="cookie-bottom-main" cx="100" cy="100" r="90" fill="#d2691e" />
+                    <circle id="cookie-top-main" cx="100" cy="100" r="80" fill="#cd853f" />
                     
                     <g id="gold-layer" opacity="0">
                         <path class="gold-vein" d="M60 40 Q80 70 120 40" fill="none" stroke="#ffd700" stroke-width="4" stroke-linecap="round" />
@@ -932,8 +956,9 @@
             quantumChipLevel: 0,
             nanoOvenLevel: 0,
             numberFormat: 'short',
-            hasCookieTrio: false, // Triple income/clicks
-            hasCookieQuintet: false, // Quintuple income/clicks
+            hasCookieTrio: false, 
+            hasCookieQuintet: false,
+            hasCookieDecet: false, // 10 Cookies total
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -1024,6 +1049,7 @@
             { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
             { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
             { id: 'sp-cookie-quintet', type: 'cookie-quintet', name: 'Cookie Quintet', description: 'Attach 2 more cookies to your trio! QUINTUPLES all income and clicks.', basePrice: 50000000000000, count: 0, icon: '🍪🍪🍪🍪🍪' },
+            { id: 'sp-cookie-decet', type: 'cookie-decet', name: 'Cookie Decet', description: 'The ultimate cookie chain! 5 extra cookies attached in a complex pattern. 10x Multiplier for everything.', basePrice: 2500000000000000, count: 0, icon: '🍩🍩🍩🍩🍩' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -1317,16 +1343,14 @@
                 const item = list[i];
                 if (!item) continue;
 
-                // Hidden Logic for unique one-time bird
                 if (item.id === 'sp-bird' && state.hasBird) continue;
-                // Hidden Logic for one-time gold drone
                 if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
-                // One time purchases
                 if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
                 if (item.id === 'sp-cookie-quintet' && state.hasCookieQuintet) continue;
+                if (item.id === 'sp-cookie-decet' && state.hasCookieDecet) continue;
                 
-                // Only show Quintet if Trio is owned
                 if (item.id === 'sp-cookie-quintet' && !state.hasCookieTrio) continue;
+                if (item.id === 'sp-cookie-decet' && !state.hasCookieQuintet) continue;
 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1349,6 +1373,8 @@
                     bonusText = `Effect: 300% Multiplier`;
                 } else if (item.type === 'cookie-quintet') {
                     bonusText = `Effect: 500% Multiplier`;
+                } else if (item.type === 'cookie-decet') {
+                    bonusText = `Effect: 1000% Multiplier`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
                 } else {
@@ -1396,9 +1422,9 @@
         function clickCookie(e, silent = false) {
             if (state.isPrestiging) return;
             
-            // Apply Trio/Quintet bonus
             let cookieMult = 1;
-            if (state.hasCookieQuintet) cookieMult = 5;
+            if (state.hasCookieDecet) cookieMult = 10;
+            else if (state.hasCookieQuintet) cookieMult = 5;
             else if (state.hasCookieTrio) cookieMult = 3;
 
             const amount = state.clickPower * state.multiplier * state.prestigeBonus * cookieMult;
@@ -1421,7 +1447,6 @@
         function addCookies(amount) {
             state.cookies += amount;
             state.totalCookiesEarned += amount;
-            
             checkMilestoneAchievements();
         }
 
@@ -1479,6 +1504,10 @@
                     state.hasCookieQuintet = true;
                     calculateCPS();
                 }
+                if (sp.type === 'cookie-decet') {
+                    state.hasCookieDecet = true;
+                    calculateCPS();
+                }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
                 }
@@ -1526,15 +1555,14 @@
             const milestoneBoost = 1 + (milestoneCount * 0.15);
             baseCps *= milestoneBoost;
 
-            // Upgrade Bonus: 5% extra pro freigeschaltetem Upgrade (über Cursor hinaus)
             const upgradeBoost = 1 + ((state.unlockedUpgrades - 1) * 0.05);
             baseCps *= upgradeBoost;
 
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
             baseCps *= quantumBoost;
 
-            // Trio/Quintet boost
-            if (state.hasCookieQuintet) baseCps *= 5;
+            if (state.hasCookieDecet) baseCps *= 10;
+            else if (state.hasCookieQuintet) baseCps *= 5;
             else if (state.hasCookieTrio) baseCps *= 3;
 
             if (state.powerups.production.active > 0) {
@@ -1709,7 +1737,6 @@
                 }
             }
 
-            // Drone Position Update
             if (state.hasGoldDrone) {
                 goldenDrone.style.display = 'block';
                 const time = Date.now() / 1000;
@@ -1717,7 +1744,6 @@
                 goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
             }
 
-            // Trio/Quintet Visuals logic
             if (state.hasCookieTrio) {
                 const trioEl = document.getElementById('trio-visuals');
                 trioEl.classList.remove('opacity-0');
@@ -1755,10 +1781,9 @@
                 linkR.setAttribute('x2', rx);
                 linkR.setAttribute('y2', ry);
 
-                // Quintet additions
                 if (state.hasCookieQuintet) {
                     const topC = document.getElementById('cookie-top');
-                    const bottomC = document.getElementById('cookie-bottom');
+                    const bottomC = document.getElementById('cookie-bottom-node');
                     const linkT = document.getElementById('link-top');
                     const linkB = document.getElementById('link-bottom');
 
@@ -1786,6 +1811,70 @@
                     linkB.setAttribute('y1', mainY);
                     linkB.setAttribute('x2', bx);
                     linkB.setAttribute('y2', by);
+
+                    if (state.hasCookieDecet) {
+                        const deepB = document.getElementById('cookie-deep-bottom');
+                        const topL = document.getElementById('cookie-top-l');
+                        const topR = document.getElementById('cookie-top-r');
+                        const botL = document.getElementById('cookie-bottom-l');
+                        const botR = document.getElementById('cookie-bottom-r');
+                        
+                        const linkDB = document.getElementById('link-deep-bottom');
+                        const linkTL = document.getElementById('link-top-l');
+                        const linkTR = document.getElementById('link-top-r');
+                        const linkBL = document.getElementById('link-bottom-l');
+                        const linkBR = document.getElementById('link-bottom-r');
+
+                        [deepB, topL, topR, botL, botR, linkDB, linkTL, linkTR, linkBL, linkBR].forEach(el => el.classList.remove('opacity-0'));
+
+                        // Deep Bottom (An Main gebunden)
+                        const dbx = mainX + Math.sin(time * 1.5) * 40;
+                        const dby = mainY + dist + 150 + Math.cos(time * 1.5) * 40;
+                        deepB.style.left = (dbx - 40) + 'px';
+                        deepB.style.top = (dby - 40) + 'px';
+                        linkDB.setAttribute('x1', mainX);
+                        linkDB.setAttribute('y1', mainY + dist);
+                        linkDB.setAttribute('x2', dbx);
+                        linkDB.setAttribute('y2', dby);
+
+                        // Top Children (An Cookie Top gebunden)
+                        const tlx = tx - 120 + Math.sin(time * 2) * 20;
+                        const tly = ty - 120 + Math.cos(time * 2) * 20;
+                        topL.style.left = (tlx - 40) + 'px';
+                        topL.style.top = (tly - 40) + 'px';
+                        linkTL.setAttribute('x1', tx);
+                        linkTL.setAttribute('y1', ty);
+                        linkTL.setAttribute('x2', tlx);
+                        linkTL.setAttribute('y2', tly);
+
+                        const trx = tx + 120 + Math.sin(time * 2.2) * 20;
+                        const try_ = ty - 120 + Math.cos(time * 2.2) * 20;
+                        topR.style.left = (trx - 40) + 'px';
+                        topR.style.top = (try_ - 40) + 'px';
+                        linkTR.setAttribute('x1', tx);
+                        linkTR.setAttribute('y1', ty);
+                        linkTR.setAttribute('x2', trx);
+                        linkTR.setAttribute('y2', try_);
+
+                        // Bottom Children (An Cookie Bottom gebunden)
+                        const blx = bx - 120 + Math.sin(time * 1.8) * 20;
+                        const bly = by + 120 + Math.cos(time * 1.8) * 20;
+                        botL.style.left = (blx - 40) + 'px';
+                        botL.style.top = (bly - 40) + 'px';
+                        linkBL.setAttribute('x1', bx);
+                        linkBL.setAttribute('y1', by);
+                        linkBL.setAttribute('x2', blx);
+                        linkBL.setAttribute('y2', bly);
+
+                        const brx = bx + 120 + Math.sin(time * 1.6) * 20;
+                        const bry = by + 120 + Math.cos(time * 1.6) * 20;
+                        botR.style.left = (brx - 40) + 'px';
+                        botR.style.top = (bry - 40) + 'px';
+                        linkBR.setAttribute('x1', bx);
+                        linkBR.setAttribute('y1', by);
+                        linkBR.setAttribute('x2', brx);
+                        linkBR.setAttribute('y2', bry);
+                    }
                 }
             }
         }
@@ -1793,7 +1882,6 @@
         function showPrestigeModal() {
             let potentialPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             if (potentialPoints > PRESTIGE_MAX_BONUS_PER_RUN) potentialPoints = PRESTIGE_MAX_BONUS_PER_RUN;
-            
             document.getElementById('prestige-gain-modal').innerText = `+${potentialPoints}% Production Bonus`;
             document.getElementById('prestige-confirm-modal').style.display = 'flex';
         }
@@ -1804,28 +1892,20 @@
 
         async function executePrestige() {
             if (state.cookies < PRESTIGE_THRESHOLD || state.isPrestiging) return;
-            
             closePrestigeModal();
             state.isPrestiging = true;
             unlockAchievement('first_prestige');
-            
             let newPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             if (newPoints > PRESTIGE_MAX_BONUS_PER_RUN) newPoints = PRESTIGE_MAX_BONUS_PER_RUN;
-            
             const extraBonus = newPoints * 0.01; 
-            
             document.body.classList.add('black-hole-active');
             const wrapper = document.getElementById('main-content-wrapper');
             wrapper.classList.add('sucking-effect');
-
             await new Promise(r => setTimeout(r, 2000));
-
             state.totalPrestigeEarned += state.prestigeLevel + 1;
             state.prestigeBonus += extraBonus;
             state.prestigeLevel++;
-            
             state.achievements = state.achievements.filter(id => !id.startsWith('milestone_'));
-            
             state.cookies = 0; 
             state.cps = 0; 
             state.clickPower = 1;
@@ -1836,31 +1916,23 @@
             state.nanoOvenLevel = 0;
             state.hasCookieTrio = false;
             state.hasCookieQuintet = false;
-            
+            state.hasCookieDecet = false;
             state.hasBird = false;
             state.hasGoldDrone = false;
             if (collectorBird) collectorBird.style.display = 'none';
             if (goldenDrone) goldenDrone.style.display = 'none';
-
             [...activeSpecialCookies].forEach(c => removeCookie(c.id));
-
             buildings.forEach(b => b.count = 0);
             specials.forEach(s => { if(s.count !== undefined) s.count = 0; });
-            
             initShop(); 
             updateUI(); 
-
             await new Promise(r => setTimeout(r, 500));
-
             wrapper.classList.remove('sucking-effect');
             wrapper.classList.add('spitting-effect');
-
             await new Promise(r => setTimeout(r, 1500));
-            
             document.body.classList.remove('black-hole-active');
             wrapper.classList.remove('spitting-effect');
             state.isPrestiging = false;
-            
             saveGame();
         }
 
@@ -1895,23 +1967,19 @@
 
         function updateUI() {
             if (cookieDisplay) cookieDisplay.innerText = `${formatNumber(state.cookies)} Cookies`;
-            
             const milestoneCount = state.achievements.filter(id => id.startsWith('milestone_')).length;
             const bonusPercent = milestoneCount * 15;
-            
             const totalCps = (state.cps * state.multiplier * state.prestigeBonus);
             const currentPrestigeBonusText = ((state.prestigeBonus - 1) * 100).toFixed(0);
             const upgradeBonusPercent = (state.unlockedUpgrades - 1) * 5;
-
             if (cpsDisplay) {
                 cpsDisplay.innerHTML = `per second: ${formatNumber(totalCps)} <span class="text-purple-400 font-bold ml-1">+${currentPrestigeBonusText}% Prestige</span> <span class="text-yellow-400 font-bold ml-1">+${upgradeBonusPercent}% Upgrades</span> <span class="text-green-400 font-bold ml-1">+${bonusPercent}% Bonus</span>`;
             }
-
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
-
             if (clickPowerDisplay) {
                 let cookieMult = 1;
-                if (state.hasCookieQuintet) cookieMult = 5;
+                if (state.hasCookieDecet) cookieMult = 10;
+                else if (state.hasCookieQuintet) cookieMult = 5;
                 else if (state.hasCookieTrio) cookieMult = 3;
                 clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * cookieMult)}`;
             }
@@ -1933,32 +2001,25 @@
             else if (state.clickHeat >= 25) state.multiplier = 1.5;
             else state.multiplier = 1.0;
 
-            const bottom = document.getElementById('cookie-bottom');
-            const top = document.getElementById('cookie-top');
+            const bottom = document.getElementById('cookie-bottom-main');
+            const top = document.getElementById('cookie-top-main');
             const goldLayer = document.getElementById('gold-layer');
             const mainCookieSVG = document.getElementById('main-cookie');
-            
             const heatRatio = state.clickHeat / 100;
-
             const targetGold = "#ffd700";
             const targetDarkGold = "#b8860b";
             const currentTopColor = lerpColor("#cd853f", targetGold, heatRatio);
             const currentBottomColor = lerpColor("#d2691e", targetDarkGold, heatRatio);
-
             bottom.setAttribute('fill', currentBottomColor);
             top.setAttribute('fill', currentTopColor);
-            
             if (goldLayer) {
                 goldLayer.setAttribute('opacity', heatRatio);
                 goldLayer.style.transform = `scale(${0.8 + heatRatio * 0.2})`;
                 goldLayer.style.transformOrigin = 'center';
             }
-
             const glowAlpha = 0.4 + heatRatio * 0.4;
             mainCookieSVG.style.filter = `drop-shadow(0 0 20px rgba(255, 215, 0, ${glowAlpha}))`;
-
             let r, g, b;
-
             if (heatRatio < 0.5) {
                 const localRatio = heatRatio / 0.5;
                 r = Math.round(26 + (180 - 26) * localRatio);
@@ -1970,58 +2031,38 @@
                 g = Math.round(160 + (0 - 160) * localRatio);
                 b = Math.round(20 + (0 - 20) * localRatio);
             }
-            
             document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-            
             if (frenzyBar) frenzyBar.style.width = state.clickHeat + '%';
             if (multiplierDisplay) multiplierDisplay.innerText = `x${state.multiplier.toFixed(1)}`;
-            
-            if (state.clickHeat >= 30) {
-                document.body.classList.add('golden-frenzy');
-            } else {
-                document.body.classList.remove('golden-frenzy');
-            }
-
+            if (state.clickHeat >= 30) document.body.classList.add('golden-frenzy');
+            else document.body.classList.remove('golden-frenzy');
             if (state.multiplier >= 5 && frenzyBar) frenzyBar.classList.add('animate-pulse');
             else if (frenzyBar) frenzyBar.classList.remove('animate-pulse');
-            
             const remaining = Math.max(0, PRESTIGE_THRESHOLD - state.cookies);
             if (prestigeNeeded) prestigeNeeded.innerText = `Left: ${formatNumber(remaining)}`;
             const prestigeProg = Math.min(100, (state.cookies / PRESTIGE_THRESHOLD) * 100);
             if (prestigeBar) prestigeBar.style.width = prestigeProg + '%';
             if (prestigePercent) prestigePercent.innerText = Math.floor(prestigeProg) + '%';
-            
             let potentialPoints = Math.floor(state.cookies / PRESTIGE_THRESHOLD);
             if (potentialPoints > PRESTIGE_MAX_BONUS_PER_RUN) potentialPoints = PRESTIGE_MAX_BONUS_PER_RUN;
-
             const prestigeGainEl = document.getElementById('prestige-gain');
             if (prestigeGainEl) {
                 if (potentialPoints > 0) {
                     prestigeGainEl.innerText = `+${potentialPoints}% (MAX 500)`;
                     prestigeGainEl.classList.remove('hidden');
-                } else {
-                    prestigeGainEl.classList.add('hidden');
-                }
+                } else prestigeGainEl.classList.add('hidden');
             }
-
             if (state.cookies >= PRESTIGE_THRESHOLD) {
                 if (prestigeBtn) prestigeBtn.classList.remove('hidden');
                 if (prestigeNeeded) prestigeNeeded.innerText = "Ready for Prestige!";
             } else if (prestigeBtn) prestigeBtn.classList.add('hidden');
-            
             if (currentBonusDisplay) currentBonusDisplay.innerText = `Current Bonus: +${currentPrestigeBonusText}%`;
-            
             const hours = Math.floor(state.totalPlaytime / 3600);
             const minutes = Math.floor((state.totalPlaytime % 3600) / 60);
             const seconds = Math.floor(state.totalPlaytime % 60);
             const playtimeEl = document.getElementById('stat-playtime');
-            if (playtimeEl) {
-                playtimeEl.innerText = `${hours}h ${minutes}m ${seconds}s`;
-            }
-
+            if (playtimeEl) playtimeEl.innerText = `${hours}h ${minutes}m ${seconds}s`;
             updatePowerupHotbar();
-
-            // Drone Visual Update
             if (state.hasGoldDrone) {
                 const droneFill = document.getElementById('drone-fill');
                 const droneCookie = document.getElementById('drone-cookie');
@@ -2032,7 +2073,6 @@
                     droneCookie.style.transform = `translateX(-50%) scale(${0.5 + (state.goldDroneTimer / 15) * 0.5})`;
                 }
             }
-
             if (state.activeTab !== 'achievements') {
                 let list = state.activeTab === 'buildings' ? buildings : specials;
                 list.forEach(item => {
@@ -2041,16 +2081,12 @@
                         const price = getPrice(item);
                         const isPowerup = item.type === 'powerup';
                         const onCd = isPowerup ? state.powerups[item.powerupId].cd > 0 : false;
-
                         if (state.cookies >= price && !onCd) card.classList.remove('disabled');
                         else card.classList.add('disabled');
-                        
                         const countEl = document.getElementById(`count-${item.id}`);
                         if (countEl) countEl.innerText = item.count || 0;
-
                         const priceEl = document.getElementById('price-' + item.id);
                         if (priceEl) priceEl.innerText = formatNumber(price);
-
                         if (state.activeTab === 'buildings') {
                             const bonusLabel = document.getElementById('bonus-' + item.id);
                             const effMult = getUpgradeEfficiencyMult(item.count);
@@ -2070,7 +2106,6 @@
             const pTimer = document.getElementById('pu-timer-production');
             const pCd = document.getElementById('pu-cd-production');
             const pData = state.powerups.production;
-
             if (pSlot && pTimer && pCd) {
                 if (pData.active > 0) {
                     pSlot.className = 'powerup-slot active';
@@ -2088,12 +2123,10 @@
                     pCd.classList.add('hidden');
                 }
             }
-
             const gSlot = document.getElementById('pu-slot-golden');
             const gTimer = document.getElementById('pu-timer-golden');
             const gCd = document.getElementById('pu-cd-golden');
             const gData = state.powerups.golden;
-
             if (gSlot && gTimer && gCd) {
                 if (gData.active > 0) {
                     gSlot.className = 'powerup-slot active';
@@ -2142,23 +2175,13 @@
         function runTick() {
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
-            if (delta < 0.001) {
-                updateUI();
-                return;
-            }
+            if (delta < 0.001) { updateUI(); return; }
             state.lastTick = now;
-            
-            if (state.isPrestiging) {
-                updateUI();
-                return;
-            }
-
+            if (state.isPrestiging) { updateUI(); return; }
             state.totalPlaytime += delta;
-
             const baseDecay = 22;
             const decayPenalty = baseDecay * (1 - Math.min(0.9, state.heatResist));
             state.clickHeat = Math.max(0, state.clickHeat - (decayPenalty * delta));
-            
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
                 if (pu.active > 0) {
@@ -2166,19 +2189,12 @@
                     pu.active = Math.max(0, pu.active - delta);
                     if (key === 'production' && oldActive > 0 && pu.active === 0) calculateCPS();
                 }
-                if (pu.cd > 0) {
-                    pu.cd = Math.max(0, pu.cd - delta);
-                    if (pu.cd === 0) initShop();
-                }
+                if (pu.cd > 0) pu.cd = Math.max(0, pu.cd - delta);
             });
-
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
-            
-            // Golden Drone Tick
             if (state.hasGoldDrone) {
                 state.goldDroneTimer += delta;
                 if (state.goldDroneTimer >= 15) {
-                    // Spawn a random special cookie
                     const pool = ['golden', 'blue', 'green', 'red'];
                     const weights = [0.6, 0.2, 0.15, 0.05];
                     let r = Math.random();
@@ -2191,9 +2207,7 @@
                     state.goldDroneTimer = 0;
                 }
             }
-
             const spawnMult = state.powerups.golden.active > 0 ? 5 : 1;
-
             if (state.multiplier >= 3.0) {
                 state.goldenCookieTimer += delta * spawnMult;
                 if (state.goldenCookieTimer >= 5) {
@@ -2201,25 +2215,21 @@
                     state.goldenCookieTimer = 0;
                 }
             } else state.goldenCookieTimer = 0;
-            
             state.randomGoldenSpawnTimer += delta * spawnMult;
             if (state.randomGoldenSpawnTimer >= 1.0) {
                 if (Math.random() < 0.002 * spawnMult) spawnSpecialCookie('golden');
                 state.randomGoldenSpawnTimer = 0;
             }
-            
             state.blueCookieSpawnTimer += delta;
             if (state.blueCookieSpawnTimer >= 1.0) {
                 if (Math.random() < 0.01) spawnSpecialCookie('blue');
                 state.blueCookieSpawnTimer = 0;
             }
-
             state.redCookieSpawnTimer += delta;
             if (state.redCookieSpawnTimer >= 1.0) {
                 if (Math.random() < 0.001) spawnSpecialCookie('red');
                 state.redCookieSpawnTimer = 0;
             }
-
             updateSpecialPhysics();
             updateUI();
         }
@@ -2234,34 +2244,22 @@
                 if (fpsEl) fpsEl.innerText = `FPS: ${fps}`;
                 frameCount = 0;
                 lastFpsUpdate = now;
-                
                 const startup = document.getElementById('startup-modal');
                 if (startup && startup.style.display === 'none') {
-                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) {
-                        showPerformanceModal();
-                    }
+                    if (fps < 40 && state.showParticles && !state.performanceWarningShown) showPerformanceModal();
                 }
             }
         }
 
         setInterval(runTick, 16); 
-
-        function renderLoop() {
-            updateFPS();
-            requestAnimationFrame(renderLoop);
-        }
-
+        function renderLoop() { updateFPS(); requestAnimationFrame(renderLoop); }
         setInterval(saveGame, 30000);
-
         mainCookie.addEventListener('mousedown', (e) => { clickCookie(e); });
         mainCookie.addEventListener('contextmenu', e => e.preventDefault());
-        
         window.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
             keysPressed[key] = true;
-            if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) {
-                showResetModal();
-            }
+            if (keysPressed['k'] && keysPressed['n'] && keysPressed['x']) showResetModal();
             if (e.code === 'Space') {
                 e.preventDefault();
                 const rect = mainCookie.getBoundingClientRect();
@@ -2269,13 +2267,11 @@
                 mainCookie.style.transform = 'scale(0.95)';
             }
         });
-        
         window.addEventListener('keyup', (key) => { 
             const k = key.key.toLowerCase();
             keysPressed[k] = false;
             if (key.code === 'Space') mainCookie.style.transform = ''; 
         });
-
         loadGame();
         initShop();
         updateParticleUI();
