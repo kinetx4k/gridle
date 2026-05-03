@@ -31,6 +31,52 @@
             to { background-position: 80px 80px, 300px 300px; }
         }
 
+        /* --- Trio Effects --- */
+        .trio-link {
+            stroke: #ffd700;
+            stroke-width: 4;
+            stroke-dasharray: 10;
+            animation: dash 1s linear infinite;
+            filter: drop-shadow(0 0 8px #ffd700);
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+
+        .side-cookie {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 0 10px rgba(210, 105, 30, 0.4));
+            transition: all 0.3s ease;
+        }
+
+        /* --- Auto Hand --- */
+        #robotic-hand {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+        }
+
+        .hand-clicking {
+            animation: tap 0.2s infinite ease-in-out;
+        }
+
+        @keyframes tap {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .hand-cooling {
+            filter: grayscale(1) brightness(0.5);
+            opacity: 0.5;
+        }
+
         #prestige-overlay {
             position: fixed;
             inset: 0;
@@ -320,6 +366,7 @@
             display: none;
         }
 
+        /* Drone Styles */
         #golden-drone {
             position: absolute;
             width: 60px;
@@ -742,6 +789,41 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
+            <!-- Robotic Hand Entity -->
+            <div id="robotic-hand">
+                <svg viewBox="0 0 100 100">
+                    <path d="M30 60 C30 40, 40 30, 50 30 C60 30, 70 40, 70 60 L70 90 L30 90 Z" fill="#607d8b" />
+                    <circle cx="50" cy="30" r="10" fill="#00bcd4" />
+                    <rect x="45" y="40" width="10" height="40" fill="#455a64" rx="2" />
+                    <path d="M40 30 L60 30" stroke="white" stroke-width="2" />
+                </svg>
+            </div>
+
+            <!-- Cookie Trio Visuals -->
+            <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
+                <svg class="absolute inset-0 w-full h-full">
+                    <line id="link-left" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
+                    <line id="link-right" class="trio-link" x1="0" y1="0" x2="0" y2="0" />
+                </svg>
+                <div id="cookie-left" class="side-cookie">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
+                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
+                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
+                    </svg>
+                </div>
+                <div id="cookie-right" class="side-cookie">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="90" fill="#d2691e" />
+                        <circle cx="100" cy="100" r="80" fill="#cd853f" />
+                        <circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" />
+                        <circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" />
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Drone Entity -->
             <div id="golden-drone">
                 <div class="drone-cooldown-ring">
                     <div id="drone-fill" class="drone-cooldown-fill"></div>
@@ -856,7 +938,7 @@
             redCookieSpawnTimer: 0,
             activeTab: 'buildings',
             hasBird: false,
-            goldDroneCount: 0, // Changed to count for multiple drones
+            hasGoldDrone: false,
             goldDroneTimer: 0,
             achievements: [],
             showParticles: true,
@@ -867,6 +949,10 @@
             quantumChipLevel: 0,
             nanoOvenLevel: 0,
             numberFormat: 'short',
+            hasCookieTrio: false, // Triple income/clicks
+            hasAutoHand: false,  // Auto clicking logic
+            autoHandState: 'cooling', // overdrive or cooling
+            autoHandTimer: 0,
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -955,6 +1041,8 @@
             { id: 'sp-clicker', type: 'click', name: 'Stronger Grip', description: 'Doubles the base click power.', basePrice: 50, factor: 2, count: 0, icon: '💪' },
             { id: 'sp-bird', type: 'bird', name: 'Collector Bird', description: 'A bird that collects special cookies.', basePrice: 1000000000, count: 0, icon: '🐦' },
             { id: 'sp-gold-drone', type: 'gold-drone', name: 'Golden Drone', description: 'Spawns a special cookie every 15 seconds.', basePrice: 10000000000, count: 0, icon: '🚁' },
+            { id: 'sp-auto-hand', type: 'auto-hand', name: 'Robotic Hand', description: 'Automatically clicks. Fills heat bar for 10s, cools for 5s.', basePrice: 500000000000, count: 0, icon: '🤖' },
+            { id: 'sp-cookie-trio', type: 'cookie-trio', name: 'Cookie Trio', description: 'Adds two linked cookies. TRIPLES all income and clicks.', basePrice: 1000000000000, count: 0, icon: '🍪🍪🍪' },
             { id: 'sp-heat-shield', type: 'heat-resist', name: 'Thermal Shielding', description: 'Reduces heat decay speed by 5%.', basePrice: 250000000, factor: 0.05, count: 0, icon: '🛡️' },
             { id: 'sp-quantum-chip', type: 'quantum-chip', name: 'Quantum Core', description: 'Increases base production by 10%.', basePrice: 8000000000, factor: 0.1, count: 0, icon: '💾' },
             { id: 'sp-nano-oven', type: 'nano-oven', name: 'Nano Oven', description: 'Reduces building costs by 1%.', basePrice: 15000000000, factor: 0.01, count: 0, icon: '🍳' },
@@ -1215,7 +1303,7 @@
                         card.innerHTML = `
                             <div class="icon">${ach.icon}</div>
                             <div class="flex-1">
-                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+15% Bonus</span></div>
+                                <div class="font-bold text-sm text-yellow-400">${ach.name} <span class="text-green-400 text-[10px] ml-1">+5% Bonus</span></div>
                                 <div class="text-[10px] text-zinc-500">${ach.description}</div>
                             </div>
                             <div class="text-yellow-400 text-xs">✓</div>
@@ -1248,7 +1336,13 @@
                 const item = list[i];
                 if (!item) continue;
 
+                // Hidden Logic for unique one-time bird
                 if (item.id === 'sp-bird' && state.hasBird) continue;
+                // Hidden Logic for one-time gold drone
+                if (item.id === 'sp-gold-drone' && state.hasGoldDrone) continue;
+                // One time purchases
+                if (item.id === 'sp-cookie-trio' && state.hasCookieTrio) continue;
+                if (item.id === 'sp-auto-hand' && state.hasAutoHand) continue;
                 
                 const card = document.createElement('div');
                 card.id = `upgrade-${item.id}`;
@@ -1267,10 +1361,12 @@
                     bonusText = `Mult: +${(state.quantumChipLevel * 10).toFixed(0)}%`;
                 } else if (item.type === 'nano-oven') {
                     bonusText = `Discount: ${(state.nanoOvenLevel * 1).toFixed(0)}%`;
+                } else if (item.type === 'cookie-trio') {
+                    bonusText = `Effect: 300% Multiplier`;
+                } else if (item.type === 'auto-hand') {
+                    bonusText = `Effect: Active Clicking`;
                 } else if (state.activeTab === 'buildings') {
                     bonusText = `Each +${formatNumber(item.baseCps)} CPS`;
-                } else if (item.type === 'gold-drone') {
-                    bonusText = `Speed: +${state.goldDroneCount} Drones`;
                 } else {
                     bonusText = "One-time purchase";
                 }
@@ -1313,17 +1409,24 @@
             return shortValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + words[exponent];
         }
 
-        function clickCookie(e) {
+        function clickCookie(e, silent = false) {
             if (state.isPrestiging) return;
-            const amount = state.clickPower * state.multiplier * state.prestigeBonus;
+            
+            // Apply Trio bonus
+            let trioMult = state.hasCookieTrio ? 3 : 1;
+            const amount = state.clickPower * state.multiplier * state.prestigeBonus * trioMult;
+            
             addCookies(amount);
             state.totalClicks++;
             
             unlockAchievement('first_click');
             
             state.clickHeat = Math.min(100, state.clickHeat + 4.0);
-            createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
-            spawnFloatingCookie();
+            
+            if (!silent) {
+                createParticle(e.clientX, e.clientY, `+${formatNumber(amount)}`);
+                spawnFloatingCookie();
+            }
             updateUI();
             saveGame();
         }
@@ -1379,7 +1482,16 @@
                     unlockAchievement('bird_buy');
                 }
                 if (sp.type === 'gold-drone') {
-                    state.goldDroneCount++;
+                    state.hasGoldDrone = true;
+                }
+                if (sp.type === 'cookie-trio') {
+                    state.hasCookieTrio = true;
+                    calculateCPS();
+                }
+                if (sp.type === 'auto-hand') {
+                    state.hasAutoHand = true;
+                    state.autoHandTimer = 10;
+                    state.autoHandState = 'overdrive';
                 }
                 if (sp.type === 'heat-resist') {
                     state.heatResist += sp.factor;
@@ -1406,7 +1518,6 @@
             if (item.type === 'quantum-chip') scaling = 3.0;
             if (item.type === 'nano-oven') scaling = 4.0;
             if (item.type === 'heat-resist') scaling = 2.0;
-            if (item.type === 'gold-drone') scaling = 10.0; // Tenfold price scaling
 
             let price = Math.floor(item.basePrice * Math.pow(scaling, item.count || 0));
             
@@ -1431,6 +1542,9 @@
 
             const quantumBoost = 1 + (state.quantumChipLevel * 0.1);
             baseCps *= quantumBoost;
+
+            // Trio boost
+            if (state.hasCookieTrio) baseCps *= 3;
 
             if (state.powerups.production.active > 0) {
                 baseCps *= 5;
@@ -1604,11 +1718,75 @@
                 }
             }
 
-            if (state.goldDroneCount > 0 && goldenDrone) {
+            // Drone Position Update
+            if (state.hasGoldDrone && goldenDrone) {
                 goldenDrone.style.display = 'block';
                 const time = Date.now() / 1000;
                 goldenDrone.style.left = `calc(50% - 150px + ${Math.sin(time * 0.5) * 100}px)`;
                 goldenDrone.style.top = `calc(30% + ${Math.cos(time * 0.7) * 40}px)`;
+            }
+
+            // Trio Visuals logic
+            if (state.hasCookieTrio) {
+                const trioEl = document.getElementById('trio-visuals');
+                trioEl.classList.remove('opacity-0');
+                const mainRect = mainCookie.getBoundingClientRect();
+                const mainX = mainRect.left + mainRect.width / 2;
+                const mainY = mainRect.top + mainRect.height / 2;
+
+                const leftC = document.getElementById('cookie-left');
+                const rightC = document.getElementById('cookie-right');
+                const linkL = document.getElementById('link-left');
+                const linkR = document.getElementById('link-right');
+
+                const time = Date.now() / 1000;
+                const dist = 220;
+                const offX = Math.sin(time * 0.8) * 20;
+                const offY = Math.cos(time * 1.2) * 20;
+
+                const lx = mainX - dist + offX;
+                const ly = mainY + offY;
+                const rx = mainX + dist - offX;
+                const ry = mainY - offY;
+
+                leftC.style.left = (lx - 60) + 'px';
+                leftC.style.top = (ly - 60) + 'px';
+                rightC.style.left = (rx - 60) + 'px';
+                rightC.style.top = (ry - 60) + 'px';
+
+                linkL.setAttribute('x1', mainX);
+                linkL.setAttribute('y1', mainY);
+                linkL.setAttribute('x2', lx);
+                linkL.setAttribute('y2', ly);
+
+                linkR.setAttribute('x1', mainX);
+                linkR.setAttribute('y1', mainY);
+                linkR.setAttribute('x2', rx);
+                linkR.setAttribute('y2', ry);
+            }
+
+            // Robotic Hand logic
+            if (state.hasAutoHand) {
+                const handEl = document.getElementById('robotic-hand');
+                handEl.style.display = 'block';
+                const mainRect = mainCookie.getBoundingClientRect();
+                const time = Date.now() / 1000;
+
+                if (state.autoHandState === 'overdrive') {
+                    handEl.classList.add('hand-clicking');
+                    handEl.classList.remove('hand-cooling');
+                    const hx = mainRect.left + mainRect.width / 2 + Math.sin(time * 5) * 50;
+                    const hy = mainRect.top + mainRect.height / 2 + Math.cos(time * 5) * 50;
+                    handEl.style.left = hx + 'px';
+                    handEl.style.top = hy + 'px';
+                } else {
+                    handEl.classList.remove('hand-clicking');
+                    handEl.classList.add('hand-cooling');
+                    const hx = mainRect.left + mainRect.width / 2;
+                    const hy = mainRect.top - 100;
+                    handEl.style.left = hx + 'px';
+                    handEl.style.top = hy + 'px';
+                }
             }
         }
 
@@ -1656,9 +1834,11 @@
             state.heatResist = 0;
             state.quantumChipLevel = 0;
             state.nanoOvenLevel = 0;
+            state.hasCookieTrio = false;
+            state.hasAutoHand = false;
             
             state.hasBird = false;
-            state.goldDroneCount = 0;
+            state.hasGoldDrone = false;
             if (collectorBird) collectorBird.style.display = 'none';
             if (goldenDrone) goldenDrone.style.display = 'none';
 
@@ -1728,7 +1908,7 @@
 
             document.title = `${formatNumber(state.cookies)} Cookies - Cookie Clicker`;
 
-            if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower)}`;
+            if (clickPowerDisplay) clickPowerDisplay.innerText = `Click Power: ${formatNumber(state.clickPower * (state.hasCookieTrio ? 3 : 1))}`;
             if (statTotalClicks) statTotalClicks.innerText = state.totalClicks;
             if (statAllTime) statAllTime.innerText = formatNumber(state.totalCookiesEarned);
             
@@ -1835,7 +2015,8 @@
 
             updatePowerupHotbar();
 
-            if (state.goldDroneCount > 0) {
+            // Drone Visual Update
+            if (state.hasGoldDrone) {
                 const droneFill = document.getElementById('drone-fill');
                 const droneCookie = document.getElementById('drone-cookie');
                 const progress = (state.goldDroneTimer / 15) * 100;
@@ -1972,6 +2153,25 @@
             const decayPenalty = baseDecay * (1 - Math.min(0.9, state.heatResist));
             state.clickHeat = Math.max(0, state.clickHeat - (decayPenalty * delta));
             
+            // Auto Hand Logic Cycle
+            if (state.hasAutoHand) {
+                state.autoHandTimer -= delta;
+                if (state.autoHandState === 'overdrive') {
+                    state.clickHeat = 100; // Stay full
+                    // Fast virtual clicks
+                    clickCookie({ clientX: 0, clientY: 0 }, true); 
+                    if (state.autoHandTimer <= 0) {
+                        state.autoHandState = 'cooling';
+                        state.autoHandTimer = 5;
+                    }
+                } else {
+                    if (state.autoHandTimer <= 0) {
+                        state.autoHandState = 'overdrive';
+                        state.autoHandTimer = 10;
+                    }
+                }
+            }
+
             Object.keys(state.powerups).forEach(key => {
                 const pu = state.powerups[key];
                 if (pu.active > 0) {
@@ -1987,10 +2187,11 @@
 
             if (state.cps > 0) addCookies(state.cps * state.multiplier * state.prestigeBonus * delta);
             
-            if (state.goldDroneCount > 0) {
-                // Timer runs faster based on drone count
-                state.goldDroneTimer += delta * state.goldDroneCount;
+            // Golden Drone Tick
+            if (state.hasGoldDrone) {
+                state.goldDroneTimer += delta;
                 if (state.goldDroneTimer >= 15) {
+                    // Spawn a random special cookie
                     const pool = ['golden', 'blue', 'green', 'red'];
                     const weights = [0.6, 0.2, 0.15, 0.05];
                     let r = Math.random();
