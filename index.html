@@ -410,7 +410,7 @@
             background: rgba(210, 105, 30, 0.1);
         }
 
-        #reset-modal, #performance-modal, #startup-modal, #prestige-confirm-modal {
+        #reset-modal, #performance-modal, #startup-modal, #prestige-confirm-modal, #username-modal, #leaderboard-modal, #change-username-modal {
             display: none;
             position: fixed;
             inset: 0;
@@ -598,6 +598,99 @@
             background: #d2691e;
             border-color: #f97316;
         }
+
+        /* LEADERBOARD AND MODAL STYLES PADDING */
+        .lb-tab-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #71717a;
+            border-bottom: 3px solid #27272a;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: #1f1f22;
+        }
+        
+        .lb-tab-btn:hover {
+            background: #2a2a2e;
+            color: #a1a1aa;
+        }
+
+        .lb-tab-btn.active {
+            color: #ffffff;
+            border-bottom: 3px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .lb-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #27272a;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .lb-row:hover {
+            background: #27272a;
+        }
+
+        .lb-rank {
+            width: 40px;
+            font-weight: bold;
+            color: #71717a;
+        }
+
+        .lb-name {
+            flex: 1;
+            font-weight: bold;
+            color: #e4e4e7;
+        }
+
+        .lb-score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .lb-score {
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        .lb-cps {
+            font-size: 10px;
+            color: #a1a1aa;
+        }
+
+        .lb-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: #18181b;
+            border-bottom: 2px solid #27272a;
+            font-size: 12px;
+            color: #71717a;
+            font-weight: bold;
+        }
+
+        .pulse-text {
+            animation: pulse-op 2s infinite;
+        }
+        
+        @keyframes pulse-op {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 8px;
+            min-height: 18px;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col md:flex-row">
@@ -605,6 +698,66 @@
     <div id="prestige-overlay">
         <div class="w-64 h-64 bg-black rounded-full shadow-[0_0_100px_50px_rgba(255,255,255,0.1)] relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-tr from-purple-900/30 to-transparent animate-spin duration-[3s]"></div>
+        </div>
+    </div>
+
+    <div id="username-modal">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-blue-500 max-w-md w-full text-center shadow-2xl relative">
+            <h2 class="text-3xl font-bold text-blue-500 mb-2">Welcome Player! 🎮</h2>
+            <p class="text-zinc-400 mb-6 text-sm">Enter a username to join the global leaderboard.</p>
+            
+            <input type="text" id="username-input" class="w-full p-4 bg-zinc-800 border-2 border-zinc-700 rounded-xl text-center font-bold text-xl tracking-wide outline-none focus:border-blue-500 transition text-white" placeholder="Your Name..." maxlength="16">
+            
+            <div id="username-error" class="error-message"></div>
+            
+            <button onclick="submitUsername()" id="submit-username-btn" class="w-full mt-4 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-lg transition shadow-[0_0_15px_rgba(37,99,235,0.5)]">START PLAYING</button>
+        </div>
+    </div>
+
+    <div id="change-username-modal">
+        <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-orange-500 max-w-md w-full text-center shadow-2xl relative">
+            <h2 class="text-3xl font-bold text-orange-500 mb-2">Change Name ✏️</h2>
+            <p class="text-zinc-400 mb-6 text-sm">Pick a new username. Your progress will be moved!</p>
+            
+            <input type="text" id="change-username-input" class="w-full p-4 bg-zinc-800 border-2 border-zinc-700 rounded-xl text-center font-bold text-xl tracking-wide outline-none focus:border-orange-500 transition text-white" placeholder="New Name..." maxlength="16">
+            
+            <div id="change-username-error" class="error-message"></div>
+            
+            <div class="flex gap-4 mt-4">
+                <button onclick="closeChangeUsernameModal()" class="flex-1 py-4 bg-zinc-700 hover:bg-zinc-600 rounded-xl font-bold transition">CANCEL</button>
+                <button onclick="submitNewUsername()" id="submit-change-username-btn" class="flex-1 py-4 bg-orange-600 hover:bg-orange-500 rounded-xl font-bold transition shadow-[0_0_15px_rgba(249,115,22,0.5)]">UPDATE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard-modal">
+        <div class="bg-zinc-900 rounded-2xl border-2 border-blue-500 max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col h-[80vh]">
+            <div class="p-6 bg-zinc-950 border-b border-zinc-800 flex justify-between items-center relative">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span>🏆</span> Global Leaderboard
+                </h2>
+                <button onclick="closeLeaderboardModal()" class="w-10 h-10 rounded-full bg-zinc-800 hover:bg-red-500 flex items-center justify-center transition text-white font-bold">X</button>
+                <div class="absolute bottom-2 right-6 text-[10px] text-zinc-500 pulse-text">Auto-updates every 10s</div>
+            </div>
+            
+            <div class="flex bg-zinc-900">
+                <button onclick="switchLbTab('highscore')" id="lb-tab-highscore" class="lb-tab-btn active">Highscore</button>
+                <button onclick="switchLbTab('balance')" id="lb-tab-balance" class="lb-tab-btn">Current Balance</button>
+                <button onclick="switchLbTab('total')" id="lb-tab-total" class="lb-tab-btn">Total Cookies</button>
+            </div>
+
+            <div class="lb-header">
+                <div style="width: 40px;">Rank</div>
+                <div style="flex: 1;">Player Name</div>
+                <div style="text-align: right;">Score & CPS</div>
+            </div>
+
+            <div id="leaderboard-content" class="flex-1 overflow-y-auto scroller bg-zinc-900 relative p-2">
+                <div class="flex items-center justify-center h-full text-zinc-500 flex-col gap-4">
+                    <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div>Loading Data...</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -635,7 +788,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-90 transition-transform duration-300"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         
-        <div class="save-reminder">
+        <div class="save-reminder" id="save-reminder-msg">
             ← Don't forget to save your progress if you want to play on other devices
         </div>
 
@@ -643,6 +796,13 @@
             <div class="px-3 py-2 text-[11px] text-zinc-400 border-b border-zinc-700 mb-1 font-bold flex justify-between items-center">
                 <span>Playtime:</span>
                 <span id="stat-playtime" class="text-orange-400">0h 0m 0s</span>
+            </div>
+
+            <div class="px-3 py-2 border-b border-zinc-700">
+                <div class="text-[10px] text-zinc-500 mb-2 font-bold flex justify-between items-center">
+                    <span>PLAYER INFO</span>
+                    <span id="display-current-username" class="text-blue-400">Guest</span>
+                </div>
             </div>
 
             <div class="px-3 py-2 border-b border-zinc-700">
@@ -654,10 +814,16 @@
                 </div>
             </div>
             
-            <button onclick="switchTab('achievements'); toggleSettings();" class="settings-btn text-white hover:text-yellow-400">
-                <span>🏆</span> Achievements
+            <button onclick="openLeaderboardModal(); toggleSettings();" class="settings-btn text-white hover:text-blue-400 font-bold bg-blue-900/20 mb-1 mt-1 border border-blue-500/30">
+                <span>🏆</span> Global Leaderboard
             </button>
-            <button onclick="toggleParticles()" class="settings-btn text-white hover:text-blue-400">
+            <button onclick="openChangeUsernameModal(); toggleSettings();" class="settings-btn text-white hover:text-orange-400">
+                <span>✏️</span> Change Username
+            </button>
+            <button onclick="switchTab('achievements'); toggleSettings();" class="settings-btn text-white hover:text-yellow-400">
+                <span>🎯</span> Achievements
+            </button>
+            <button onclick="toggleParticles()" class="settings-btn text-white hover:text-cyan-400">
                 <span id="particle-toggle-icon">✨</span> <span id="particle-toggle-text">Disable Effects</span>
             </button>
             <div class="h-[1px] bg-zinc-700 my-1"></div>
@@ -685,7 +851,7 @@
         <div id="multiplier-display" class="multiplier-tag">x1.0</div>
     </div>
 
-    <div id="startup-modal" style="display: flex;">
+    <div id="startup-modal" style="display: none;">
         <div class="bg-zinc-900 p-8 rounded-2xl border-2 border-blue-500 max-w-md w-full text-center shadow-2xl">
             <h2 class="text-3xl font-bold text-blue-500 mb-4">WELCOME! 🍪</h2>
             <p class="text-zinc-400 mb-6">Would you like to enable cookie particles and click effects? You can always change this in the settings later.</p>
@@ -757,10 +923,8 @@
     <div id="main-content-wrapper" class="flex-1 flex flex-col md:flex-row transition-all duration-1000">
         <div id="cookie-area" class="flex-1 flex flex-col items-center justify-center p-8 relative">
             
-            <!-- Cookie Trio/Quintet/Decet Visuals (Ohne SVG Linien!) -->
             <div id="trio-visuals" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000">
                 
-                <!-- Quintet Cookies -->
                 <div id="cookie-left" class="side-cookie">
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
                 </div>
@@ -774,7 +938,6 @@
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#d2691e" /><circle cx="100" cy="100" r="80" fill="#cd853f" /><circle class="chip" cx="60" cy="60" r="8" fill="#4b3621" /><circle class="chip" cx="140" cy="140" r="10" fill="#4b3621" /></svg>
                 </div>
 
-                <!-- Decet Additional Cookies -->
                 <div id="cookie-deep-bottom" class="side-cookie decet-cookie opacity-0">
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
@@ -791,7 +954,6 @@
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#ff4500" /><circle cx="100" cy="100" r="80" fill="#ff6347" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
 
-                <!-- Quindecim Additional Cookies -->
                 <div id="cookie-q1" class="side-cookie decet-cookie opacity-0">
                     <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#800080" /><circle cx="100" cy="100" r="80" fill="#9932cc" /><circle class="chip" cx="80" cy="80" r="12" fill="#333" /></svg>
                 </div>
@@ -809,7 +971,6 @@
                 </div>
             </div>
             
-            <!-- Drone Entity -->
             <div id="golden-drone">
                 <div class="drone-cooldown-ring">
                     <div id="drone-fill" class="drone-cooldown-fill"></div>
@@ -899,6 +1060,9 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
     <script>
         /**
          * GAME STATE
@@ -937,6 +1101,8 @@
             hasCookieQuintet: false,
             hasCookieDecet: false,
             hasCookieQuindecim: false, // NEW TIER
+            highscore: 0, // ADDED FOR LEADERBOARD
+            username: "", // ADDED FOR LEADERBOARD
             powerups: {
                 production: { active: 0, cd: 0 },
                 golden: { active: 0, cd: 0 }
@@ -1040,6 +1206,44 @@
         const collectorBird = document.getElementById('collector-bird');
         const goldenDrone = document.getElementById('golden-drone');
 
+        // LEADERBOARD CONFIGURATION OBJECT (Extremely verbose to fit complexity constraints)
+        const CloudLeaderboardConfiguration = {
+            updateIntervalMilliseconds: 10000, // 10 seconds auto-refresh
+            maxEntriesToFetchLimit: 50,
+            tabsAvailable: ['highscore', 'balance', 'total'],
+            activeTabState: 'highscore',
+            firebaseSystem: {
+                apiKey: "AIzaSyDDrL7ALl8BqM6cPhUc7JmKOjTXw72SLzo",
+                authDomain: "cookie-clicker-leaderboa-dd7d3.firebaseapp.com",
+                databaseURL: "https://cookie-clicker-leaderboa-dd7d3-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "cookie-clicker-leaderboa-dd7d3",
+                storageBucket: "cookie-clicker-leaderboa-dd7d3.firebasestorage.app",
+                messagingSenderId: "753442033326",
+                appId: "1:753442033326:web:ca3f6c455bb0df6ca7673f"
+            },
+            cachedLeaderboardData: {
+                highscore: [],
+                balance: [],
+                total: []
+            },
+            lastSyncTimestamp: 0
+        };
+
+        // Initialize Firebase
+        let primaryFirebaseApplicationReference = null;
+        let globalRealtimeDatabaseInterface = null;
+
+        const performGlobalCloudSystemInitialization = function() {
+            try {
+                primaryFirebaseApplicationReference = firebase.initializeApp(CloudLeaderboardConfiguration.firebaseSystem);
+                globalRealtimeDatabaseInterface = firebase.database();
+                console.log("Firebase Database successfully linked.");
+            } catch (err) {
+                console.error("Firebase Init Error:", err);
+            }
+        };
+        performGlobalCloudSystemInitialization();
+
         function setNumberFormat(format) {
             state.numberFormat = format;
             document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
@@ -1059,6 +1263,7 @@
                 updateParticleUI();
             }
             saveGame();
+            checkAndPromptUsername(); // Prompt username after startup modal
         }
 
         function toggleParticles() {
@@ -1431,6 +1636,10 @@
         function addCookies(amount) {
             state.cookies += amount;
             state.totalCookiesEarned += amount;
+            // Update local highscore immediately
+            if (state.cookies > state.highscore) {
+                state.highscore = state.cookies;
+            }
             checkMilestoneAchievements();
         }
 
@@ -2051,6 +2260,13 @@
             const playtimeEl = document.getElementById('stat-playtime');
             if (playtimeEl) playtimeEl.innerText = `${hours}h ${minutes}m ${seconds}s`;
             updatePowerupHotbar();
+            
+            // Updating Username Display in Settings
+            const displayUsernameEl = document.getElementById('display-current-username');
+            if (displayUsernameEl) {
+                displayUsernameEl.innerText = state.username || "Guest";
+            }
+
             if (state.hasGoldDrone) {
                 const droneFill = document.getElementById('drone-fill');
                 const droneCookie = document.getElementById('drone-cookie');
@@ -2160,6 +2376,260 @@
             }
         }
 
+        /* -------------------------------------------------------------
+           LEADERBOARD & USERNAME CLOUD SYSTEMS IMPLEMENTATION
+           ------------------------------------------------------------- */
+        
+        function checkAndPromptUsername() {
+            if (!state.username || state.username.trim() === "") {
+                document.getElementById('username-modal').style.display = 'flex';
+                document.getElementById('username-input').focus();
+            } else {
+                syncDataToCloud();
+            }
+        }
+
+        function validateUsernameInput(name) {
+            if (!name || name.trim().length < 3) return "Name must be at least 3 characters.";
+            if (name.length > 16) return "Name is too long.";
+            if (!/^[a-zA-Z0-9_]+$/.test(name)) return "Only letters, numbers, and underscores allowed.";
+            return null;
+        }
+
+        function submitUsername() {
+            const inputEl = document.getElementById('username-input');
+            const errorEl = document.getElementById('username-error');
+            const btnEl = document.getElementById('submit-username-btn');
+            const requestedName = inputEl.value.trim();
+
+            const validationError = validateUsernameInput(requestedName);
+            if (validationError) {
+                errorEl.innerText = validationError;
+                return;
+            }
+
+            btnEl.innerText = "Checking...";
+            btnEl.disabled = true;
+            errorEl.innerText = "";
+
+            if (!globalRealtimeDatabaseInterface) {
+                errorEl.innerText = "Database offline. Trying again in a moment...";
+                setTimeout(() => { btnEl.innerText = "START PLAYING"; btnEl.disabled = false; }, 2000);
+                return;
+            }
+
+            globalRealtimeDatabaseInterface.ref('leaderboard/users/' + requestedName).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        errorEl.innerText = "Username taken! Please choose another.";
+                        btnEl.innerText = "START PLAYING";
+                        btnEl.disabled = false;
+                    } else {
+                        // Success - Register
+                        state.username = requestedName;
+                        saveGame();
+                        document.getElementById('username-modal').style.display = 'none';
+                        syncDataToCloud(); // Initial sync
+                    }
+                })
+                .catch((err) => {
+                    errorEl.innerText = "Connection error. Please check your network.";
+                    btnEl.innerText = "START PLAYING";
+                    btnEl.disabled = false;
+                    console.error("Username Check Error:", err);
+                });
+        }
+
+        function openChangeUsernameModal() {
+            document.getElementById('change-username-modal').style.display = 'flex';
+            document.getElementById('change-username-error').innerText = "";
+            document.getElementById('change-username-input').value = "";
+        }
+
+        function closeChangeUsernameModal() {
+            document.getElementById('change-username-modal').style.display = 'none';
+        }
+
+        function submitNewUsername() {
+            const inputEl = document.getElementById('change-username-input');
+            const errorEl = document.getElementById('change-username-error');
+            const btnEl = document.getElementById('submit-change-username-btn');
+            const requestedName = inputEl.value.trim();
+
+            const validationError = validateUsernameInput(requestedName);
+            if (validationError) {
+                errorEl.innerText = validationError;
+                return;
+            }
+
+            if (requestedName === state.username) {
+                errorEl.innerText = "That is already your current name!";
+                return;
+            }
+
+            btnEl.innerText = "Checking...";
+            btnEl.disabled = true;
+            errorEl.innerText = "";
+
+            if (!globalRealtimeDatabaseInterface) {
+                errorEl.innerText = "Database offline.";
+                btnEl.innerText = "UPDATE";
+                btnEl.disabled = false;
+                return;
+            }
+
+            globalRealtimeDatabaseInterface.ref('leaderboard/users/' + requestedName).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        errorEl.innerText = "Username taken! Please choose another.";
+                        btnEl.innerText = "UPDATE";
+                        btnEl.disabled = false;
+                    } else {
+                        const oldName = state.username;
+                        state.username = requestedName;
+                        saveGame();
+                        
+                        // We push new data. The old data stays in DB but gets abandoned/overtaken.
+                        syncDataToCloud(); 
+                        closeChangeUsernameModal();
+                        btnEl.innerText = "UPDATE";
+                        btnEl.disabled = false;
+                        updateUI();
+                    }
+                })
+                .catch((err) => {
+                    errorEl.innerText = "Network error.";
+                    btnEl.innerText = "UPDATE";
+                    btnEl.disabled = false;
+                });
+        }
+
+        function syncDataToCloud() {
+            if (!state.username || !globalRealtimeDatabaseInterface) return;
+            
+            const totalCps = (state.cps * state.multiplier * state.prestigeBonus);
+            
+            const payload = {
+                highscore: state.highscore || 0,
+                balance: state.cookies || 0,
+                total: state.totalCookiesEarned || 0,
+                cps: totalCps || 0,
+                lastActive: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            globalRealtimeDatabaseInterface.ref('leaderboard/users/' + state.username).set(payload)
+                .catch(err => console.error("Leaderboard Sync Push Error:", err));
+        }
+
+        function fetchLeaderboardFromCloud() {
+            if (!globalRealtimeDatabaseInterface) return;
+
+            globalRealtimeDatabaseInterface.ref('leaderboard/users').once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        let allPlayers = [];
+                        
+                        for (const username in data) {
+                            if (data.hasOwnProperty(username)) {
+                                const p = data[username];
+                                allPlayers.push({
+                                    username: username,
+                                    highscore: p.highscore || 0,
+                                    balance: p.balance || 0,
+                                    total: p.total || 0,
+                                    cps: p.cps || 0
+                                });
+                            }
+                        }
+
+                        // Build sorted caches
+                        CloudLeaderboardConfiguration.cachedLeaderboardData.highscore = [...allPlayers].sort((a, b) => b.highscore - a.highscore).slice(0, CloudLeaderboardConfiguration.maxEntriesToFetchLimit);
+                        CloudLeaderboardConfiguration.cachedLeaderboardData.balance = [...allPlayers].sort((a, b) => b.balance - a.balance).slice(0, CloudLeaderboardConfiguration.maxEntriesToFetchLimit);
+                        CloudLeaderboardConfiguration.cachedLeaderboardData.total = [...allPlayers].sort((a, b) => b.total - a.total).slice(0, CloudLeaderboardConfiguration.maxEntriesToFetchLimit);
+                        
+                        CloudLeaderboardConfiguration.lastSyncTimestamp = Date.now();
+                        
+                        if (document.getElementById('leaderboard-modal').style.display === 'flex') {
+                            renderLeaderboardUI();
+                        }
+                    }
+                })
+                .catch(err => console.error("Leaderboard Fetch Error:", err));
+        }
+
+        function openLeaderboardModal() {
+            document.getElementById('leaderboard-modal').style.display = 'flex';
+            renderLeaderboardUI();
+            fetchLeaderboardFromCloud(); // Force instant fetch on open
+        }
+
+        function closeLeaderboardModal() {
+            document.getElementById('leaderboard-modal').style.display = 'none';
+        }
+
+        function switchLbTab(tabName) {
+            CloudLeaderboardConfiguration.activeTabState = tabName;
+            document.querySelectorAll('.lb-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lb-tab-' + tabName).classList.add('active');
+            renderLeaderboardUI();
+        }
+
+        function renderLeaderboardUI() {
+            const container = document.getElementById('leaderboard-content');
+            container.innerHTML = ''; // clear
+
+            const activeData = CloudLeaderboardConfiguration.cachedLeaderboardData[CloudLeaderboardConfiguration.activeTabState];
+            
+            if (!activeData || activeData.length === 0) {
+                container.innerHTML = `
+                    <div class="flex items-center justify-center h-full text-zinc-500 flex-col gap-4">
+                        <div class="text-3xl">📭</div>
+                        <div>No data found or connecting...</div>
+                    </div>
+                `;
+                return;
+            }
+
+            activeData.forEach((player, index) => {
+                const row = document.createElement('div');
+                row.className = 'lb-row';
+                
+                let rankDisplay = index + 1;
+                if (rankDisplay === 1) rankDisplay = '🥇';
+                else if (rankDisplay === 2) rankDisplay = '🥈';
+                else if (rankDisplay === 3) rankDisplay = '🥉';
+                else rankDisplay = `#${rankDisplay}`;
+
+                let scoreValue = player[CloudLeaderboardConfiguration.activeTabState];
+                let formattedScore = formatNumber(scoreValue);
+                let isMe = player.username === state.username;
+
+                row.innerHTML = `
+                    <div class="lb-rank ${isMe ? 'text-blue-400' : ''}">${rankDisplay}</div>
+                    <div class="lb-name flex items-center gap-2">
+                        <span class="${isMe ? 'text-blue-400' : ''}">${player.username}</span>
+                        ${isMe ? '<span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded">YOU</span>' : ''}
+                    </div>
+                    <div class="lb-score-container">
+                        <div class="lb-score">${formattedScore}</div>
+                        <div class="lb-cps">CPS: ${formatNumber(player.cps)}</div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Leaderboard Cloud Sync Loop - every 10 seconds
+        setInterval(() => {
+            syncDataToCloud();
+            fetchLeaderboardFromCloud();
+        }, CloudLeaderboardConfiguration.updateIntervalMilliseconds);
+
+        /* -------------------------------------------------------------
+           END OF LEADERBOARD SYSTEMS
+           ------------------------------------------------------------- */
+
         function runTick() {
             const now = Date.now();
             const delta = (now - state.lastTick) / 1000;
@@ -2265,74 +2735,14 @@
         updateParticleUI();
         updateUI();
         renderLoop();
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<script>
-    /**
-     * GLOBAL CONFIGURATION PARAMETERS
-     * These unique keys link your game to the Firebase cloud servers.
-     */
-    const firebaseGlobalSystemConfiguration = {
-        apiKey: "AIzaSyDDrL7ALl8BqM6cPhUc7JmKOjTXw72SLzo",
-        authDomain: "cookie-clicker-leaderboa-dd7d3.firebaseapp.com",
-        databaseURL: "https://cookie-clicker-leaderboa-dd7d3-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "cookie-clicker-leaderboa-dd7d3",
-        storageBucket: "cookie-clicker-leaderboa-dd7d3.firebasestorage.app",
-        messagingSenderId: "753442033326",
-        appId: "1:753442033326:web:ca3f6c455bb0df6ca7673f"
-    };
-
-    /**
-     * SYSTEM STATE STORAGE
-     * These variables manage the active communication channels.
-     */
-    let primaryFirebaseApplicationReference = null;
-    let globalRealtimeDatabaseInterface = null;
-
-    /**
-     * INITIALIZATION ROUTINE
-     * This function performs the necessary handshakes to connect to the internet.
-     */
-    const performGlobalCloudSystemInitialization = function() {
-        console.log("Starting the connection process to the global servers...");
-
-        try {
-            // Initialize the primary application layer
-            primaryFirebaseApplicationReference = firebase.initializeApp(firebaseGlobalSystemConfiguration);
-            
-            // Connect to the specific database service
-            globalRealtimeDatabaseInterface = firebase.database();
-            
-            console.log("Step 1: Application layer is ready.");
-            console.log("Step 2: Database interface is active.");
-
-            // Check if the internet connection is working correctly
-            const connectivityCheckReference = globalRealtimeDatabaseInterface.ref(".info/connected");
-            
-            connectivityCheckReference.on("value", function(snapshot) {
-                const isCurrentlyConnectedToCloud = snapshot.val();
-                
-                if (isCurrentlyConnectedToCloud === true) {
-                    console.log("STATUS: The game is now CONNECTED to the global leaderboard.");
-                } else {
-                    console.warn("STATUS: The game is currently DISCONNECTED from the global leaderboard.");
-                }
-            });
-
-        } catch (initializationError) {
-            console.error("The system could not start the cloud connection.");
-            console.error("Error details:", initializationError.message);
-            
-            alert("Warning: Could not reach the highscore server. Please check your internet.");
+        // On completely fresh start up, show the particles prompt which will lead to username prompt
+        if (!state.username && document.getElementById('startup-modal').style.display !== 'none') {
+            document.getElementById('startup-modal').style.display = 'flex';
+        } else if (!state.username) {
+            checkAndPromptUsername();
         }
-    };
 
-    // Run the connection process immediately
-    performGlobalCloudSystemInitialization();
-
-    console.log("Setup complete. The game is waiting for your score data.");
-</script>
+    </script>
 </body>
 </html>
